@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased min-h-screen;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-700 text-gray-300 hover:bg-gray-600 focus:ring-gray-500;
+  }
+
+  .input {
+    @apply w-full bg-gray-800 text-gray-100 rounded-lg px-4 py-2 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all;
+  }
+
+  .card {
+    @apply bg-gray-800 rounded-lg shadow-lg border border-gray-700/50 backdrop-blur-sm;
+  }
+}
+
+.bg-grid-white {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.02)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+}
+
+.prose {
+  @apply text-gray-100;
+}
+
+.prose pre {
+  @apply bg-gray-800/50 border border-gray-700/50;
+}
+
+.prose code {
+  @apply text-blue-400 bg-gray-800/50 px-1.5 py-0.5 rounded-md text-sm;
+}
+
+.prose pre code {
+  @apply text-gray-300 bg-transparent p-0;
+}
+
+.prose img {
+  @apply rounded-lg;
+}
+
+.prose a {
+  @apply text-blue-400 hover:text-blue-300 no-underline;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-blue-500 pl-4 italic;
+}
+
+.prose ul {
+  @apply list-disc pl-6 my-4;
+}
+
+.prose ol {
+  @apply list-decimal pl-6 my-4;
+}
+
+.prose li {
+  @apply my-1;
+}
+
+.prose table {
+  @apply border-collapse w-full my-4;
+}
+
+.prose th {
+  @apply bg-gray-800 text-left p-2 border border-gray-700;
+}
+
+.prose td {
+  @apply p-2 border border-gray-700;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  @apply font-bold text-gray-100;
+}
+
+.prose h1 {
+  @apply text-2xl mt-8 mb-4;
+}
+
+.prose h2 {
+  @apply text-xl mt-6 mb-3;
+}
+
+.prose h3 {
+  @apply text-lg mt-4 mb-2;
+}
+
+.prose h4 {
+  @apply mt-4 mb-2;
+}
