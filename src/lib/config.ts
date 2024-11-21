@@ -27,7 +27,7 @@ export const config = {
     },
     google: {
       baseUrl: 'https://www.googleapis.com/customsearch/v1',
-      searchEngineId: 'AIzaSyBYnK6ckkX8gW_Qs4vYGKn2uvd3GyVIooU',
+      searchEngineId: import.meta.env.VITE_GOOGLE_SEARCH_ENGINE_ID || '',
       resultsPerPage: 5
     },
     serp: {
