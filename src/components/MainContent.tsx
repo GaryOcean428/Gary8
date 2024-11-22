@@ -7,7 +7,14 @@ import { DocumentPanel } from './panels/DocumentPanel';
 import { SearchPanel } from './panels/SearchPanel';
 import { SettingsPanel } from './panels/SettingsPanel';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { ActivePanel } from '../App';
+
+type ActivePanel = 
+  | 'chat' 
+  | 'canvas' 
+  | 'documents' 
+  | 'settings' 
+  | 'search'
+  | 'competitor-analysis';
 
 interface MainContentProps {
   activePanel: ActivePanel;
@@ -38,16 +45,14 @@ export function MainContent({ activePanel }: MainContentProps) {
                 return <Chat />;
               case 'canvas':
                 return <CanvasPanel />;
-              case 'agent':
-                return <AgentPanel />;
-              case 'tools':
-                return <ToolsPanel />;
               case 'documents':
                 return <DocumentPanel />;
               case 'search':
                 return <SearchPanel />;
               case 'settings':
                 return <SettingsPanel />;
+              case 'competitor-analysis':
+                return <AgentPanel />;
               default:
                 return <Chat />;
             }

@@ -2,13 +2,9 @@ import { thoughtLogger } from '../logging/thought-logger';
 import { GitHubClient } from '../github/github-client';
 import { CodespaceClient } from '../github/codespace-client';
 import { AppError } from '../errors/AppError';
-
-interface CodeCapability {
-  name: string;
-  type: 'class' | 'function' | 'interface';
-  path: string;
-  description?: string;
-}
+import { CodeCapability, FileContent } from '../interfaces/code-interfaces';
+import { CODE_CONSTANTS } from '../constants/code-constants';
+import { ErrorHandler } from '../utils/error-handler';
 
 export class CodeAwareness {
   private static instance: CodeAwareness;
@@ -141,12 +137,9 @@ export class CodeAwareness {
   }
 
   private isRelevantFile(path: string): boolean {
-    const relevantExtensions = ['.ts', '.tsx', '.js', '.jsx', '.json', '.md'];
-    const excludedPaths = ['node_modules', 'dist', '.git'];
-    
     return (
-      relevantExtensions.some(ext => path.endsWith(ext)) &&
-      !excludedPaths.some(excluded => path.includes(excluded))
+      CODE_CONSTANTS.RELEVANT_EXTENSIONS.some(ext => path.endsWith(ext)) &&
+      !CODE_CONSTANTS.EXCLUDED_PATHS.some(excluded => path.includes(excluded))
     );
   }
 
@@ -157,26 +150,26 @@ export class CodeAwareness {
     return this.sourceFiles.get(path) || null;
   }
 
-  async searchCode(query: string): Promise<Array<{ path: string; content: string; matches: string[] }>> {
+  async searchCode(query: string): Promise<FileContent[]> {
     if (!this.initialized) {
       await this.initialize();
     }
 
-    const results: Array<{ path: string; content: string; matches: string[] }> = [];
-    const searchRegex = new RegExp(query, 'gi');
+    try {
+      const results: FileContent[] = [];
+      const searchRegex = new RegExp(query, 'gi');
 
-    for (const [path, content] of this.sourceFiles.entries()) {
-      const matches = content.match(searchRegex);
-      if (matches) {
-        results.push({
-          path,
-          content,
-          matches
-        });
+      for (const [path, content] of this.sourceFiles.entries()) {
+        const matches = content.match(searchRegex);
+        if (matches) {
+          results.push({ path, content, matches });
+        }
       }
-    }
 
-    return results;
+      return results;
+    } catch (error) {
+      return ErrorHandler.handle(error, 'search code');
+    }
   }
 
   getCapabilities(): CodeCapability[] {

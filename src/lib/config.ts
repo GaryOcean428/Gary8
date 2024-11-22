@@ -1,12 +1,10 @@
-import { XAI_CONFIG } from './config';
-
 // API Keys
-export const PERPLEXITY_API_KEY = import.meta.env.VITE_PERPLEXITY_API_KEY || '';
-export const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || '';
-export const SERP_API_KEY = import.meta.env.VITE_SERP_API_KEY || '';
-export const XAI_API_KEY = import.meta.env.VITE_XAI_API_KEY || '';
-export const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || '';
-export const HUGGINGFACE_TOKEN = import.meta.env.VITE_HUGGINGFACE_TOKEN || '';
+export const PERPLEXITY_API_KEY = process.env.NEXT_PUBLIC_PERPLEXITY_API_KEY || '';
+export const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || '';
+export const SERP_API_KEY = process.env.NEXT_PUBLIC_SERP_API_KEY || '';
+export const XAI_API_KEY = process.env.NEXT_PUBLIC_XAI_API_KEY || '';
+export const GROQ_API_KEY = process.env.NEXT_PUBLIC_GROQ_API_KEY || '';
+export const HUGGINGFACE_TOKEN = process.env.NEXT_PUBLIC_HUGGINGFACE_TOKEN || '';
 
 // API Configuration
 export const config = {
@@ -27,7 +25,7 @@ export const config = {
     },
     google: {
       baseUrl: 'https://www.googleapis.com/customsearch/v1',
-      searchEngineId: import.meta.env.VITE_GOOGLE_SEARCH_ENGINE_ID || '',
+      searchEngineId: process.env.NEXT_PUBLIC_GOOGLE_SEARCH_ENGINE_ID || '',
       resultsPerPage: 5
     },
     serp: {
@@ -50,6 +48,15 @@ export const config = {
       },
       maxTokens: 4096,
       temperature: 0.7
+    },
+    firebase: {
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
+      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
+      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
+      measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || ''
     }
   },
   features: {

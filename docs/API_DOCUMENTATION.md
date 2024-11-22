@@ -3,6 +3,7 @@
 ## Core Services
 
 ### 1. GitHub Integration
+
 ```typescript
 interface GitHubConfig {
   apiKey: string;
@@ -18,6 +19,7 @@ async function createPullRequest(params: PullRequestParams): Promise<PullRequest
 ```
 
 ### 2. Search Integration
+
 ```typescript
 interface SearchConfig {
   providers: {
@@ -36,6 +38,87 @@ async function aggregateResults(results: SearchResult[]): Promise<string>
 ```
 
 ### 3. Firebase Integration
+
+```typescript
+interface FirebaseConfig {
+  apiKey: string;
+  authDomain: string;
+  projectId: string;
+  storageBucket: string;
+  messagingSenderId: string;
+  appId: string;
+}
+
+// Firebase Operations
+async function initializeFirebase(config: FirebaseConfig): Promise<void>
+async function authenticateUser(email: string, password: string): Promise<User>
+async function storeDocument(collection: string, data: any): Promise<string>
+async function queryDocuments(collection: string, query: Query): Promise<Document[]>
+```
+
+### 4. Canvas Integration
+
+```typescript
+interface CanvasConfig {
+  theme: ThemeConfig;
+  dimensions: {
+    width: number;
+    height: number;
+  };
+  agents: {
+    enabled: boolean;
+    models: string[];
+  };
+}
+
+// Canvas Operations
+class CanvasManager {
+  initialize(config: CanvasConfig): Promise<void>
+  addElement(element: CanvasElement): Promise<string>
+  updateElement(id: string, updates: Partial<CanvasElement>): Promise<void>
+  removeElement(id: string): Promise<void>
+  executeCode(code: string): Promise<any>
+  processCommand(command: string): Promise<void>
+}
+
+// Canvas Agent Operations
+class CanvasAgent {
+  processNaturalLanguage(input: string): Promise<CanvasAction>
+  generateTemplate(description: string): Promise<CanvasTemplate>
+  suggestStyles(element: CanvasElement): Promise<StyleSuggestions>
+  optimizeLayout(elements: CanvasElement[]): Promise<LayoutSuggestions>
+}
+```
+
+### 5. Theme System
+
+```typescript
+interface ThemeConfig {
+  mode: 'light' | 'dark';
+  colors: {
+    background: string;
+    foreground: string;
+    primary: string;
+    secondary: string;
+    accent: string;
+    border: string;
+    text: {
+      primary: string;
+      secondary: string;
+      accent: string;
+    };
+    code: CodeTheme;
+  };
+}
+
+// Theme Operations
+class ThemeManager {
+  setTheme(mode: 'light' | 'dark'): void
+  getTheme(): ThemeConfig
+  generateTheme(baseColor: string): ThemeConfig
+  applyTheme(theme: ThemeConfig): void
+}
+```
 
 ## Model Integration
 
@@ -62,6 +145,7 @@ async function aggregateResults(results: SearchResult[]): Promise<string>
 ## API Configuration
 
 ### Authentication
+
 ```typescript
 interface APIConfig {
   apiKeys: {
@@ -77,18 +161,91 @@ interface APIConfig {
 }
 ```
 
-### Rate Limits
-- GitHub: 5000 requests/hour
-- Groq: 60 requests/minute
-- Perplexity: 100 requests/minute
-- X.AI: 50 requests/minute
-- Tavily: 60 requests/minute
-- Google: 100 requests/day
-- SERP: 100 requests/month
+### Rate Limiting
+
+```typescript
+interface RateLimitConfig {
+  window: number;
+  maxRequests: number;
+  strategy: 'token' | 'sliding' | 'fixed';
+}
+
+// Rate limiter implementation
+class RateLimiter {
+  constructor(config: RateLimitConfig)
+  async acquire(): Promise<boolean>
+  async release(): Promise<void>
+  getStatus(): RateLimitStatus
+}
+
+// Service-specific limits
+const rateLimits = {
+  github: { window: 3600, maxRequests: 5000 },    // 5000 requests/hour
+  groq: { window: 60, maxRequests: 60 },          // 60 requests/minute
+  perplexity: { window: 60, maxRequests: 100 },   // 100 requests/minute
+  xai: { window: 60, maxRequests: 50 },           // 50 requests/minute
+  tavily: { window: 60, maxRequests: 60 },        // 60 requests/minute
+  google: { window: 86400, maxRequests: 100 },    // 100 requests/day
+  serp: { window: 2592000, maxRequests: 100 }     // 100 requests/month
+};
+```
+
+## Cache Configuration
+
+### Redis Setup
+
+```typescript
+interface RedisConfig {
+  host: string;
+  port: number;
+  password?: string;
+  db: number;
+  tls?: boolean;
+  retryStrategy?: RetryStrategy;
+  fallback?: 'memory' | 'none';
+}
+
+interface CacheConfig {
+  ttl: number;
+  maxSize: number;
+  serializer?: 'json' | 'msgpack';
+  compression?: boolean;
+}
+
+// Redis service
+class RedisService {
+  constructor(config: RedisConfig)
+  async get<T>(key: string): Promise<T | null>
+  async set<T>(key: string, value: T, ttl?: number): Promise<void>
+  async delete(key: string): Promise<void>
+  async flush(): Promise<void>
+  getStatus(): ConnectionStatus
+}
+
+// Development configuration
+const devConfig: RedisConfig = {
+  host: 'localhost',
+  port: 6379,
+  db: 0,
+  fallback: 'memory'
+};
+
+// Production configuration
+const prodConfig: RedisConfig = {
+  host: process.env.REDIS_HOST,
+  port: parseInt(process.env.REDIS_PORT),
+  password: process.env.REDIS_PASSWORD,
+  tls: true,
+  db: 0,
+  retryStrategy: exponentialBackoff,
+  fallback: 'none'
+};
+```
 
 ## Usage Examples
 
 ### GitHub Operations
+
 ```typescript
 // Initialize GitHub client
 const github = GitHubClient.getInstance();
@@ -108,7 +265,30 @@ const content = await github.getFileContent(
 );
 ```
 
+### Canvas Operations
+
+```typescript
+// Initialize canvas
+const canvas = new CanvasManager();
+await canvas.initialize({
+  theme: ThemeManager.getTheme(),
+  dimensions: { width: 1200, height: 800 },
+  agents: { enabled: true, models: ['grok-beta'] }
+});
+
+// Process natural language command
+const agent = new CanvasAgent();
+await agent.processNaturalLanguage(
+  "Create a responsive layout with header, sidebar, and main content"
+);
+
+// Apply theme
+ThemeManager.setTheme('dark');
+await canvas.refresh();
+```
+
 ### Search Operations
+
 ```typescript
 // Initialize search service
 const search = SearchService.getInstance();
@@ -158,3 +338,22 @@ try {
    - Sanitize inputs
    - Use secure connections
    - Handle sensitive data properly
+
+5. **Caching**
+   - Use Redis for caching frequently accessed data
+   - Set appropriate expiration times
+   - Handle cache misses gracefully
+   - Implement proper invalidation strategies
+
+6. **Canvas Operations**
+   - Validate user input
+   - Handle state changes atomically
+   - Implement proper error boundaries
+   - Cache frequently used templates
+   - Optimize rendering performance
+
+7. **Theme Management**
+   - Follow design system guidelines
+   - Cache theme configurations
+   - Handle theme transitions smoothly
+   - Support system preferences

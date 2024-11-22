@@ -1,4 +1,4 @@
-# Agent One: Multi-Agent AI System
+# Gary8: Multi-Agent AI System
 
 A sophisticated multi-agent AI system designed for collaborative task execution, data analysis, and information synthesis. Built with TypeScript and React, featuring a modular architecture with specialized agents working together through a Mixture of Agents (MoA) approach.
 

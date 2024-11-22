@@ -1,6 +1,6 @@
-## X.AI Integration Documentation
+# X.AI Integration Documentation
 
-### API Configuration
+## API Configuration
 
 The X.AI API integration uses the following configuration:
 
@@ -17,14 +17,17 @@ The X.AI API integration uses the following configuration:
     tokensPerMinute: 100000
   }
 }
-```
+```plaintext
 
 ### Authentication
 
 Authentication is done using an API key passed in the Authorization header:
+
 ```
+
 Authorization: Bearer YOUR_API_KEY
-```
+
+```plaintext
 
 ### Rate Limits
 
@@ -39,11 +42,15 @@ Authorization: Bearer YOUR_API_KEY
 ### Endpoints
 
 Chat Completions:
-```
+
+```plaintext
+
 POST /chat/completions
+
 ```
 
 Request body:
+
 ```json
 {
   "messages": [{"role": "user", "content": "Hello"}],
@@ -58,7 +65,7 @@ Request body:
 
 To enable streaming responses, set `stream: true` in the request. The response will be a stream of server-sent events in the format:
 
-```
+```plaintext
 data: {"choices": [{"delta": {"content": "Hello"}}]}
 data: {"choices": [{"delta": {"content": " world"}}]}
 data: [DONE]
@@ -67,6 +74,7 @@ data: [DONE]
 ### Error Handling
 
 Errors are returned in the format:
+
 ```json
 {
   "error": {

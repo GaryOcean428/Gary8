@@ -98,6 +98,7 @@ async serpSearch(query: string): Promise<SearchResult>
 ## Search Flow
 
 1. **Query Processing**
+
    ```typescript
    // Initialize search
    const searchService = SearchService.getInstance();
@@ -108,6 +109,7 @@ async serpSearch(query: string): Promise<SearchResult>
    ```
 
 2. **Provider Selection**
+
    ```typescript
    // Primary providers
    const primaryResults = await Promise.allSettled([
@@ -125,6 +127,7 @@ async serpSearch(query: string): Promise<SearchResult>
    ```
 
 3. **Result Processing**
+
    ```typescript
    // Process with RAG
    const ragResults = await ragProcessor.process(results);
@@ -133,7 +136,7 @@ async serpSearch(query: string): Promise<SearchResult>
    const finalResult = await moaAggregator.aggregate(ragResults);
    ```
 
-## Error Handling
+## Error Handling in Search Flow
 
 ```typescript
 try {
@@ -226,3 +229,17 @@ try {
   });
 }
 ```
+
+## Cache Integration
+
+The updates focus on:
+
+1. Adding Redis caching infrastructure
+2. Defining cache policies and TTLs
+3. Implementing distributed caching patterns
+4. Adding cache invalidation strategies
+5. Including cache monitoring and metrics
+
+This ensures the project has robust caching capabilities while maintaining the existing agent framework. The Redis integration will significantly improve performance for repeated operations and help with rate limiting.
+
+The documentation now better reflects the system's capabilities and provides clear guidance for implementing caching strategies across different components.

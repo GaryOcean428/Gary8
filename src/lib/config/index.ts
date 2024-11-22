@@ -1,13 +1,13 @@
 export const config = {
   apiKeys: {
-    xai: import.meta.env.VITE_XAI_API_KEY || '',
-    groq: import.meta.env.VITE_GROQ_API_KEY || '',
-    perplexity: import.meta.env.VITE_PERPLEXITY_API_KEY || '',
-    huggingface: import.meta.env.VITE_HUGGINGFACE_TOKEN || '',
-    github: import.meta.env.VITE_GITHUB_TOKEN || '',
-    tavily: import.meta.env.VITE_TAVILY_API_KEY || '',
-    google: import.meta.env.VITE_GOOGLE_API_KEY || '',
-    serp: import.meta.env.VITE_SERP_API_KEY || ''
+    xai: process.env.NEXT_PUBLIC_XAI_API_KEY || '',
+    groq: process.env.NEXT_PUBLIC_GROQ_API_KEY || '',
+    perplexity: process.env.NEXT_PUBLIC_PERPLEXITY_API_KEY || '',
+    huggingface: process.env.NEXT_PUBLIC_HUGGINGFACE_TOKEN || '',
+    github: process.env.NEXT_PUBLIC_GITHUB_TOKEN || '',
+    tavily: process.env.NEXT_PUBLIC_TAVILY_API_KEY || '',
+    google: process.env.NEXT_PUBLIC_GOOGLE_API_KEY || '',
+    serp: process.env.NEXT_PUBLIC_SERP_API_KEY || ''
   },
   services: {
     xai: {
@@ -44,7 +44,7 @@ export const config = {
     },
     google: {
       baseUrl: 'https://www.googleapis.com/customsearch/v1',
-      searchEngineId: import.meta.env.VITE_GOOGLE_SEARCH_ENGINE_ID || '',
+      searchEngineId: process.env.NEXT_PUBLIC_GOOGLE_SEARCH_ENGINE_ID || '',
       resultsPerPage: 10
     },
     serp: {
@@ -52,14 +52,14 @@ export const config = {
       resultsPerPage: 10
     },
     firebase: {
-      apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
-      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
-      databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || '',
-      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
-      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
-      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-      appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
-      measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || '',
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+      databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL || '',
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
+      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
+      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
+      measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || '',
       appName: 'Gary8',
       linkedSite: 'gary8-ffec8-b37e9',
       collections: {
@@ -80,6 +80,15 @@ export const config = {
     enableMemory: true,
     enableSearch: true,
     enableGitHub: true
+  },
+  vectorStore: {
+    pinecone: {
+      indexName: 'gto-general',
+      host: 'https://gto-general-ieixnqw.svc.aped-4627-b74a.pinecone.io',
+      dimensions: 3072,
+      metric: 'cosine' as const,
+      environment: 'aped-4627-b74a'
+    }
   }
 } as const;
 

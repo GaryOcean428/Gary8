@@ -4,9 +4,18 @@ import { Toggle } from '../../Toggle';
 import { SaveButton } from '../../SaveButton';
 import { Info } from 'lucide-react';
 
+interface WorkflowSettings {
+  collaborationEnabled: boolean;
+  // Add other settings as needed
+}
+
+const defaultSettings: WorkflowSettings = {
+  collaborationEnabled: false
+};
+
 export function WorkflowSettings() {
   const { settings, updateSettings } = useSettings();
-  const [localSettings, setLocalSettings] = useState(settings.workflow);
+  const [localSettings, setLocalSettings] = useState<WorkflowSettings>(defaultSettings);
   const isDirty = JSON.stringify(localSettings) !== JSON.stringify(settings.workflow);
 
   const handleSave = async () => {

@@ -5,10 +5,35 @@ import { GitHubClient } from './github/github-client';
 import { CodeAwareness } from './system/code-awareness';
 import { config } from './config';
 import { firebaseService } from './services/firebase';
+import { LangChainConfig } from './config/langchain-config';
+import { WorkflowManager } from './langraph/workflow-manager';
+import { ToolhouseConfig } from './config/toolhouse-config';
+import { LangChainService } from './services/langchain-service';
+import { ToolhouseService } from './services/toolhouse-service';
 
 export async function initializeSystem() {
   try {
     thoughtLogger.log('plan', 'Starting system initialization');
+
+    // Initialize LangChain configuration
+    const langchainConfig = LangChainConfig.getInstance();
+    await langchainConfig.initialize();
+
+    // Initialize LangChain service
+    const langchainService = LangChainService.getInstance();
+
+    // Initialize Toolhouse configuration
+    const toolhouseConfig = ToolhouseConfig.getInstance();
+    await toolhouseConfig.initialize();
+
+    // Initialize workflow manager
+    const workflowManager = WorkflowManager.getInstance();
+    await workflowManager.initialize();
+
+    // Add API key validation
+    if (!validateApiKeys()) {
+      throw new Error('Invalid API configuration');
+    }
 
     // Initialize Firebase first
     const firebase = firebaseService;
@@ -42,6 +67,10 @@ export async function initializeSystem() {
       systemInitializer.initialize()
     ]);
 
+    // Initialize Toolhouse service
+    const toolhouseService = ToolhouseService.getInstance();
+    await toolhouseService.initialize();
+
     thoughtLogger.log('success', 'System initialization complete');
     return true;
   } catch (error) {
@@ -50,4 +79,16 @@ export async function initializeSystem() {
     // This prevents the blank screen and allows the app to function with reduced capabilities
     return true;
   }
+}
+
+function validateApiKeys(): boolean {
+  const requiredKeys = [
+    'PERPLEXITY_API_KEY',
+    'ANTHROPIC_API_KEY',
+    // ... other required keys
+  ];
+  
+  return requiredKeys.every(key => 
+    process.env[key] && process.env[key]!.length > 0
+  );
 }

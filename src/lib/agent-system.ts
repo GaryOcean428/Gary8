@@ -1,14 +1,17 @@
 import { APIClient } from './api/api-client';
+import { TavilyAPI } from './api/tavily-api';
 import { thoughtLogger } from './logging/thought-logger';
 import { AppError } from './errors/AppError';
 import type { Message } from './types';
 
 class AgentSystem {
   private apiClient: APIClient;
+  private tavilyClient: TavilyAPI;
   private initialized = false;
 
   constructor() {
     this.apiClient = APIClient.getInstance();
+    this.tavilyClient = TavilyAPI.getInstance();
   }
 
   async initialize(): Promise<void> {
@@ -16,6 +19,13 @@ class AgentSystem {
 
     try {
       await this.apiClient.initialize();
+      
+      try {
+        await this.tavilyClient.search('test query', { max_results: 1 });
+      } catch (tavilyError) {
+        thoughtLogger.log('warn', 'Tavily initialization warning', { error: tavilyError });
+      }
+
       this.initialized = true;
       thoughtLogger.log('success', 'Agent system initialized successfully');
     } catch (error) {

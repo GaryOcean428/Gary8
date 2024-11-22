@@ -1,32 +1,54 @@
-export interface Message {
+// Panel Types
+export type ActivePanel = 
+  | 'chat' 
+  | 'canvas' 
+  | 'documents' 
+  | 'settings' 
+  | 'search'
+  | 'competitor-analysis';
+
+// Agent Types
+export interface Agent {
   id: string;
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-  timestamp: number;
-  model?: string;
+  name: string;
+  description: string;
+  capabilities: string[];
+  status: 'idle' | 'working' | 'error';
 }
 
-export interface SavedChat {
+// Document Types
+export interface Document {
   id: string;
   title: string;
-  messages: Message[];
-  timestamp: number;
-  tags?: string[];
-}
-
-export interface SearchResult {
-  type: 'answer' | 'source';
-  title?: string;
   content: string;
-  url?: string;
-  timestamp: string;
+  type: 'text' | 'code' | 'image';
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface SearchResponse {
-  answer: string;
-  sources: Array<{
-    title: string;
-    url: string;
-    snippet: string;
-  }>;
+// Settings Types
+export interface Settings {
+  theme: 'light' | 'dark';
+  fontSize: number;
+  language: string;
+  notifications: boolean;
+  autoSave: boolean;
+}
+
+// Search Types
+export interface SearchResult {
+  id: string;
+  title: string;
+  content: string;
+  type: string;
+  score: number;
+  highlights: string[];
+}
+
+// Canvas Types
+export interface CanvasElement {
+  id: string;
+  type: 'text' | 'shape' | 'image' | 'connection';
+  position: { x: number; y: number };
+  data: any;
 }
