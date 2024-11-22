@@ -1,88 +1,107 @@
 import { z } from 'zod';
 
-export const AgentRole = z.enum([
-  'orchestrator',    // High-level task planning and delegation
-  'researcher',      // Web search and information gathering
-  'analyst',         // Data analysis and insights
-  'coder',          // Code generation and execution
-  'writer',         // Content generation and refinement
-  'critic',         // Review and quality control
-  'executor'        // Task execution and tool usage
-]);
+export type ModelTier = '3B' | '7B' | '70B' | 'superior';
 
-export type AgentRole = z.infer<typeof AgentRole>;
+export type AgentCapability = 
+  | 'planning'
+  | 'execution'
+  | 'reflection'
+  | 'coordination'
+  | 'analysis';
 
-export const AgentCapability = z.enum([
-  'web-search',
-  'code-execution',
-  'data-analysis',
-  'content-generation',
-  'task-planning',
-  'tool-usage',
-  'memory-access',
-  'agent-communication',
-  'error-handling',
-  'self-reflection'
-]);
+export const AGENT_ROLES = [
+  'primary',
+  'specialist',
+  'task',
+  'orchestrator',
+  'researcher',
+  'analyst',
+  'coder',
+  'writer',
+  'critic',
+  'executor'
+] as const;
 
-export type AgentCapability = z.infer<typeof AgentCapability>;
+export type AgentRole = typeof AGENT_ROLES[number];
 
-export const AgentConfig = z.object({
+export type AgentStatus = 
+  | 'idle'
+  | 'active'
+  | 'busy'
+  | 'paused'
+  | 'error'
+  | 'waiting'
+  | 'terminated';
+
+export type MessageType = 
+  | 'command'
+  | 'response'
+  | 'report'
+  | 'query';
+
+export interface AgentMetrics {
+  tasksCompleted: number;
+  successRate: number;
+  averageResponseTime: number;
+}
+
+export interface AgentState {
+  id: string;
+  status: AgentStatus;
+  currentTask?: string;
+  subordinates: string[];
+  lastActive: number;
+  metrics: AgentMetrics;
+}
+
+export interface AgentConfig {
+  id: string;
+  name: string;
+  role: AgentRole;
+  capabilities: AgentCapability[];
+  model: string;
+  modelTier?: ModelTier;
+  temperature: number;
+  maxTokens: number;
+  systemPrompt: string;
+  tools: string[];
+  superiorId?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface AgentMessage {
+  id: string;
+  from: string;
+  to: string;
+  content: string;
+  type: MessageType;
+  timestamp: number;
+  metadata?: Record<string, unknown>;
+}
+
+export interface AgentEvent {
+  type: 'task-completed' | 'task-failed' | 'error-occurred';
+  agentId: string;
+  data: Record<string, unknown>;
+}
+
+export const AgentConfigSchema = z.object({
   id: z.string(),
   name: z.string(),
-  role: AgentRole,
-  capabilities: z.array(AgentCapability),
+  role: z.enum(AGENT_ROLES),
+  capabilities: z.array(z.enum([
+    'planning',
+    'execution',
+    'reflection',
+    'coordination',
+    'analysis'
+  ])),
   model: z.string(),
-  temperature: z.number().min(0).max(1),
-  maxTokens: z.number().positive(),
+  modelTier: z.enum(['3B', '7B', '70B', 'superior']).optional(),
+  temperature: z.number(),
+  maxTokens: z.number(),
   systemPrompt: z.string(),
   tools: z.array(z.string()),
+  superiorId: z.string().optional(),
   metadata: z.record(z.unknown()).optional()
 });
-
-export type AgentConfig = z.infer<typeof AgentConfig>;
-
-export const AgentMessage = z.object({
-  id: z.string(),
-  from: z.string(),
-  to: z.string(),
-  content: z.string(),
-  type: z.enum(['command', 'response', 'error', 'reflection', 'plan', 'result']),
-  timestamp: z.number(),
-  metadata: z.record(z.unknown()).optional()
-});
-
-export type AgentMessage = z.infer<typeof AgentMessage>;
-
-export const AgentState = z.object({
-  id: z.string(),
-  status: z.enum(['idle', 'active', 'paused', 'error']),
-  currentTask: z.string().optional(),
-  memory: z.record(z.unknown()),
-  metrics: z.object({
-    tasksCompleted: z.number(),
-    successRate: z.number(),
-    averageResponseTime: z.number(),
-    lastActive: z.number()
-  })
-});
-
-export type AgentState = z.infer<typeof AgentState>;
-
-export const AgentEvent = z.object({
-  type: z.enum([
-    'task-assigned',
-    'task-completed',
-    'task-failed',
-    'message-sent',
-    'message-received',
-    'state-changed',
-    'error-occurred',
-    'reflection-added'
-  ]),
-  agentId: z.string(),
-  timestamp: z.number(),
-  data: z.record(z.unknown())
-});
-
-export type AgentEvent = z.infer<typeof AgentEvent>;

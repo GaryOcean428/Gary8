@@ -1,8 +1,10 @@
-import { HfInference } from '@huggingface/inference';
+import { CodeReviewResult } from '../interfaces/code-interfaces';
+import { CODE_CONSTANTS } from '../constants/code-constants';
+import { ErrorHandler } from '../utils/error-handler';
 import { thoughtLogger } from '../logging/thought-logger';
+import { HfInference } from '@huggingface/inference';
 import { AppError } from '../errors/AppError';
 import { config } from '../config';
-import type { Message } from '../types';
 
 export class QwenAPI {
   private static instance: QwenAPI;
@@ -29,16 +31,21 @@ export class QwenAPI {
         throw new AppError('Hugging Face API key not configured', 'CONFIG_ERROR');
       }
 
-      // Verify model access
-      await this.hf.modelInfo({
-        model: this.model
+      // Verify model availability with a simple test request
+      await this.hf.textGeneration({
+        model: this.model,
+        inputs: 'Test',
+        parameters: {
+          max_new_tokens: 1,
+          temperature: 0.1
+        }
       });
 
       this.initialized = true;
       thoughtLogger.log('success', 'Qwen API initialized successfully');
     } catch (error) {
       thoughtLogger.log('error', 'Failed to initialize Qwen API', { error });
-      throw error;
+      throw error instanceof AppError ? error : new AppError('Failed to initialize Qwen API', 'API_ERROR', error);
     }
   }
 
@@ -47,57 +54,64 @@ export class QwenAPI {
     language?: string,
     onProgress?: (content: string) => void
   ): Promise<string> {
-    if (!this.initialized) {
-      await this.initialize();
-    }
+    if (!this.initialized) await this.initialize();
 
     try {
-      thoughtLogger.log('execution', 'Generating code with Qwen', {
-        language,
-        promptLength: prompt.length
-      });
-
-      const messages = this.formatPrompt(prompt, language);
+      thoughtLogger.log('execution', 'Generating code with Qwen', { language });
       
       const response = await this.hf.textGeneration({
         model: this.model,
-        inputs: messages,
+        inputs: this.formatPrompt(prompt, language),
         parameters: {
-          max_new_tokens: 2048,
-          temperature: 0.2,
-          top_p: 0.95,
-          stream: Boolean(onProgress)
+          max_new_tokens: CODE_CONSTANTS.MAX_TOKENS.CODE_GENERATION,
+          temperature: CODE_CONSTANTS.TEMPERATURES.CODE_GENERATION,
+          top_p: 0.95
         }
       });
 
-      if (onProgress && response.details?.text) {
-        onProgress(response.details.text);
+      if (onProgress && response.generated_text) {
+        onProgress(response.generated_text);
       }
 
       thoughtLogger.log('success', 'Code generation complete');
       return response.generated_text;
     } catch (error) {
-      thoughtLogger.log('error', 'Code generation failed', { error });
-      throw error instanceof AppError ? error : new AppError(
-        'Failed to generate code',
-        'GENERATION_ERROR',
-        error
-      );
+      throw ErrorHandler.handleWithThrow(error, 'generate code');
     }
   }
 
   async reviewCode(
     code: string,
     language?: string
-  ): Promise<{ issues: string[]; suggestions: string[]; quality: number }> {
-    if (!this.initialized) {
-      await this.initialize();
-    }
+  ): Promise<CodeReviewResult> {
+    if (!this.initialized) await this.initialize();
 
     try {
       thoughtLogger.log('execution', 'Reviewing code with Qwen', { language });
 
-      const prompt = `Review the following ${language || ''} code and provide:
+      const response = await this.hf.textGeneration({
+        model: this.model,
+        inputs: this.formatReviewPrompt(code, language),
+        parameters: {
+          max_new_tokens: CODE_CONSTANTS.MAX_TOKENS.CODE_REVIEW,
+          temperature: CODE_CONSTANTS.TEMPERATURES.CODE_REVIEW
+        }
+      });
+
+      const result = this.parseReviewResponse(response.generated_text);
+      thoughtLogger.log('success', 'Code review complete', { 
+        issues: result.issues,
+        suggestions: result.suggestions,
+        quality: result.quality
+      } as Record<string, unknown>);
+      return result;
+    } catch (error) {
+      throw ErrorHandler.handleWithThrow(error, 'review code');
+    }
+  }
+
+  private formatReviewPrompt(code: string, language?: string): string {
+    return `Review the following ${language || ''} code and provide:
 1. List of potential issues
 2. Improvement suggestions
 3. Code quality score (0-100)
@@ -106,55 +120,28 @@ Code to review:
 \`\`\`
 ${code}
 \`\`\``;
+  }
 
-      const response = await this.hf.textGeneration({
-        model: this.model,
-        inputs: prompt,
-        parameters: {
-          max_new_tokens: 1024,
-          temperature: 0.3
-        }
-      });
+  private parseReviewResponse(text: string): CodeReviewResult {
+    const issues: string[] = [];
+    const suggestions: string[] = [];
+    let quality = 0;
+    let currentSection = '';
 
-      // Parse response
-      const issues: string[] = [];
-      const suggestions: string[] = [];
-      let quality = 0;
-
-      const lines = response.generated_text.split('\n');
-      let currentSection = '';
-
-      for (const line of lines) {
-        if (line.includes('Issues:')) {
-          currentSection = 'issues';
-        } else if (line.includes('Suggestions:')) {
-          currentSection = 'suggestions';
-        } else if (line.includes('Quality Score:')) {
-          quality = parseInt(line.match(/\d+/)?.[0] || '0');
-        } else if (line.trim().startsWith('-')) {
-          if (currentSection === 'issues') {
-            issues.push(line.trim().slice(2));
-          } else if (currentSection === 'suggestions') {
-            suggestions.push(line.trim().slice(2));
-          }
-        }
+    const lines = text.split('\n');
+    for (const line of lines) {
+      if (line.includes('Issues:')) currentSection = 'issues';
+      else if (line.includes('Suggestions:')) currentSection = 'suggestions';
+      else if (line.includes('Quality Score:')) {
+        quality = parseInt(line.match(/\d+/)?.[0] || '0');
+      } else if (line.trim().startsWith('-')) {
+        const item = line.trim().slice(2);
+        if (currentSection === 'issues') issues.push(item);
+        else if (currentSection === 'suggestions') suggestions.push(item);
       }
-
-      thoughtLogger.log('success', 'Code review complete', {
-        issueCount: issues.length,
-        suggestionCount: suggestions.length,
-        quality
-      });
-
-      return { issues, suggestions, quality };
-    } catch (error) {
-      thoughtLogger.log('error', 'Code review failed', { error });
-      throw error instanceof AppError ? error : new AppError(
-        'Failed to review code',
-        'REVIEW_ERROR',
-        error
-      );
     }
+
+    return { issues, suggestions, quality };
   }
 
   private formatPrompt(prompt: string, language?: string): string {
@@ -167,5 +154,23 @@ Provide clean, efficient, and well-documented code with proper error handling.`;
 
   get isInitialized(): boolean {
     return this.initialized;
+  }
+
+  async generateResponse(prompt: string): Promise<string> {
+    if (!this.initialized) await this.initialize();
+
+    try {
+      const response = await this.hf.textGeneration({
+        model: this.model,
+        inputs: prompt,
+        parameters: {
+          max_new_tokens: 1024,
+          temperature: 0.2
+        }
+      });
+      return response.generated_text;
+    } catch (error) {
+      throw ErrorHandler.handleWithThrow(error, 'generate response');
+    }
   }
 }

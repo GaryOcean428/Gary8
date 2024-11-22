@@ -1,29 +1,30 @@
 import { EventEmitter } from '../events/event-emitter';
+import { db } from '../firebase/config';
+import { collection, addDoc } from 'firebase/firestore';
 
-export type ThoughtType = 
-  | 'observation'  // For recording facts and events
-  | 'reasoning'    // For logical deductions
-  | 'plan'         // For outlining steps
-  | 'decision'     // For choices made
-  | 'critique'     // For self-criticism
-  | 'reflection'   // For meta-cognition
-  | 'execution'    // For actions taken
-  | 'success'      // For successful outcomes
-  | 'error'        // For failures and issues
-  | 'agent-state'  // For agent status changes
-  | 'agent-comm'   // For inter-agent communication
-  | 'memory-op'    // For memory operations
-  | 'task-plan';   // For task planning events
+export type ThoughtType = 'error' | 'success' | 'info' | 'warning' | 'debug';
+
+export const getThoughtTypes = (): ThoughtType[] => [
+  'error',
+  'success',
+  'info',
+  'warning',
+  'debug'
+];
 
 export interface Thought {
   id: string;
-  level: ThoughtType;
+  type: ThoughtType;
   message: string;
-  timestamp: number;
-  metadata?: Record<string, unknown>;
+  timestamp: string;
+  data?: any;
+}
+
+interface GetThoughtsOptions {
   agentId?: string;
   collaborationId?: string;
-  parentThoughtId?: string;
+  level?: ThoughtType;
+  since?: number | null;
   taskId?: string;
   source?: string;
 }
@@ -39,7 +40,7 @@ export class ThoughtLogger extends EventEmitter {
   private constructor() {
     super();
     // Log initial startup
-    this.log('observation', 'System initialized');
+    this.log('info', 'System initialized');
     this.startMemoryTracking();
   }
 
@@ -63,41 +64,30 @@ export class ThoughtLogger extends EventEmitter {
     return this.memoryUsage;
   }
 
-  log(
-    level: ThoughtType,
-    message: string,
-    metadata?: Record<string, unknown>,
-    options: {
-      agentId?: string;
-      collaborationId?: string;
-      parentThoughtId?: string;
-      taskId?: string;
-      source?: string;
-    } = {}
-  ): void {
-    const thought: Thought = {
+  log(type: ThoughtType, message: string, data?: any): Thought {
+    const timestamp = new Date().toISOString();
+    const thought = {
       id: crypto.randomUUID(),
-      level,
+      type,
       message,
-      timestamp: Date.now(),
-      metadata,
-      ...options
+      timestamp,
+      data
     };
 
     // Track collaborations
-    if (options.collaborationId) {
-      const thoughts = this.activeCollaborations.get(options.collaborationId) || [];
+    if (thought.data?.collaborationId) {
+      const thoughts = this.activeCollaborations.get(thought.data.collaborationId) || [];
       thoughts.push(thought.id);
-      this.activeCollaborations.set(options.collaborationId, thoughts);
+      this.activeCollaborations.set(thought.data.collaborationId, thoughts);
     }
 
     // Track tasks
-    if (options.taskId) {
-      const agents = this.activeTasks.get(options.taskId) || new Set();
-      if (options.agentId) {
-        agents.add(options.agentId);
+    if (thought.data?.taskId) {
+      const agents = this.activeTasks.get(thought.data.taskId) || new Set();
+      if (thought.data.agentId) {
+        agents.add(thought.data.agentId);
       }
-      this.activeTasks.set(options.taskId, agents);
+      this.activeTasks.set(thought.data.taskId, agents);
     }
 
     this.thoughts.push(thought);
@@ -105,48 +95,46 @@ export class ThoughtLogger extends EventEmitter {
 
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      const prefix = [
-        options.agentId ? `[${options.agentId}]` : '',
-        options.taskId ? `(Task ${options.taskId})` : '',
-        level.toUpperCase()
-      ].filter(Boolean).join(' ');
-      
-      console.log(`${prefix}: ${message}`, metadata || '');
+      const logMethod = type === 'error' ? console.error :
+                       type === 'warning' ? console.warn :
+                       console.log;
+      logMethod(`[${type.toUpperCase()}] ${message}`, data);
     }
+
+    // Store in database using Firestore v9 syntax
+    const thoughtsCollection = collection(db, 'thoughts');
+    addDoc(thoughtsCollection, thought)
+      .catch(error => console.error('Failed to store thought:', error));
+
+    return thought;
   }
 
-  getThoughts(options: {
-    agentId?: string;
-    collaborationId?: string;
-    level?: ThoughtType;
-    since?: number;
-    taskId?: string;
-    source?: string;
-  } = {}): Thought[] {
+  getThoughts(options: GetThoughtsOptions = {}): Thought[] {
     let filtered = [...this.thoughts];
 
     if (options.agentId) {
-      filtered = filtered.filter(t => t.agentId === options.agentId);
+      filtered = filtered.filter(t => t.data?.agentId === options.agentId);
     }
 
     if (options.collaborationId) {
-      filtered = filtered.filter(t => t.collaborationId === options.collaborationId);
+      filtered = filtered.filter(t => t.data?.collaborationId === options.collaborationId);
     }
 
     if (options.level) {
-      filtered = filtered.filter(t => t.level === options.level);
+      filtered = filtered.filter(t => t.type === options.level);
     }
 
-    if (options.since) {
-      filtered = filtered.filter(t => t.timestamp >= options.since);
+    const sinceTimestamp = options.since ?? null;
+    if (sinceTimestamp !== null) {
+      filtered = filtered.filter(t => new Date(t.timestamp) >= new Date(sinceTimestamp));
     }
 
     if (options.taskId) {
-      filtered = filtered.filter(t => t.taskId === options.taskId);
+      filtered = filtered.filter(t => t.data?.taskId === options.taskId);
     }
 
     if (options.source) {
-      filtered = filtered.filter(t => t.source === options.source);
+      filtered = filtered.filter(t => t.data?.source === options.source);
     }
 
     return filtered;
@@ -164,24 +152,6 @@ export class ThoughtLogger extends EventEmitter {
   private notifyListeners(): void {
     const thoughts = this.getThoughts();
     this.listeners.forEach(listener => listener(thoughts));
-  }
-
-  getThoughtTypes(): Record<string, ThoughtType> {
-    return {
-      OBSERVATION: 'observation',
-      REASONING: 'reasoning',
-      PLAN: 'plan',
-      DECISION: 'decision',
-      CRITIQUE: 'critique',
-      REFLECTION: 'reflection',
-      EXECUTION: 'execution',
-      SUCCESS: 'success',
-      ERROR: 'error',
-      AGENT_STATE: 'agent-state',
-      AGENT_COMM: 'agent-comm',
-      MEMORY_OP: 'memory-op',
-      TASK_PLAN: 'task-plan'
-    };
   }
 
   clear(): void {

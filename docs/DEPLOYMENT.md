@@ -1,30 +1,64 @@
-# Deployment Documentation
+# Deployment Guide
 
-## Firebase Hosting
+## Environment Setup
 
-Agent One is deployed using Firebase Hosting, providing fast and secure hosting with automatic SSL and global CDN.
+### Development
+- Uses `.env.development`
+- Local Redis instance
+- Development API keys
+- Debug logging enabled
 
-### Project Details
-- **Name**: agent-one
-- **ID**: agent-one-ffec8
-- **Number**: 425089133667
-- **Environment**: Production
-- **Organization**: skillhiregto.com.au
-- **Public Name**: Gary8
-- **Support**: braden.lang@skillhiregto.com.au
+### Production
+- Uses `.env.production`
+- Production Redis cluster
+- Production API keys
+- Optimized logging
 
-### Commands
+## Deployment Process
 
-- `npm run deploy` - Build and deploy to production
-- `npm run deploy:preview` - Build and deploy to preview channel
-- `npm run firebase:emulate` - Run local emulator
+1. **Pre-deployment Checks**
+   - Run test suite
+   - Validate environment variables
+   - Check security configurations
+   - Verify API key permissions
 
-### Configuration Files
+2. **Deployment Steps**
+   ```bash
+   # Build application
+   npm run build
 
-- `.firebaserc` - Project and target configuration
-- `firebase.json` - Hosting and site configuration
-- `.env` - Environment variables and Firebase keys
+   # Run tests
+   npm run test
 
-### Deployment Process
+   # Deploy to Firebase
+   firebase deploy
+   ```
 
-1. Build the application:
+3. **Post-deployment**
+   - Verify all services are running
+   - Check monitoring systems
+   - Validate API responses
+   - Monitor error rates
+
+## Monitoring
+
+- Firebase Analytics
+- Error tracking
+- Performance metrics
+- Usage statistics
+- Security alerts
+
+## Rollback Procedure
+
+1. Identify issues
+2. Revert to last stable version
+3. Deploy previous version
+4. Investigate root cause
+
+## Maintenance
+
+- Regular security updates
+- Performance optimization
+- Database maintenance
+- Log rotation
+- Backup verification

@@ -2,12 +2,16 @@ import { VectorStore } from './vector-store';
 import { IndexedDBStorage } from '../storage/indexed-db';
 import { thoughtLogger } from '../logging/thought-logger';
 import type { Message } from '../types';
+import { Redis } from 'ioredis';
+import { PineconeClient } from '@pinecone-database/pinecone';
 
 export class MemoryManager {
   private static instance: MemoryManager;
   private vectorStore: VectorStore;
   private storage: IndexedDBStorage;
   private initialized = false;
+  private redis: Redis;
+  private pinecone: PineconeClient;
 
   private constructor() {
     this.vectorStore = new VectorStore();
@@ -29,6 +33,20 @@ export class MemoryManager {
       await this.vectorStore.initialize();
       this.initialized = true;
       thoughtLogger.log('success', 'Memory manager initialized');
+
+      // Initialize Redis
+      this.redis = new Redis({
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT || '6379'),
+        password: process.env.REDIS_PASSWORD
+      });
+      
+      // Initialize Pinecone
+      this.pinecone = new PineconeClient();
+      await this.pinecone.init({
+        environment: process.env.PINECONE_ENVIRONMENT!,
+        apiKey: process.env.PINECONE_API_KEY!
+      });
     } catch (error) {
       thoughtLogger.log('error', 'Failed to initialize memory manager', { error });
       throw error;

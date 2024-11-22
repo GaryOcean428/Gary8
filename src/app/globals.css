@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: theme('colors.indigo.500');
+  --color-secondary: theme('colors.indigo.600');
+  --color-accent: theme('colors.indigo.400');
+  --color-background: theme('colors.white');
+  --color-surface: theme('colors.slate.100');
+  --color-text: theme('colors.slate.900');
+}
+
+:root[class~="dark"] {
+  --color-primary: theme('colors.indigo.500');
+  --color-secondary: theme('colors.indigo.600');
+  --color-accent: theme('colors.indigo.400');
+  --color-background: theme('colors.slate.900');
+  --color-surface: theme('colors.slate.800');
+  --color-text: theme('colors.slate.100');
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}

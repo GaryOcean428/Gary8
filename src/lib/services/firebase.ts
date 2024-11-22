@@ -1,18 +1,24 @@
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+// src/lib/services/firebase.ts
+
+import { FirebaseApp, initializeApp } from 'firebase/app';
+import { Analytics, getAnalytics } from 'firebase/analytics';
+import { Auth, getAuth } from 'firebase/auth';
+import { Firestore, getFirestore } from 'firebase/firestore';
 import { config } from '../config';
 import { thoughtLogger } from '../logging/thought-logger';
 
 class FirebaseService {
   private static instance: FirebaseService;
-  private app;
-  private analytics;
-  private initialized = false;
+  private app: FirebaseApp;
+  private analyticsInstance: Analytics;
+  private authInstance: Auth;
+  private firestoreInstance: Firestore;
 
   private constructor() {
     this.app = initializeApp(config.services.firebase);
-    this.analytics = getAnalytics(this.app);
-    this.initialized = true;
+    this.analyticsInstance = getAnalytics(this.app);
+    this.authInstance = getAuth(this.app);
+    this.firestoreInstance = getFirestore(this.app);
     thoughtLogger.log('success', 'Firebase service initialized');
   }
 
@@ -23,12 +29,20 @@ class FirebaseService {
     return FirebaseService.instance;
   }
 
-  getApp() {
+  getApp(): FirebaseApp {
     return this.app;
   }
 
-  getAnalytics() {
-    return this.analytics;
+  getAnalytics(): Analytics {
+    return this.analyticsInstance;
+  }
+
+  getAuth(): Auth {
+    return this.authInstance;
+  }
+
+  getFirestore(): Firestore {
+    return this.firestoreInstance;
   }
 }
 

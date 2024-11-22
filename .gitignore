@@ -13,7 +13,13 @@ build
 coverage
 
 # Environment files
-.env*
+.env
+.env.local
+.env.development
+.env.production
+.env*.local
+
+# But keep example files
 !.env.example
 
 # Firebase

@@ -8,7 +8,14 @@ import { Menu, X } from 'lucide-react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSettings } from '../context/SettingsContext';
-import type { ActivePanel } from '../App';
+
+type ActivePanel = 
+  | 'chat' 
+  | 'canvas' 
+  | 'documents' 
+  | 'settings' 
+  | 'search'
+  | 'competitor-analysis';
 
 interface LayoutProps {
   activePanel: ActivePanel;
