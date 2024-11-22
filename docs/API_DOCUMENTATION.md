@@ -35,6 +35,8 @@ async function processWithRAG(results: SearchResult[]): Promise<SearchResult[]>
 async function aggregateResults(results: SearchResult[]): Promise<string>
 ```
 
+### 3. Firebase Integration
+
 ## Model Integration
 
 ### Available Models
