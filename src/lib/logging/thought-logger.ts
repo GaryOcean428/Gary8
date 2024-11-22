@@ -1,6 +1,6 @@
 import { EventEmitter } from '../events/event-emitter';
 import { db } from '../firebase/config';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, FirestoreError } from 'firebase/firestore';
 
 export type ThoughtType = 'error' | 'success' | 'info' | 'warning' | 'debug';
 
@@ -104,7 +104,7 @@ export class ThoughtLogger extends EventEmitter {
     // Store in database using Firestore v9 syntax
     const thoughtsCollection = collection(db, 'thoughts');
     addDoc(thoughtsCollection, thought)
-      .catch(error => console.error('Failed to store thought:', error));
+      .catch((error: FirestoreError) => console.error('Failed to store thought:', error));
 
     return thought;
   }
@@ -126,7 +126,11 @@ export class ThoughtLogger extends EventEmitter {
 
     const sinceTimestamp = options.since ?? null;
     if (sinceTimestamp !== null) {
-      filtered = filtered.filter(t => new Date(t.timestamp) >= new Date(sinceTimestamp));
+      filtered = filtered.filter(t => {
+        // Convert ISO string timestamp to milliseconds for direct comparison
+        const thoughtTimestamp = Date.parse(t.timestamp);
+        return thoughtTimestamp >= sinceTimestamp;
+      });
     }
 
     if (options.taskId) {

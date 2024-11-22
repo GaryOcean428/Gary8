@@ -85,6 +85,24 @@ export interface AgentEvent {
   data: Record<string, unknown>;
 }
 
+// Zod schema for AgentMetrics
+export const AgentMetricsSchema = z.object({
+  tasksCompleted: z.number(),
+  successRate: z.number(),
+  averageResponseTime: z.number()
+});
+
+// Zod schema for AgentState
+export const AgentStateSchema = z.object({
+  id: z.string(),
+  status: z.enum(['idle', 'active', 'busy', 'paused', 'error', 'waiting', 'terminated']),
+  currentTask: z.string().optional(),
+  subordinates: z.array(z.string()),
+  lastActive: z.number(),
+  metrics: AgentMetricsSchema
+});
+
+// Zod schema for AgentConfig
 export const AgentConfigSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -104,4 +122,22 @@ export const AgentConfigSchema = z.object({
   tools: z.array(z.string()),
   superiorId: z.string().optional(),
   metadata: z.record(z.unknown()).optional()
+});
+
+// Zod schema for AgentMessage
+export const AgentMessageSchema = z.object({
+  id: z.string(),
+  from: z.string(),
+  to: z.string(),
+  content: z.string(),
+  type: z.enum(['command', 'response', 'report', 'query']),
+  timestamp: z.number(),
+  metadata: z.record(z.unknown()).optional()
+});
+
+// Zod schema for AgentEvent
+export const AgentEventSchema = z.object({
+  type: z.enum(['task-completed', 'task-failed', 'error-occurred']),
+  agentId: z.string(),
+  data: z.record(z.unknown())
 });

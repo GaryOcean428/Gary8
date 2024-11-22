@@ -2,6 +2,16 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useToast } from '../hooks/useToast';
 
+interface WorkflowSettings {
+  collaborationEnabled: boolean;
+  taskPlanningEnabled: boolean;
+  parallelTasks: number;
+  logTaskPlanning: boolean;
+  logAgentComm: boolean;
+  logAgentState: boolean;
+  logMemoryOps: boolean;
+}
+
 interface Settings {
   theme: 'light' | 'dark' | 'system';
   apiKeys: {
@@ -32,6 +42,7 @@ interface Settings {
     showErrors: boolean;
     showSuccess: boolean;
   };
+  workflow: WorkflowSettings;
 }
 
 interface SettingsContextType {
@@ -69,6 +80,15 @@ const defaultSettings: Settings = {
     sound: true,
     showErrors: true,
     showSuccess: true
+  },
+  workflow: {
+    collaborationEnabled: false,
+    taskPlanningEnabled: false,
+    parallelTasks: 1,
+    logTaskPlanning: false,
+    logAgentComm: false,
+    logAgentState: false,
+    logMemoryOps: false
   }
 };
 
