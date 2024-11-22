@@ -1,22 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSettings } from '../../../context/SettingsContext';
 import { Toggle } from '../../Toggle';
 import { SaveButton } from '../../SaveButton';
 import { Info } from 'lucide-react';
 
-interface WorkflowSettings {
-  collaborationEnabled: boolean;
-  // Add other settings as needed
+interface WorkflowState {
+  [key: string]: any;
 }
 
-const defaultSettings: WorkflowSettings = {
-  collaborationEnabled: false
+const defaultSettings: WorkflowState = {
+  collaborationEnabled: false,
+  taskPlanningEnabled: false,
+  parallelTasks: 1,
+  logTaskPlanning: false,
+  logAgentComm: false,
+  logAgentState: false,
+  logMemoryOps: false
 };
 
 export function WorkflowSettings() {
   const { settings, updateSettings } = useSettings();
-  const [localSettings, setLocalSettings] = useState<WorkflowSettings>(defaultSettings);
+  const [localSettings, setLocalSettings] = useState<WorkflowState>(defaultSettings);
   const isDirty = JSON.stringify(localSettings) !== JSON.stringify(settings.workflow);
+
+  // Load initial settings from context
+  useEffect(() => {
+    if (settings.workflow) {
+      setLocalSettings({
+        ...defaultSettings,
+        ...settings.workflow
+      });
+    }
+  }, [settings.workflow]);
 
   const handleSave = async () => {
     await updateSettings({
@@ -30,6 +45,10 @@ export function WorkflowSettings() {
       ...prev,
       parallelTasks: value
     }));
+  };
+
+  const updateSetting = (prev: WorkflowState) => {
+    // ... rest of the code
   };
 
   return (
@@ -49,7 +68,7 @@ export function WorkflowSettings() {
             <span className="text-sm">Enable agent collaboration</span>
             <Toggle
               enabled={localSettings.collaborationEnabled}
-              onChange={(enabled) => setLocalSettings(prev => ({
+              onChange={(enabled) => updateSetting(prev => ({
                 ...prev,
                 collaborationEnabled: enabled
               }))}
@@ -66,7 +85,7 @@ export function WorkflowSettings() {
             <span className="text-sm">Enable task planning</span>
             <Toggle
               enabled={localSettings.taskPlanningEnabled}
-              onChange={(enabled) => setLocalSettings(prev => ({
+              onChange={(enabled) => updateSetting(prev => ({
                 ...prev,
                 taskPlanningEnabled: enabled
               }))}
@@ -117,7 +136,7 @@ export function WorkflowSettings() {
               <span className="text-sm">Log task planning</span>
               <Toggle
                 enabled={localSettings.logTaskPlanning}
-                onChange={(enabled) => setLocalSettings(prev => ({
+                onChange={(enabled) => updateSetting(prev => ({
                   ...prev,
                   logTaskPlanning: enabled
                 }))}
@@ -127,7 +146,7 @@ export function WorkflowSettings() {
               <span className="text-sm">Log agent communication</span>
               <Toggle
                 enabled={localSettings.logAgentComm}
-                onChange={(enabled) => setLocalSettings(prev => ({
+                onChange={(enabled) => updateSetting(prev => ({
                   ...prev,
                   logAgentComm: enabled
                 }))}
@@ -136,8 +155,8 @@ export function WorkflowSettings() {
             <div className="flex items-center justify-between">
               <span className="text-sm">Log agent state changes</span>
               <Toggle
-                enabled={localSettings.logAgentState || false}
-                onChange={(enabled) => setLocalSettings(prev => ({
+                enabled={localSettings.logAgentState}
+                onChange={(enabled) => updateSetting(prev => ({
                   ...prev,
                   logAgentState: enabled
                 }))}
@@ -146,8 +165,8 @@ export function WorkflowSettings() {
             <div className="flex items-center justify-between">
               <span className="text-sm">Log memory operations</span>
               <Toggle
-                enabled={localSettings.logMemoryOps || false}
-                onChange={(enabled) => setLocalSettings(prev => ({
+                enabled={localSettings.logMemoryOps}
+                onChange={(enabled) => updateSetting(prev => ({
                   ...prev,
                   logMemoryOps: enabled
                 }))}

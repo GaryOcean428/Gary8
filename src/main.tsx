@@ -1,13 +1,1 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
-
-const root = document.getElementById('root')
-if (!root) throw new Error('Root element not found')
-
-ReactDOM.createRoot(root).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-)
+// Remove this file since it's Vite-specific. Next.js uses pages/_app.tsx and pages/index.tsx instead

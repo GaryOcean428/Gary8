@@ -2,7 +2,7 @@
   "hosting": {
     "site": "gary8-ffec8-b37e9",
     "target": "gary8",
-    "public": "dist",
+    "public": ".next",
     "ignore": [
       "firebase.json",
       "**/.*",
