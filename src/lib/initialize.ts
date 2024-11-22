@@ -4,10 +4,15 @@ import { SearchService } from './services/search-service';
 import { GitHubClient } from './github/github-client';
 import { CodeAwareness } from './system/code-awareness';
 import { config } from './config';
+import { firebaseService } from './services/firebase';
 
 export async function initializeSystem() {
   try {
     thoughtLogger.log('plan', 'Starting system initialization');
+
+    // Initialize Firebase first
+    const firebase = firebaseService;
+    thoughtLogger.log('success', 'Firebase initialized');
 
     // Skip GitHub initialization if no token is provided
     // This prevents the blank screen issue when GitHub token is missing

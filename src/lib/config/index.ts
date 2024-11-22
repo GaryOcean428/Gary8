@@ -50,6 +50,29 @@ export const config = {
     serp: {
       baseUrl: 'https://serpapi.com/search',
       resultsPerPage: 10
+    },
+    firebase: {
+      apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
+      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
+      databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || '',
+      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
+      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
+      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+      appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
+      measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || '',
+      appName: 'Gary8',
+      linkedSite: 'gary8-ffec8-b37e9',
+      collections: {
+        users: 'users',
+        chats: 'chats',
+        messages: 'messages',
+        memory: 'memory',
+        workflows: 'workflows'
+      },
+      storage: {
+        maxUploadSize: 5242880, // 5MB
+        allowedTypes: ['image/*', 'application/pdf']
+      }
     }
   },
   features: {
