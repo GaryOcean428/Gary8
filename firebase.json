@@ -2,20 +2,18 @@
   "hosting": {
     "site": "gary8-ffec8-b37e9",
     "target": "gary8",
-    "public": ".next/static",
+    "public": "out",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ],
+    "cleanUrls": true,
     "rewrites": [
       {
         "source": "**",
-        "destination": "/_next/static/index.html"
+        "destination": "/index.html"
       }
-    ],
-    "predeploy": [
-      "npm run build"
     ]
   }
 }

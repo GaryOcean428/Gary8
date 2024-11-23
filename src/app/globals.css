@@ -2,25 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --color-primary: theme('colors.indigo.500');
-  --color-secondary: theme('colors.indigo.600');
-  --color-accent: theme('colors.indigo.400');
-  --color-background: theme('colors.white');
-  --color-surface: theme('colors.slate.100');
-  --color-text: theme('colors.slate.900');
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+  }
 }
 
-:root[class~="dark"] {
-  --color-primary: theme('colors.indigo.500');
-  --color-secondary: theme('colors.indigo.600');
-  --color-accent: theme('colors.indigo.400');
-  --color-background: theme('colors.slate.900');
-  --color-surface: theme('colors.slate.800');
-  --color-text: theme('colors.slate.100');
+/* Ensure consistent scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--secondary) transparent;
 }
 
-body {
-  background-color: var(--color-background);
-  color: var(--color-text);
+/* Ensure consistent focus outlines */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Ensure consistent transitions */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }

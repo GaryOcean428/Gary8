@@ -1,1 +1,0 @@
-// Remove this file since it's Vite-specific. Next.js uses pages/_app.tsx and pages/index.tsx instead

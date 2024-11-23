@@ -1,24 +1,30 @@
-import React from 'react';
+'use client';
+
+import { Switch } from "@nextui-org/react";
 
 interface ToggleProps {
   enabled: boolean;
   onChange: (enabled: boolean) => void;
+  size?: "sm" | "md" | "lg";
+  disabled?: boolean;
 }
 
-export function Toggle({ enabled, onChange }: ToggleProps) {
+export function Toggle({ 
+  enabled, 
+  onChange, 
+  size = "md", 
+  disabled = false 
+}: ToggleProps) {
   return (
-    <button
-      type="button"
-      onClick={() => onChange(!enabled)}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-        enabled ? 'bg-blue-600' : 'bg-gray-700'
-      }`}
-    >
-      <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-          enabled ? 'translate-x-6' : 'translate-x-1'
-        }`}
-      />
-    </button>
+    <Switch
+      isSelected={enabled}
+      onValueChange={onChange}
+      size={size}
+      isDisabled={disabled}
+      classNames={{
+        base: "inline-flex flex-row-reverse w-full max-w-md",
+        wrapper: "group-data-[selected=true]:bg-primary",
+      }}
+    />
   );
 }
