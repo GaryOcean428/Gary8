@@ -1,5 +1,7 @@
+'use client';
+
 import { useEffect, useRef } from 'react';
-import * as fabric from 'fabric';
+import { fabric } from 'fabric';
 
 export function Canvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -18,5 +20,9 @@ export function Canvas() {
     };
   }, []);
 
-  return <canvas ref={canvasRef} />;
+  return (
+    <div className="relative w-full h-full min-h-[600px] bg-background border border-border rounded-lg">
+      <canvas ref={canvasRef} />
+    </div>
+  );
 }

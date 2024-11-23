@@ -25,22 +25,3 @@
     --secondary-foreground: 0 0% 98%;
   }
 }
-
-/* Ensure consistent scrollbars */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--secondary) transparent;
-}
-
-/* Ensure consistent focus outlines */
-*:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* Ensure consistent transitions */
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
