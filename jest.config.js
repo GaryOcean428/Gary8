@@ -14,4 +14,4 @@ const config = {
   },
 }
 
-module.exports = createJestConfig(config) 
+module.exports = createJestConfig(config)
