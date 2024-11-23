@@ -4,11 +4,19 @@ import { Toggle } from '../../Toggle';
 import { SaveButton } from '../../SaveButton';
 import { Info } from 'lucide-react';
 
-interface WorkflowState {
-  [key: string]: any;
+interface WorkflowSettings {
+  collaborationEnabled: boolean;
+  taskPlanningEnabled: boolean;
+  parallelTasks: number;
+  logTaskPlanning: boolean;
+  logAgentComm: boolean;
+  logAgentState: boolean;
+  logMemoryOps: boolean;
 }
 
-const defaultSettings: WorkflowState = {
+interface WorkflowState extends WorkflowSettings {}
+
+const defaultSettings: WorkflowSettings = {
   collaborationEnabled: false,
   taskPlanningEnabled: false,
   parallelTasks: 1,
@@ -47,8 +55,8 @@ export function WorkflowSettings() {
     }));
   };
 
-  const updateSetting = (prev: WorkflowState) => {
-    // ... rest of the code
+  const updateSetting = (updater: (prev: WorkflowSettings) => WorkflowSettings) => {
+    setLocalSettings(prev => updater(prev));
   };
 
   return (
