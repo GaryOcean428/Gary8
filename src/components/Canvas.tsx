@@ -1,15 +1,15 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { fabric } from 'fabric';
+import { Canvas as FabricCanvas } from 'fabric/fabric-impl';
 
 export function Canvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fabricRef = useRef<fabric.Canvas>();
+  const fabricRef = useRef<FabricCanvas>();
 
   useEffect(() => {
     if (canvasRef.current && !fabricRef.current) {
-      fabricRef.current = new fabric.Canvas(canvasRef.current, {
+      fabricRef.current = new FabricCanvas(canvasRef.current, {
         width: 800,
         height: 600,
       });
