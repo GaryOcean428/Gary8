@@ -17,6 +17,14 @@ interface FirebaseConfig {
   appId: string;
 }
 
+interface WorkflowSettings {
+  collaborationEnabled: boolean;
+  taskPlanningEnabled: boolean;
+  parallelTasks: number;
+  logTaskPlanning: boolean;
+  logAgentComm: boolean;
+}
+
 type ProviderId = 'perplexity' | 'tavily' | 'google' | 'serp';
 
 interface SearchProviderConfig {
@@ -58,6 +66,7 @@ interface StoreState {
   githubConfig: GitHubConfig;
   firebaseConfig: FirebaseConfig;
   searchConfig: SearchConfig;
+  workflowSettings: WorkflowSettings;
   logs: Array<{
     type: 'error' | 'warning' | 'info' | 'success';
     message: string;
@@ -73,6 +82,7 @@ interface StoreState {
   setGithubConfig: (config: GitHubConfig) => void;
   setFirebaseConfig: (config: FirebaseConfig) => void;
   setSearchConfig: (config: SearchConfig) => void;
+  setWorkflowSettings: (settings: WorkflowSettings) => void;
   addLog: (log: Omit<StoreState['logs'][number], 'timestamp'>) => void;
   clearLogs: () => void;
 }
@@ -105,6 +115,13 @@ export const useStore = create<StoreState>()(
         storageBucket: '',
         messagingSenderId: '',
         appId: ''
+      },
+      workflowSettings: {
+        collaborationEnabled: false,
+        taskPlanningEnabled: false,
+        parallelTasks: 1,
+        logTaskPlanning: false,
+        logAgentComm: false
       },
       searchConfig: {
         enabledProviders: ['perplexity'],
@@ -142,6 +159,7 @@ export const useStore = create<StoreState>()(
       setGithubConfig: (config) => set({ githubConfig: config }),
       setFirebaseConfig: (config) => set({ firebaseConfig: config }),
       setSearchConfig: (config) => set({ searchConfig: config }),
+      setWorkflowSettings: (settings) => set({ workflowSettings: settings }),
       addLog: (log) => set((state) => ({
         logs: [...state.logs, { ...log, timestamp: Date.now() }]
       })),
@@ -155,6 +173,7 @@ export const useStore = create<StoreState>()(
         githubConfig: state.githubConfig,
         firebaseConfig: state.firebaseConfig,
         searchConfig: state.searchConfig,
+        workflowSettings: state.workflowSettings,
         sidebarOpen: state.sidebarOpen,
         loggingOpen: state.loggingOpen
       }),
@@ -162,4 +181,4 @@ export const useStore = create<StoreState>()(
   )
 );
 
-export type { ProviderId, FirebaseConfig, GitHubConfig, SearchConfig };
+export type { ProviderId, FirebaseConfig, GitHubConfig, SearchConfig, WorkflowSettings };

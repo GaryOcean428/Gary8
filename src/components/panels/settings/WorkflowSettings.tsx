@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { type FC, useState, useEffect, type SetStateAction } from 'react';
 import { useSettings } from '../../../context/SettingsContext';
 import { Toggle } from '../../Toggle';
 import { SaveButton } from '../../SaveButton';
@@ -14,7 +14,7 @@ interface WorkflowSettings {
   logMemoryOps: boolean;
 }
 
-interface WorkflowState extends WorkflowSettings {}
+type WorkflowState = WorkflowSettings;
 
 const defaultSettings: WorkflowSettings = {
   collaborationEnabled: false,
@@ -26,7 +26,7 @@ const defaultSettings: WorkflowSettings = {
   logMemoryOps: false
 };
 
-export function WorkflowSettings() {
+export const WorkflowSettings: FC = () => {
   const { settings, updateSettings } = useSettings();
   const [localSettings, setLocalSettings] = useState<WorkflowState>(defaultSettings);
   const isDirty = JSON.stringify(localSettings) !== JSON.stringify(settings.workflow);
@@ -57,6 +57,14 @@ export function WorkflowSettings() {
 
   const updateSetting = (updater: (prev: WorkflowSettings) => WorkflowSettings) => {
     setLocalSettings(prev => updater(prev));
+  };
+
+  const setWorkflowName = (prev: SetStateAction<string>) => {
+    // implementation
+  };
+
+  const setDescription = (prev: SetStateAction<string>) => {
+    // implementation
   };
 
   return (
@@ -102,15 +110,18 @@ export function WorkflowSettings() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">
+          <label htmlFor="parallel-tasks" className="block text-sm font-medium mb-1">
             Parallel Processing
             <span className="text-gray-400 ml-2">Concurrent task execution</span>
           </label>
           <div className="relative">
             <select
+              id="parallel-tasks"
               value={localSettings.parallelTasks}
               onChange={(e) => handleParallelTasksChange(parseInt(e.target.value))}
               className="w-full bg-gray-700 rounded px-3 py-2"
+              aria-describedby="parallel-tasks-description"
+              title="Select number of parallel tasks"
             >
               <option value={1}>Sequential (1 task)</option>
               <option value={2}>Balanced (2 tasks)</option>
@@ -120,12 +131,13 @@ export function WorkflowSettings() {
             <button
               type="button"
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+              aria-label="Information about parallel tasks"
               title="Parallel tasks allow multiple agents to work simultaneously on different aspects of a complex task. Higher values increase processing speed but require more system resources."
             >
               <Info className="w-4 h-4" />
             </button>
           </div>
-          <p className="mt-2 text-sm text-gray-400">
+          <p id="parallel-tasks-description" className="mt-2 text-sm text-gray-400">
             Current parallel tasks: {localSettings.parallelTasks}
             <br />
             <span className="text-xs">

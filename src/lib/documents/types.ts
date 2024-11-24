@@ -1,14 +1,11 @@
 export interface Document {
   id: string;
-  name: string;
+  title: string;
   content: string;
-  mimeType: string;
+  url?: string;
   tags: string[];
-  vectorId?: string;
-  workspaceId: string;
+  lastModified: number;
   createdAt: number;
-  updatedAt: number;
-  metadata?: Record<string, unknown>;
 }
 
 export interface Workspace {
@@ -18,6 +15,15 @@ export interface Workspace {
   createdAt: number;
   updatedAt: number;
   documentIds: string[];
+  collaborators?: string[];
+  permissions?: {
+    [userId: string]: 'read' | 'write' | 'admin'
+  };
+  settings?: {
+    defaultModel?: string;
+    aiCapabilities?: string[];
+    toolAccess?: string[];
+  };
 }
 
 export interface SearchOptions {
@@ -32,4 +38,10 @@ export interface SearchResult {
   document: Document;
   score: number;
   excerpt?: string;
+  context?: {
+    sourcePath?: string;
+    matchType?: 'exact' | 'semantic' | 'hybrid';
+    confidence?: number;
+    relatedDocs?: string[];
+  };
 }

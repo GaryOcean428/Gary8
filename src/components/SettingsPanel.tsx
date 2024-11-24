@@ -76,6 +76,7 @@ export function SettingsPanel() {
         <button
           onClick={() => setSettingsPanelOpen(false)}
           className="p-2 hover:bg-secondary rounded-lg transition-colors"
+          aria-label="Close settings panel"
         >
           <X className="w-5 h-5" />
         </button>
@@ -94,6 +95,8 @@ export function SettingsPanel() {
                   ? 'bg-primary text-primary-foreground'
                   : 'text-foreground/60 hover:text-foreground hover:bg-secondary'
               )}
+              aria-label={`Switch to ${tab.label} settings`}
+              aria-current={activeTab === tab.id ? 'page' : undefined}
             >
               <tab.icon className="w-4 h-4" />
               {tab.label}

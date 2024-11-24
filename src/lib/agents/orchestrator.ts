@@ -1,46 +1,128 @@
-import { AgentRegistry } from './registry';
 import { BaseAgent } from './core/base-agent';
-import { DynamicConfigManager } from './dynamic-config-manager';
-import { AgentConfig } from './agent-types';
+import { CodeAgent } from './code-agent';
+import { thoughtLogger } from '../utils/logger';
+import { ErrorHandler } from '../error/error-handler';
+import { MonitoringService } from '../monitoring/monitoring-service';
 
-export class Orchestrator {
-  private registry: AgentRegistry;
-  private configManager: DynamicConfigManager;
+interface Task {
+  id: string;
+  type: 'code' | 'search' | 'analysis' | 'execution';
+  content: string;
+  priority: number;
+  dependencies?: string[];
+  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+}
 
-  constructor() {
-    this.registry = AgentRegistry.getInstance();
-    this.configManager = new DynamicConfigManager();
+export class AgentOrchestrator {
+  private static instance: AgentOrchestrator;
+  private agents: Map<string, BaseAgent>;
+  private taskQueue: Task[];
+  private monitoring: MonitoringService;
+
+  private constructor() {
+    this.agents = new Map();
+    this.taskQueue = [];
+    this.monitoring = MonitoringService.getInstance();
+    this.initializeAgents();
   }
 
-  async executeTask(taskId: string, agentId: string, payload: unknown): Promise<unknown> {
-    const agent = this.registry.getAgent(agentId);
-    if (!agent) {
-      throw new Error(`Agent ${agentId} not found for task ${taskId}`);
+  static getInstance(): AgentOrchestrator {
+    if (!this.instance) {
+      this.instance = new AgentOrchestrator();
     }
+    return this.instance;
+  }
 
-    // Apply dynamic configuration if available
-    const dynamicConfig = this.configManager.getConfig(agentId);
-    if (dynamicConfig) {
-      await this.applyConfiguration(agent, dynamicConfig, taskId);
-    }
+  private initializeAgents(): void {
+    // Initialize core agents
+    this.agents.set('code', new CodeAgent({
+      id: 'code-agent',
+      capabilities: ['code_generation', 'code_review', 'testing']
+    }));
+    // Add more agents as needed
+  }
 
-    try {
-      const result = await agent.execute(payload);
-      // Could emit a task completion event with taskId
-      agent.emit('taskComplete', { taskId, result });
-      return result;
-    } catch (error) {
-      // Include taskId in error handling
-      agent.emit('taskError', { taskId, error });
-      throw new Error(`Task ${taskId} execution failed: ${error}`);
+  async executeTask(task: Task): Promise<any> {
+    return await ErrorHandler.handleWithRetry(async () => {
+      thoughtLogger.info('Executing task', { taskId: task.id, type: task.type });
+      
+      return await this.monitoring.trackOperation(`task_${task.type}`, async () => {
+        const agent = this.getAgentForTask(task);
+        if (!agent) {
+          throw new Error(`No agent available for task type: ${task.type}`);
+        }
+
+        task.status = 'in_progress';
+        const result = await agent.execute(task);
+        task.status = 'completed';
+        
+        return result;
+      });
+    }, `execute_task_${task.id}`);
+  }
+
+  private getAgentForTask(task: Task): BaseAgent | undefined {
+    switch (task.type) {
+      case 'code':
+        return this.agents.get('code');
+      // Add more task types as needed
+      default:
+        return undefined;
     }
   }
 
-  private async applyConfiguration(agent: BaseAgent, config: AgentConfig, taskId: string): Promise<void> {
-    // Include taskId in configuration update event
-    agent.emit('configUpdate', { config, taskId });
+  async planExecution(tasks: Task[]): Promise<Task[]> {
+    // Sort tasks by priority and dependencies
+    return tasks.sort((a, b) => {
+      if (a.dependencies?.includes(b.id)) return 1;
+      if (b.dependencies?.includes(a.id)) return -1;
+      return b.priority - a.priority;
+    });
+  }
+
+  async executeParallel(tasks: Task[]): Promise<any[]> {
+    const plannedTasks = await this.planExecution(tasks);
+    const results: any[] = [];
     
-    // Additional configuration logic can be added here
-    // For example, updating agent capabilities or state
+    // Group tasks that can be executed in parallel
+    const taskGroups = this.groupParallelTasks(plannedTasks);
+    
+    for (const group of taskGroups) {
+      const groupResults = await Promise.all(
+        group.map(task => this.executeTask(task))
+      );
+      results.push(...groupResults);
+    }
+    
+    return results;
+  }
+
+  private groupParallelTasks(tasks: Task[]): Task[][] {
+    const groups: Task[][] = [];
+    let currentGroup: Task[] = [];
+    
+    for (const task of tasks) {
+      if (this.canRunInParallel(task, currentGroup)) {
+        currentGroup.push(task);
+      } else {
+        if (currentGroup.length > 0) {
+          groups.push([...currentGroup]);
+        }
+        currentGroup = [task];
+      }
+    }
+    
+    if (currentGroup.length > 0) {
+      groups.push(currentGroup);
+    }
+    
+    return groups;
+  }
+
+  private canRunInParallel(task: Task, group: Task[]): boolean {
+    return !group.some(t => 
+      task.dependencies?.includes(t.id) || 
+      t.dependencies?.includes(task.id)
+    );
   }
 }

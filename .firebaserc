@@ -1,22 +1,7 @@
 {
   "projects": {
-    "default": "gary8-ffec8-b37e9"
-  },
-  "targets": {
-    "gary8-ffec8-b37e9": {
-      "hosting": {
-        "gary8": [
-          "gary8-ffec8-b37e9"
-        ]
-      }
-    },
-    "agent-one-ffec8": {
-      "hosting": {
-        "gary8": [
-          "gary8-ffec8-b37e9"
-        ]
-      }
-    }
-  },
-  "etags": {}
+    "default": "agent-one-ffec8",
+    "development": "skillhiregto-gary8-dev",
+    "production": "skillhiregto-gary8"
+  }
 }

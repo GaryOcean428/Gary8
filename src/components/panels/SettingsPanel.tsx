@@ -1,92 +1,216 @@
 'use client';
 
-import { Card, Switch, Select, SelectItem, Input } from '@nextui-org/react';
+import { useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { 
+  Settings, 
+  Shield, 
+  Cpu, 
+  Network, 
+  Database,
+  Key,
+  Save
+} from 'lucide-react';
+import { useTheme } from '@/hooks/useTheme';
+import { useSettings } from '@/hooks/useSettings';
 
 export function SettingsPanel() {
+  const { theme, setTheme } = useTheme();
+  const { settings, updateSettings } = useSettings();
+  const [isDirty, setIsDirty] = useState(false);
+
+  const handleSettingChange = (key: string, value: any) => {
+    updateSettings({ [key]: value });
+    setIsDirty(true);
+  };
+
+  const handleSave = async () => {
+    try {
+      await updateSettings(settings);
+      setIsDirty(false);
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Agent Settings</h2>
+    <div className="h-full flex flex-col p-4 space-y-4 bg-background/95">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold flex items-center gap-2">
+          <Settings className="w-6 h-6 text-primary" />
+          Settings
+        </h2>
+        <Button
+          variant="default"
+          size="sm"
+          onClick={handleSave}
+          disabled={!isDirty}
+          className="flex items-center gap-1"
+        >
+          <Save className="w-4 h-4" />
+          Save Changes
+        </Button>
+      </div>
 
-      {/* Agent Configuration */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Agent Configuration</h3>
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h4 className="font-medium">Auto-Recovery</h4>
-              <p className="text-sm text-gray-500">Automatically recover from errors</p>
+      <Tabs defaultValue="general" className="flex-1">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="agents">Agents</TabsTrigger>
+          <TabsTrigger value="api">API</TabsTrigger>
+          <TabsTrigger value="security">Security</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="general" className="space-y-4 mt-4">
+          <Card className="p-4">
+            <h3 className="text-lg font-semibold mb-4">Appearance</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span>Theme</span>
+                <Select
+                  value={theme}
+                  onValueChange={(value) => setTheme(value)}
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">Light</SelectItem>
+                    <SelectItem value="dark">Dark</SelectItem>
+                    <SelectItem value="system">System</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <Switch defaultSelected />
-          </div>
+          </Card>
 
-          <div className="flex justify-between items-center">
-            <div>
-              <h4 className="font-medium">Human Oversight</h4>
-              <p className="text-sm text-gray-500">Require approval for critical actions</p>
+          <Card className="p-4">
+            <h3 className="text-lg font-semibold mb-4">Performance</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <span className="font-medium">Enable Analytics</span>
+                  <p className="text-sm text-muted-foreground">
+                    Collect anonymous usage data
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.analyticsEnabled}
+                  onCheckedChange={(checked) => 
+                    handleSettingChange('analyticsEnabled', checked)
+                  }
+                />
+              </div>
             </div>
-            <Switch defaultSelected />
-          </div>
+          </Card>
+        </TabsContent>
 
-          <div>
-            <h4 className="font-medium mb-2">Default Model</h4>
-            <Select 
-              label="Select Model"
-              defaultSelectedKeys={["grok-beta"]}
-            >
-              <SelectItem key="grok-beta" value="grok-beta">Grok Beta</SelectItem>
-              <SelectItem key="claude-3" value="claude-3">Claude 3</SelectItem>
-              <SelectItem key="perplexity" value="perplexity">Perplexity</SelectItem>
-            </Select>
-          </div>
-        </div>
-      </Card>
+        <TabsContent value="agents" className="space-y-4 mt-4">
+          <Card className="p-4">
+            <h3 className="text-lg font-semibold mb-4">Agent Configuration</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <span className="font-medium">Auto-Recovery</span>
+                  <p className="text-sm text-muted-foreground">
+                    Automatically recover from errors
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.autoRecoveryEnabled}
+                  onCheckedChange={(checked) =>
+                    handleSettingChange('autoRecoveryEnabled', checked)
+                  }
+                />
+              </div>
 
-      {/* Security Settings */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Security & Permissions</h3>
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h4 className="font-medium">Sandbox Mode</h4>
-              <p className="text-sm text-gray-500">Run agents in isolated environment</p>
+              <div className="flex justify-between items-center">
+                <div>
+                  <span className="font-medium">Parallel Execution</span>
+                  <p className="text-sm text-muted-foreground">
+                    Run compatible tasks in parallel
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.parallelExecutionEnabled}
+                  onCheckedChange={(checked) =>
+                    handleSettingChange('parallelExecutionEnabled', checked)
+                  }
+                />
+              </div>
             </div>
-            <Switch defaultSelected />
-          </div>
+          </Card>
+        </TabsContent>
 
-          <div className="flex justify-between items-center">
-            <div>
-              <h4 className="font-medium">File System Access</h4>
-              <p className="text-sm text-gray-500">Allow file system operations</p>
+        <TabsContent value="api" className="space-y-4 mt-4">
+          <Card className="p-4">
+            <h3 className="text-lg font-semibold mb-4">API Configuration</h3>
+            <div className="space-y-4">
+              {['groq', 'anthropic', 'perplexity'].map((provider) => (
+                <div key={provider} className="space-y-2">
+                  <label className="text-sm font-medium capitalize">
+                    {provider} API Key
+                  </label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="password"
+                      value={settings[`${provider}ApiKey`] || ''}
+                      onChange={(e) => 
+                        handleSettingChange(`${provider}ApiKey`, e.target.value)
+                      }
+                      className="font-mono"
+                    />
+                    <Button variant="outline" size="icon">
+                      <Key className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
-            <Switch />
-          </div>
-        </div>
-      </Card>
+          </Card>
+        </TabsContent>
 
-      {/* Performance Settings */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Performance</h3>
-        <div className="space-y-4">
-          <div>
-            <h4 className="font-medium mb-2">Concurrent Tasks</h4>
-            <Input 
-              type="number" 
-              defaultValue="3"
-              min="1"
-              max="10"
-            />
-          </div>
+        <TabsContent value="security" className="space-y-4 mt-4">
+          <Card className="p-4">
+            <h3 className="text-lg font-semibold mb-4">Security Settings</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <span className="font-medium">Require Authentication</span>
+                  <p className="text-sm text-muted-foreground">
+                    Enable authentication for all operations
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.authRequired}
+                  onCheckedChange={(checked) =>
+                    handleSettingChange('authRequired', checked)
+                  }
+                />
+              </div>
 
-          <div>
-            <h4 className="font-medium mb-2">Memory Limit</h4>
-            <Select defaultSelectedKeys={["4gb"]}>
-              <SelectItem key="2gb" value="2gb">2GB</SelectItem>
-              <SelectItem key="4gb" value="4gb">4GB</SelectItem>
-              <SelectItem key="8gb" value="8gb">8GB</SelectItem>
-            </Select>
-          </div>
-        </div>
-      </Card>
+              <div className="flex justify-between items-center">
+                <div>
+                  <span className="font-medium">API Rate Limiting</span>
+                  <p className="text-sm text-muted-foreground">
+                    Enable rate limiting for API calls
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.rateLimitingEnabled}
+                  onCheckedChange={(checked) =>
+                    handleSettingChange('rateLimitingEnabled', checked)
+                  }
+                />
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

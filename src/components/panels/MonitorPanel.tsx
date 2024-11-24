@@ -9,7 +9,8 @@ import {
   Memory, 
   AlertCircle,
   CheckCircle2,
-  Clock
+  Clock,
+  HardDrive
 } from 'lucide-react';
 
 export function MonitorPanel() {
@@ -62,7 +63,7 @@ export function MonitorPanel() {
 
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Memory className="w-4 h-4" />
+            <HardDrive className="w-4 h-4" />
             <h3 className="font-semibold">Memory</h3>
           </div>
           <Progress 

@@ -67,6 +67,8 @@ export interface AgentConfig {
   tools: string[];
   superiorId?: string;
   metadata?: Record<string, unknown>;
+  maxRetries?: number;
+  timeout?: number;
 }
 
 export interface AgentMessage {
@@ -121,7 +123,9 @@ export const AgentConfigSchema = z.object({
   systemPrompt: z.string(),
   tools: z.array(z.string()),
   superiorId: z.string().optional(),
-  metadata: z.record(z.unknown()).optional()
+  metadata: z.record(z.unknown()).optional(),
+  maxRetries: z.number().optional(),
+  timeout: z.number().optional()
 });
 
 // Zod schema for AgentMessage
@@ -141,3 +145,38 @@ export const AgentEventSchema = z.object({
   agentId: z.string(),
   data: z.record(z.unknown())
 });
+
+export interface AgentCapability {
+  name: string;
+  description: string;
+  requires: string[];
+  provides: string[];
+}
+
+export interface AgentState {
+  status: 'idle' | 'busy' | 'error';
+  currentTask?: string;
+  lastActivity: number;
+  errorCount: number;
+  successCount: number;
+}
+
+export interface AgentContext {
+  workspace: string;
+  session: string;
+  user?: string;
+  environment: 'development' | 'production';
+  capabilities: Set<string>;
+}
+
+export interface ExecutionResult {
+  success: boolean;
+  data?: any;
+  error?: Error;
+  duration: number;
+  metadata: {
+    agent: string;
+    task: string;
+    timestamp: number;
+  };
+}

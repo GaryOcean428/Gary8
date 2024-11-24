@@ -28,11 +28,14 @@ export function CanvasPrompt({ onSubmit, isGenerating }: CanvasPromptProps) {
             placeholder="Describe the interface you want to create..."
             className="w-full bg-white rounded-lg pl-4 pr-12 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
             disabled={isGenerating}
+            aria-label="Interface description"
           />
           <button
             type="submit"
             disabled={!prompt.trim() || isGenerating}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-blue-600 hover:text-blue-700 disabled:opacity-50 disabled:hover:text-blue-600"
+            title="Generate interface"
+            aria-label="Generate interface from description"
           >
             <Wand2 className="w-5 h-5" />
           </button>

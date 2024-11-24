@@ -1,54 +1,46 @@
-// Panel Types
 export type ActivePanel = 
   | 'chat' 
   | 'canvas' 
   | 'documents' 
   | 'settings' 
   | 'search'
+  | 'agents'
+  | 'monitor'
+  | 'code'
   | 'competitor-analysis';
 
-// Agent Types
-export interface Agent {
-  id: string;
-  name: string;
-  description: string;
-  capabilities: string[];
-  status: 'idle' | 'working' | 'error';
+export interface SidebarProps {
+  activePanel: ActivePanel;
+  onPanelChange: (panel: ActivePanel) => void;
 }
 
-// Document Types
-export interface Document {
-  id: string;
-  title: string;
-  content: string;
-  type: 'text' | 'code' | 'image';
-  createdAt: Date;
-  updatedAt: Date;
+export interface LayoutProps {
+  activePanel: ActivePanel;
+  onPanelChange: (panel: ActivePanel) => void;
+  children?: React.ReactNode;
 }
 
-// Settings Types
-export interface Settings {
-  theme: 'light' | 'dark';
-  fontSize: number;
-  language: string;
-  notifications: boolean;
-  autoSave: boolean;
+export interface PineconeVector {
+  id: string;
+  values: number[];
+  metadata?: Record<string, any>;
 }
 
-// Search Types
-export interface SearchResult {
-  id: string;
-  title: string;
-  content: string;
-  type: string;
-  score: number;
-  highlights: string[];
+export interface PineconeQueryOptions {
+  vector: number[];
+  topK: number;
+  filter?: Record<string, any>;
+  includeValues?: boolean;
+  includeMetadata?: boolean;
+  namespace?: string;
 }
 
-// Canvas Types
-export interface CanvasElement {
-  id: string;
-  type: 'text' | 'shape' | 'image' | 'connection';
-  position: { x: number; y: number };
-  data: any;
+export interface PineconeResponse {
+  matches: Array<{
+    id: string;
+    score: number;
+    values?: number[];
+    metadata?: Record<string, any>;
+  }>;
+  namespace: string;
 }

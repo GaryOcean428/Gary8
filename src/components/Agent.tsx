@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Brain } from 'lucide-react';
 
 export function Agent() {
+  const [temperature, setTemperature] = useState(0.5);
+
+  const handleTemperatureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTemperature(parseFloat(e.target.value));
+  };
+
   return (
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between p-4 border-b border-border bg-background/50 backdrop-blur-sm">
@@ -40,16 +46,33 @@ export function Agent() {
           <h2 className="text-lg font-medium mb-4">Agent Configuration</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Default Model</label>
-              <select className="w-full bg-background rounded-lg px-3 py-2">
+              <label htmlFor="default-model" className="block text-sm font-medium mb-1">Default Model</label>
+              <select 
+                id="default-model"
+                className="w-full bg-background rounded-lg px-3 py-2"
+                aria-label="Select default model"
+              >
                 <option>grok-beta</option>
                 <option>llama-3.2-70b-preview</option>
                 <option>llama-3.2-7b-preview</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Temperature</label>
-              <input type="range" min="0" max="1" step="0.1" className="w-full" />
+              <label htmlFor="temperature" className="block text-sm font-medium mb-1">Temperature</label>
+              <input 
+                id="temperature"
+                type="range" 
+                min={0}
+                max={1}
+                step={0.1}
+                value={temperature}
+                onChange={handleTemperatureChange}
+                className="w-full"
+                aria-label="Set temperature"
+              />
+              <div className="text-sm text-foreground/60 mt-1" aria-live="polite">
+                Current temperature: {temperature.toFixed(1)}
+              </div>
             </div>
           </div>
         </div>

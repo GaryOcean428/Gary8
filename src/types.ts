@@ -19,6 +19,34 @@ export type {
   Settings
 };
 
+// Panel Types
+export type ActivePanel = 'chat' | 'canvas' | 'documents' | 'settings' | 'tools';
+
+// Pinecone Types
+export interface PineconeVector {
+  id: string;
+  values: number[];
+  metadata?: Record<string, any>;
+}
+
+export interface PineconeQueryOptions {
+  vector: number[];
+  topK: number;
+  filter?: Record<string, any>;
+  includeValues?: boolean;
+  includeMetadata?: boolean;
+}
+
+export interface PineconeResponse {
+  matches: Array<{
+    id: string;
+    score: number;
+    values?: number[];
+    metadata?: Record<string, any>;
+  }>;
+  namespace: string;
+}
+
 // System Configuration Types
 export interface SystemConfig {
   redis: RedisCacheConfig;
