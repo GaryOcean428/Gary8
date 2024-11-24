@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "clean": "rimraf .next out",
+    "clean": "rimraf .next out dist",
     "prebuild": "npm run clean",
     "deploy:dev": "cross-env NODE_ENV=development tsx src/scripts/deploy.ts development",
     "deploy:prod": "cross-env NODE_ENV=production tsx src/scripts/deploy.ts production",
