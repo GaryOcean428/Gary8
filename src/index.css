@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #1A1B2E;
+    --primary: #00BFFF;
+    --primary-foreground: #ffffff;
+    --secondary: #FFB6C8;
+    --secondary-foreground: #1A1B2E;
+    --accent: #7C3AED;
+    --accent-foreground: #ffffff;
+    --border: #E2E8F0;
+    --muted: #F8FAFC;
+    --muted-foreground: #64748B;
+    
+    /* Code theme colors */
+    --code-background: #F8FAFC;
+    --code-text: #1A1B2E;
+    --code-comment: #64748B;
+    --code-keyword: #00BFFF;
+    --code-string: #FFB6C8;
+    --code-function: #7C3AED;
+  }
+
+  .dark {
+    --background: #1A1B2E;
+    --foreground: #ffffff;
+    --primary: #00BFFF;
+    --primary-foreground: #ffffff;
+    --secondary: #FFB6C8;
+    --secondary-foreground: #1A1B2E;
+    --accent: #9F7AEA;
+    --accent-foreground: #ffffff;
+    --border: #2D3748;
+    --muted: #151623;
+    --muted-foreground: #A0AEC0;
+    
+    /* Code theme colors */
+    --code-background: #151623;
+    --code-text: #ffffff;
+    --code-comment: #A0AEC0;
+    --code-keyword: #00BFFF;
+    --code-string: #FFB6C8;
+    --code-function: #9F7AEA;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Smooth transitions for theme changes */
+* {
+  @apply transition-colors duration-200;
+}
+
+/* Enhanced focus styles */
+:focus-visible {
+  @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+}
+
+/* Gradient text utilities */
+.gradient-text {
+  @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-border hover:bg-muted-foreground rounded-full transition-colors;
+}
+
+/* Selection styling */
+::selection {
+  @apply bg-primary/20 text-foreground;
+}

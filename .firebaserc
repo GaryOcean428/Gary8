@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "agent-one-ffec8",
+    "development": "skillhiregto-gary8-dev",
+    "production": "skillhiregto-gary8"
+  }
+}
