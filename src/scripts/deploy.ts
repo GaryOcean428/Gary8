@@ -1,19 +1,36 @@
 import { execSync } from 'child_process';
-import * as fs from 'fs';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 
 const deploy = async (environment: 'development' | 'production') => {
   try {
+    // Load environment variables
+    dotenv.config({
+      path: `.env.${environment}`
+    });
+
     // Clean previous builds
     console.log('🧹 Cleaning previous builds...');
     execSync('npm run clean', { stdio: 'inherit' });
 
     // Build the application
     console.log('🏗️ Building application...');
-    execSync(`cross-env NODE_ENV=${environment} npm run build`, { stdio: 'inherit' });
+    execSync('next build', { 
+      stdio: 'inherit',
+      env: { ...process.env, NODE_ENV: environment }
+    });
+
+    // Get project ID from environment
+    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+    if (!projectId) {
+      throw new Error('Firebase project ID not found in environment variables');
+    }
 
     // Deploy to Firebase
-    console.log(`🚀 Deploying to ${environment}...`);
-    execSync(`firebase deploy -P ${environment}`, { stdio: 'inherit' });
+    console.log(`🚀 Deploying to ${environment} (${projectId})...`);
+    execSync(`firebase use ${projectId} && firebase deploy --only hosting`, { 
+      stdio: 'inherit'
+    });
 
     console.log('✅ Deployment completed successfully!');
   } catch (error) {
@@ -22,4 +39,7 @@ const deploy = async (environment: 'development' | 'production') => {
   }
 };
 
-// Add these scripts to package.json: 
+// Run deploy if called directly
+if (process.argv[2]) {
+  deploy(process.argv[2] as 'development' | 'production');
+}

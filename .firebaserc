@@ -1,13 +1,7 @@
 {
   "projects": {
-    "default": "your-project-id"
-  },
-  "targets": {
-    "your-project-id": {
-      "hosting": {
-        "production": ["your-project-id"],
-        "development": ["your-project-id-dev"]
-      }
-    }
+    "default": "agent-one-ffec8",
+    "development": "skillhiregto-gary8-dev",
+    "production": "skillhiregto-gary8"
   }
 }

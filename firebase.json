@@ -6,6 +6,8 @@
       "**/.*",
       "**/node_modules/**"
     ],
+    "cleanUrls": true,
+    "trailingSlash": false,
     "rewrites": [
       {
         "source": "**",
@@ -35,6 +37,7 @@
     },
     "ui": {
       "enabled": true
-    }
+    },
+    "singleProjectMode": true
   }
 }
