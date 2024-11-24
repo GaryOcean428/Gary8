@@ -1,117 +1,67 @@
-import { BaseAgent } from './base-agent';
-import { CodeReviewResult } from '../interfaces/code-interfaces';
-import { thoughtLogger } from '../logging/thought-logger';
-import { ErrorHandler } from '../utils/error-handler';
+import { BaseAgent } from './core/base-agent';
+import { AgentConfig, AgentMessage } from './agent-types';
+import { thoughtLogger } from '../utils/logger';
+import { ErrorHandler } from '../error/error-handler';
 
 export class QualityAssuranceAgent extends BaseAgent {
-    private static instance: QualityAssuranceAgent;
-    
-    private constructor() {
-        super('quality-assurance', 'Quality Assurance Agent');
-    }
+  constructor(config: AgentConfig) {
+    super({
+      ...config,
+      role: 'critic',
+      capabilities: ['analysis', 'testing', 'validation']
+    });
+  }
 
-    static getInstance(): QualityAssuranceAgent {
-        if (!QualityAssuranceAgent.instance) {
-            QualityAssuranceAgent.instance = new QualityAssuranceAgent();
-        }
-        return QualityAssuranceAgent.instance;
-    }
+  async validateCode(code: string): Promise<{
+    isValid: boolean;
+    issues: string[];
+    suggestions: string[];
+  }> {
+    return await ErrorHandler.handleWithRetry(async () => {
+      thoughtLogger.info('Validating code', { agentId: this.config.id });
 
-    async reviewCode(code: string, language?: string): Promise<CodeReviewResult> {
-        try {
-            thoughtLogger.log('info', 'Starting code review', { language });
+      const analysis = await this.llmClient.analyze(
+        code,
+        'Analyze this code for potential issues and improvements'
+      );
 
-            // Perform static analysis
-            const staticAnalysis = await this.performStaticAnalysis(code);
+      return {
+        isValid: analysis.issues.length === 0,
+        issues: analysis.issues,
+        suggestions: analysis.suggestions
+      };
+    }, 'validate_code');
+  }
 
-            // Check for security vulnerabilities
-            const securityIssues = await this.checkSecurity(code);
+  async generateTests(code: string): Promise<string> {
+    return await ErrorHandler.handleWithRetry(async () => {
+      thoughtLogger.info('Generating tests', { agentId: this.config.id });
 
-            // Analyze code quality
-            const qualityScore = await this.calculateQualityScore(staticAnalysis);
+      return await this.llmClient.generate(
+        code,
+        'Generate comprehensive test cases for this code'
+      );
+    }, 'generate_tests');
+  }
 
-            const result: CodeReviewResult = {
-                issues: [...staticAnalysis.issues, ...securityIssues],
-                suggestions: staticAnalysis.suggestions,
-                quality: qualityScore
-            };
+  async reviewPullRequest(diff: string): Promise<{
+    approved: boolean;
+    comments: string[];
+    suggestions: string[];
+  }> {
+    return await ErrorHandler.handleWithRetry(async () => {
+      thoughtLogger.info('Reviewing PR', { agentId: this.config.id });
 
-            thoughtLogger.log('success', 'Code review completed', { 
-                issueCount: result.issues.length,
-                quality: result.quality 
-            });
+      const review = await this.llmClient.analyze(
+        diff,
+        'Review this pull request diff and provide feedback'
+      );
 
-            return result;
-        } catch (error) {
-            throw ErrorHandler.handleWithThrow(error, 'review code');
-        }
-    }
-    
-    async runTests(testFiles: string[]): Promise<void> {
-        try {
-            thoughtLogger.log('info', 'Running tests', { fileCount: testFiles.length });
-
-            for (const file of testFiles) {
-                await this.executeTestFile(file);
-            }
-
-            thoughtLogger.log('success', 'Tests completed successfully');
-        } catch (error) {
-            throw ErrorHandler.handleWithThrow(error, 'run tests');
-        }
-    }
-
-    private async performStaticAnalysis(code: string) {
-        const issues: string[] = [];
-        const suggestions: string[] = [];
-
-        // Check for common code smells
-        if (code.includes('var ')) {
-            issues.push('Use of var keyword detected. Consider using let or const');
-        }
-
-        // Check function length
-        const functions = code.match(/function\s+\w+\s*\([^)]*\)\s*{[^}]*}/g) || [];
-        functions.forEach(func => {
-            if (func.split('\n').length > 30) {
-                suggestions.push('Consider breaking down large functions into smaller ones');
-            }
-        });
-
-        return { issues, suggestions };
-    }
-
-    private async checkSecurity(code: string): Promise<string[]> {
-        const issues: string[] = [];
-
-        // Check for common security issues
-        if (code.includes('eval(')) {
-            issues.push('Use of eval() detected - potential security risk');
-        }
-
-        if (code.includes('innerHTML')) {
-            issues.push('Use of innerHTML detected - potential XSS risk');
-        }
-
-        return issues;
-    }
-
-    private async calculateQualityScore(analysis: any): Promise<number> {
-        let score = 100;
-
-        // Deduct points for issues
-        score -= analysis.issues.length * 5;
-        
-        // Deduct points for suggestions
-        score -= analysis.suggestions.length * 2;
-
-        // Ensure score stays within 0-100 range
-        return Math.max(0, Math.min(100, score));
-    }
-
-    private async executeTestFile(file: string): Promise<void> {
-        thoughtLogger.log('info', 'Executing test file', { file });
-        // Implement test execution logic
-        // This would typically integrate with your test runner (Jest, Vitest, etc.)
-    }
+      return {
+        approved: review.issues.length === 0,
+        comments: review.comments,
+        suggestions: review.suggestions
+      };
+    }, 'review_pr');
+  }
 }

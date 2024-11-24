@@ -47,25 +47,35 @@ export interface Size {
 
 export interface CanvasElement {
   id: string;
-  type: 'text' | 'shape' | 'image' | 'connection' | 'code';
-  position: Position;
-  size: Size;
-  data?: Record<string, any>;
-  style?: {
+  type: 'shape' | 'text' | 'component' | 'group';
+  position: { x: number; y: number };
+  size: { width: number; height: number };
+  style: {
     fill?: string;
     stroke?: string;
+    opacity?: number;
     fontSize?: number;
     fontFamily?: string;
+  };
+  content?: string;
+  children?: string[];  // For groups
+  metadata?: {
+    createdBy: string;
+    lastModified: number;
+    version: number;
   };
 }
 
 export interface CanvasState {
-  elements: CanvasElement[];
-  selectedIds: string[];
-  scale: number;
+  elements: Map<string, CanvasElement>;
+  selectedIds: Set<string>;
   history: {
     past: CanvasElement[][];
     future: CanvasElement[][];
+  };
+  viewport: {
+    zoom: number;
+    pan: { x: number; y: number };
   };
 }
 

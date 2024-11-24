@@ -106,4 +106,34 @@ ${review.suggestions.join('\n')}`;
 ${code}
 \`\`\``;
   }
+
+  async analyzeProjectStructure(path: string): Promise<void> {
+    try {
+      const structure = await this.codeAwareness.getProjectStructure(path);
+      const suggestions = await this.qwenAPI.analyzeStructure(structure);
+      return this.formatStructureAnalysis(suggestions);
+    } catch (error) {
+      throw ErrorHandler.handleWithThrow(error, 'analyze project structure');
+    }
+  }
+
+  async generateTestCases(code: string): Promise<string> {
+    try {
+      const analysis = await this.qwenAPI.analyzeCode(code);
+      return this.qwenAPI.generateTests(analysis);
+    } catch (error) {
+      throw ErrorHandler.handleWithThrow(error, 'generate test cases');
+    }
+  }
+
+  private formatStructureAnalysis(suggestions: any): string {
+    return `Project Structure Analysis:
+Suggestions:
+${suggestions.improvements.map((imp: string, i: number) => 
+  `${i + 1}. ${imp}`
+).join('\n')}
+
+Recommended Actions:
+${suggestions.actions.join('\n')}`;
+  }
 }

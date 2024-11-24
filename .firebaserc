@@ -1,22 +1,13 @@
 {
   "projects": {
-    "default": "gary8-ffec8-b37e9"
+    "default": "your-project-id"
   },
   "targets": {
-    "gary8-ffec8-b37e9": {
+    "your-project-id": {
       "hosting": {
-        "gary8": [
-          "gary8-ffec8-b37e9"
-        ]
-      }
-    },
-    "agent-one-ffec8": {
-      "hosting": {
-        "gary8": [
-          "gary8-ffec8-b37e9"
-        ]
+        "production": ["your-project-id"],
+        "development": ["your-project-id-dev"]
       }
     }
-  },
-  "etags": {}
+  }
 }

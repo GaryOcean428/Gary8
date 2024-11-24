@@ -1,96 +1,65 @@
+import { Toolhouse, Provider } from 'toolhouse';
 import { thoughtLogger } from '../logging/thought-logger';
-import { ToolhouseService } from './toolhouse-service';
-import { LangChainConfig } from '../config/langchain-config';
-import { ReActAgent } from '@langchain/community/agents';
-import { ErrorHandler } from '../utils/error-handler';
+import { AppError } from '../errors/AppError';
 
 export class LlamaIndexService {
-    private static instance: LlamaIndexService;
-    private toolhouseService: ToolhouseService;
-    private langchainConfig: LangChainConfig;
-    private agent: ReActAgent | null = null;
+  private static instance: LlamaIndexService;
+  private toolhouse: Toolhouse;
+  private initialized: boolean = false;
 
-    private constructor() {
-        this.toolhouseService = ToolhouseService.getInstance();
-        this.langchainConfig = LangChainConfig.getInstance();
+  private constructor() {
+    this.toolhouse = new Toolhouse({ 
+      provider: Provider.LLAMAINDEX,
+      apiKey: process.env.TOOLHOUSE_API_KEY
+    });
+  }
+
+  static getInstance(): LlamaIndexService {
+    if (!LlamaIndexService.instance) {
+      LlamaIndexService.instance = new LlamaIndexService();
     }
+    return LlamaIndexService.instance;
+  }
 
-    static getInstance(): LlamaIndexService {
-        if (!LlamaIndexService.instance) {
-            LlamaIndexService.instance = new LlamaIndexService();
-        }
-        return LlamaIndexService.instance;
+  async initialize(): Promise<void> {
+    try {
+      if (this.initialized) return;
+      
+      thoughtLogger.log('info', 'Initializing LlamaIndex service');
+      
+      // Get tools with search and page contents bundle
+      const tools = await this.toolhouse.getTools({
+        bundle: "search_and_get_page_contents"
+      });
+
+      this.initialized = true;
+      thoughtLogger.log('success', 'LlamaIndex service initialized', { 
+        toolCount: tools.length 
+      });
+    } catch (error) {
+      thoughtLogger.log('error', 'Failed to initialize LlamaIndex service', { error });
+      throw new AppError('Failed to initialize LlamaIndex service', 'INITIALIZATION_ERROR');
     }
+  }
 
-    async initialize(bundle?: string): Promise<void> {
-        try {
-            thoughtLogger.log('info', 'Initializing LlamaIndex service');
+  async searchAndAnalyze(query: string): Promise<string> {
+    try {
+      if (!this.initialized) await this.initialize();
 
-            // Switch Toolhouse provider to LlamaIndex
-            await this.toolhouseService.switchProvider('llamaindex');
+      thoughtLogger.log('info', 'Executing search and analyze query', { query });
+      
+      const tools = await this.toolhouse.getTools({
+        bundle: "search_and_get_page_contents"
+      });
 
-            // Get tools (optionally from a specific bundle)
-            const tools = bundle 
-                ? await this.toolhouseService.getToolsForBundle(bundle)
-                : await this.toolhouseService.getToolhouse().getTools();
+      // Execute the search and analysis
+      const response = await this.toolhouse.execute(tools, query);
 
-            // Initialize ReAct agent with Groq model
-            const llm = this.langchainConfig.getModel('groq');
-            this.agent = await ReActAgent.fromTools(tools, {
-                llm,
-                verbose: true
-            });
-
-            thoughtLogger.log('success', 'LlamaIndex service initialized');
-        } catch (error) {
-            throw ErrorHandler.handleWithThrow(error, 'initialize llamaindex service');
-        }
+      thoughtLogger.log('success', 'Search and analysis completed');
+      return response;
+    } catch (error) {
+      thoughtLogger.log('error', 'Search and analysis failed', { error });
+      throw new AppError('Search and analysis failed', 'EXECUTION_ERROR');
     }
-
-    async processQuery(query: string): Promise<string> {
-        try {
-            if (!this.agent) {
-                throw new Error('LlamaIndex agent not initialized');
-            }
-
-            thoughtLogger.log('info', 'Processing query with LlamaIndex', { query });
-
-            const response = await this.agent.chat(query);
-            return response.content;
-        } catch (error) {
-            thoughtLogger.log('error', 'Query processing failed', { error });
-            throw error;
-        }
-    }
-
-    async searchAndAnalyze(query: string, options: {
-        maxResults?: number;
-        includeMetadata?: boolean;
-        bundle?: string;
-    } = {}): Promise<any> {
-        try {
-            // Initialize with specific bundle if provided
-            if (options.bundle && (!this.agent || this.currentBundle !== options.bundle)) {
-                await this.initialize(options.bundle);
-            }
-
-            thoughtLogger.log('info', 'Searching and analyzing with LlamaIndex', { 
-                query, 
-                options 
-            });
-
-            const response = await this.processQuery(
-                `Search and analyze the following: ${query}. ` +
-                `Return up to ${options.maxResults || 5} results. ` +
-                `${options.includeMetadata ? 'Include metadata.' : ''}`
-            );
-
-            return JSON.parse(response);
-        } catch (error) {
-            thoughtLogger.log('error', 'Search and analysis failed', { error });
-            throw error;
-        }
-    }
-
-    private currentBundle?: string;
+  }
 } 

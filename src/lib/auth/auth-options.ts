@@ -1,19 +1,13 @@
-import { NextAuthOptions } from 'next-auth';
+import { AuthOptions } from 'next-auth';
 
-export const authOptions: NextAuthOptions = {
-  providers: [
-    // Add your auth providers here
-  ],
+export const authOptions: AuthOptions = {
+  providers: [],
   pages: {
     signIn: '/auth/signin',
     error: '/auth/error',
   },
-  callbacks: {
-    async session({ session, token }) {
-      return session;
-    },
-    async jwt({ token, user }) {
-      return token;
-    },
+  session: {
+    strategy: 'jwt',
   },
-}; 
+  secret: process.env.NEXTAUTH_SECRET,
+};

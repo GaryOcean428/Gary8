@@ -1,9 +1,19 @@
 import React from 'react';
 import { useStore } from '../../store';
 import { Toggle } from '../ui/Toggle';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 
 export function WorkflowSettings() {
-  const { workflowSettings, setWorkflowSettings } = useStore();
+  const { workflowSettings, setWorkflowSettings } = useStore(state => ({
+    workflowSettings: state.workflowSettings,
+    setWorkflowSettings: state.setWorkflowSettings
+  }));
 
   return (
     <div className="space-y-6">
@@ -19,7 +29,7 @@ export function WorkflowSettings() {
                 <span className="text-sm">Enable Multi-Agent Collaboration</span>
                 <Toggle
                   checked={workflowSettings.collaborationEnabled}
-                  onCheckedChange={(checked) => {
+                  onCheckedChange={(checked: boolean) => {
                     setWorkflowSettings({
                       ...workflowSettings,
                       collaborationEnabled: checked
@@ -38,7 +48,7 @@ export function WorkflowSettings() {
                 <span className="text-sm">Enable Automatic Task Planning</span>
                 <Toggle
                   checked={workflowSettings.taskPlanningEnabled}
-                  onCheckedChange={(checked) => {
+                  onCheckedChange={(checked: boolean) => {
                     setWorkflowSettings({
                       ...workflowSettings,
                       taskPlanningEnabled: checked
@@ -51,20 +61,27 @@ export function WorkflowSettings() {
 
           {/* Parallel Processing */}
           <div>
-            <label className="block text-sm font-medium mb-2">Parallel Tasks</label>
-            <select
-              value={workflowSettings.parallelTasks}
-              onChange={(e) => setWorkflowSettings({
+            <label id="parallel-tasks-label" className="block text-sm font-medium mb-2">
+              Parallel Tasks
+            </label>
+            <Select
+              value={workflowSettings.parallelTasks.toString()}
+              onValueChange={(value) => setWorkflowSettings({
                 ...workflowSettings,
-                parallelTasks: parseInt(e.target.value)
+                parallelTasks: parseInt(value)
               })}
-              className="w-full bg-secondary rounded-lg px-3 py-2 text-sm"
+              aria-labelledby="parallel-tasks-label"
             >
-              <option value={1}>Sequential (1 task)</option>
-              <option value={2}>Balanced (2 tasks)</option>
-              <option value={4}>Performance (4 tasks)</option>
-              <option value={8}>Maximum (8 tasks)</option>
-            </select>
+              <SelectTrigger className="w-full bg-secondary rounded-lg">
+                <SelectValue placeholder="Select number of parallel tasks" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">Sequential (1 task)</SelectItem>
+                <SelectItem value="2">Balanced (2 tasks)</SelectItem>
+                <SelectItem value="4">Performance (4 tasks)</SelectItem>
+                <SelectItem value="8">Maximum (8 tasks)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Logging */}
@@ -75,7 +92,7 @@ export function WorkflowSettings() {
                 <span className="text-sm">Log Task Planning</span>
                 <Toggle
                   checked={workflowSettings.logTaskPlanning}
-                  onCheckedChange={(checked) => {
+                  onCheckedChange={(checked: boolean) => {
                     setWorkflowSettings({
                       ...workflowSettings,
                       logTaskPlanning: checked
@@ -87,7 +104,7 @@ export function WorkflowSettings() {
                 <span className="text-sm">Log Agent Communication</span>
                 <Toggle
                   checked={workflowSettings.logAgentComm}
-                  onCheckedChange={(checked) => {
+                  onCheckedChange={(checked: boolean) => {
                     setWorkflowSettings({
                       ...workflowSettings,
                       logAgentComm: checked

@@ -1,36 +1,53 @@
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { Providers } from './providers';
-import { Header } from '@/components/layout/Header';
-import { Sidebar } from '@/components/layout/Sidebar';
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { Providers } from './providers'
+import { Analytics } from '../components/analytics'
+import { ThemeProvider } from 'next-themes'
 
-const inter = Inter({ subsets: ['latin'] });
+// Optimize font loading
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap', // Ensure text remains visible during webfont load
+  variable: '--font-inter',
+})
+
+export const metadata = {
+  title: 'Gary8 - AI Agent System',
+  description: 'Advanced AI agent system for development and automation',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: '#000' }
+  ],
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={inter.variable}>
       <head>
-        <title>Gary8 Project</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <meta name="application-name" content="Gary8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className={inter.className}>
-        <Providers>
-          <div className="relative flex min-h-screen flex-col">
-            <Header />
-            <div className="flex flex-1">
-              <Sidebar />
-              <main className="flex-1 p-6">
-                {children}
-              </main>
-            </div>
-          </div>
-        </Providers>
+      <body className={`${inter.className} antialiased`} suppressHydrationWarning>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Providers>
+            <Analytics />
+            {children}
+          </Providers>
+        </ThemeProvider>
       </body>
     </html>
-  );
+  )
 }

@@ -1,32 +1,32 @@
-const path = require('path');
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Only enable these for production builds
-  ...(process.env.NODE_ENV === 'production' ? {
-    output: 'export',
-    images: {
-      unoptimized: true
-    }
-  } : {}),
   reactStrictMode: true,
+  env: {
+    NEXT_PUBLIC_PERPLEXITY_API_KEY: process.env.NEXT_PUBLIC_PERPLEXITY_API_KEY,
+    NEXT_PUBLIC_GOOGLE_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
+    NEXT_PUBLIC_SERP_API_KEY: process.env.NEXT_PUBLIC_SERP_API_KEY,
+    NEXT_PUBLIC_XAI_API_KEY: process.env.NEXT_PUBLIC_XAI_API_KEY,
+    NEXT_PUBLIC_GROQ_API_KEY: process.env.NEXT_PUBLIC_GROQ_API_KEY,
+    NEXT_PUBLIC_HUGGINGFACE_TOKEN: process.env.NEXT_PUBLIC_HUGGINGFACE_TOKEN,
+    NEXT_PUBLIC_GITHUB_TOKEN: process.env.NEXT_PUBLIC_GITHUB_TOKEN,
+    NEXT_PUBLIC_ANTHROPIC_API_KEY: process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY,
+    // Firebase config
+    NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+  },
   webpack: (config) => {
-    config.externals = [...config.externals, { canvas: 'canvas' }];
-    // Add transpilation of node_modules for certain packages
-    config.module.rules.push({
-      test: /\.(js|mjs|jsx|ts|tsx)$/,
-      include: [
-        /node_modules\/(lucide-react|@nextui-org|fabric)/
-      ],
-      use: {
-        loader: 'babel-loader',
-        options: {
-          presets: ['next/babel'],
-        },
-      },
-    });
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      path: false,
+    };
     return config;
-  }
+  },
 };
 
-module.exports = nextConfig;
+module.exports = nextConfig; 

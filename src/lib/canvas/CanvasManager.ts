@@ -1,11 +1,13 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import { CanvasElement, CanvasManager, CanvasState } from './types';
+import EventEmitter from 'events';
 
-export class FabricCanvasManager implements CanvasManager {
+export class FabricCanvasManager extends EventEmitter implements CanvasManager {
   canvas: fabric.Canvas;
   state: CanvasState;
 
   constructor(canvasElement: HTMLCanvasElement) {
+    super();
     this.canvas = new fabric.Canvas(canvasElement);
     this.state = {
       elements: [],
@@ -40,7 +42,7 @@ export class FabricCanvasManager implements CanvasManager {
   }
 
   private setupEventListeners(): void {
-    this.canvas.on('object:added', (e) => {
+    this.canvas.on('object:added', (e: fabric.IEvent<MouseEvent>) => {
       if (e.target) {
         const element = this.fabricObjectToElement(e.target);
         this.state.elements.push(element);
@@ -48,7 +50,7 @@ export class FabricCanvasManager implements CanvasManager {
       }
     });
 
-    this.canvas.on('object:modified', (e) => {
+    this.canvas.on('object:modified', (e: fabric.IEvent<MouseEvent>) => {
       if (e.target) {
         const element = this.fabricObjectToElement(e.target);
         const index = this.state.elements.findIndex(el => el.id === element.id);
@@ -59,9 +61,10 @@ export class FabricCanvasManager implements CanvasManager {
       }
     });
 
-    this.canvas.on('selection:created', (e) => {
-      if (e.selected) {
-        this.state.selectedIds = e.selected.map(obj => obj.data?.id || '');
+    this.canvas.on('selection:created', (e: fabric.IEvent<MouseEvent>) => {
+      const selected = (e as any).selected;
+      if (selected) {
+        this.state.selectedIds = selected.map((obj: fabric.Object) => obj.data?.id || '');
       }
     });
 
@@ -70,7 +73,7 @@ export class FabricCanvasManager implements CanvasManager {
     });
   }
 
-  private fabricObjectToElement(obj: fabric.Object): CanvasElement {
+  private fabricObjectToElement(obj: fabric.Object & { data?: any }): CanvasElement {
     const style: CanvasElement['style'] = {
       fill: obj.fill?.toString() || '#000000',
       stroke: obj.stroke?.toString()
@@ -110,7 +113,7 @@ export class FabricCanvasManager implements CanvasManager {
             fontSize: element.style?.fontSize,
             fontFamily: element.style?.fontFamily
           });
-          text.data = { id: element.id, type: element.type, ...defaultData };
+          (text as any).data = { id: element.id, type: element.type, ...defaultData };
           resolve(text);
           break;
 
@@ -123,7 +126,7 @@ export class FabricCanvasManager implements CanvasManager {
             fontSize: element.style?.fontSize || 14,
             fontFamily: 'monospace'
           });
-          code.data = { id: element.id, type: element.type, ...defaultData };
+          (code as any).data = { id: element.id, type: element.type, ...defaultData };
           resolve(code);
           break;
 
@@ -136,7 +139,7 @@ export class FabricCanvasManager implements CanvasManager {
             fill: element.style?.fill,
             stroke: element.style?.stroke
           });
-          rect.data = { id: element.id, type: element.type, ...defaultData };
+          (rect as any).data = { id: element.id, type: element.type, ...defaultData };
           resolve(rect);
       }
     });
@@ -164,7 +167,7 @@ export class FabricCanvasManager implements CanvasManager {
 
   removeElement(id: string): void {
     const objects = this.canvas.getObjects();
-    const object = objects.find(obj => obj.data?.id === id);
+    const object = objects.find(obj => (obj as any).data?.id === id);
     if (object) {
       this.canvas.remove(object);
       this.state.elements = this.state.elements.filter(el => el.id !== id);
@@ -244,6 +247,95 @@ export class FabricCanvasManager implements CanvasManager {
     } catch (error) {
       console.error('Error executing code:', error);
       throw error;
+    }
+  }
+
+  async addDrawingTools() {
+    this.canvas.isDrawingMode = true;
+    this.canvas.freeDrawingBrush = new fabric.PencilBrush(this.canvas);
+    this.canvas.freeDrawingBrush.width = 2;
+    this.canvas.freeDrawingBrush.color = '#000000';
+  }
+
+  async addShape(type: 'rectangle' | 'circle' | 'triangle') {
+    let shape: fabric.Object;
+    
+    switch(type) {
+      case 'rectangle':
+        shape = new fabric.Rect({
+          width: 100,
+          height: 100,
+          fill: '#ffffff',
+          stroke: '#000000'
+        });
+        break;
+      case 'circle':
+        shape = new fabric.Circle({
+          radius: 50,
+          fill: '#ffffff',
+          stroke: '#000000'
+        });
+        break;
+      case 'triangle':
+        shape = new fabric.Triangle({
+          width: 100,
+          height: 100,
+          fill: '#ffffff',
+          stroke: '#000000'
+        });
+        break;
+    }
+    
+    this.canvas.add(shape);
+    this.canvas.renderAll();
+  }
+
+  enableCollaboration() {
+    this.canvas.on('object:modified', (e: fabric.IEvent<MouseEvent>) => {
+      if (e.target) {
+        this.emit('canvas:update', {
+          type: 'modify',
+          object: e.target.toJSON()
+        });
+      }
+    });
+
+    this.canvas.on('object:added', (e: fabric.IEvent<MouseEvent>) => {
+      if (e.target) {
+        this.emit('canvas:update', {
+          type: 'add',
+          object: e.target.toJSON()
+        });
+      }
+    });
+  }
+
+  async exportCanvas(format: 'png' | 'jpg' | 'svg' | 'json'): Promise<string> {
+    switch(format) {
+      case 'png':
+      case 'jpg':
+        return this.canvas.toDataURL({
+          format: format,
+          quality: 1
+        });
+      case 'svg':
+        return this.canvas.toSVG();
+      case 'json':
+        return JSON.stringify(this.canvas.toJSON());
+    }
+  }
+
+  async importCanvas(data: string, format: 'svg' | 'json'): Promise<void> {
+    if (format === 'json') {
+      this.canvas.loadFromJSON(JSON.parse(data), () => {
+        this.canvas.renderAll();
+      });
+    } else if (format === 'svg') {
+      fabric.loadSVGFromString(data, (objects: fabric.Object[], options: fabric.IObjectOptions) => {
+        const obj = fabric.util.groupSVGElements(objects, options);
+        this.canvas.add(obj);
+        this.canvas.renderAll();
+      });
     }
   }
 }

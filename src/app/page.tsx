@@ -1,8 +1,15 @@
+'use client';
+
+import { Layout } from '../components/layout/Layout';
+import type { ActivePanel } from '../types';
+import { useState } from 'react';
+
 export default function Home() {
+  const [activePanel, setActivePanel] = useState<ActivePanel>('chat');
+
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold">Hello Gary8</h1>
-      <p className="mt-4">Edit me to test hot reloading!</p>
-    </div>
+    <Layout activePanel={activePanel} onPanelChange={setActivePanel}>
+      {/* Content will be rendered by Layout based on activePanel */}
+    </Layout>
   );
 }

@@ -1,143 +1,129 @@
 # Gary8 Project Documentation
 
-## Overview
+## Core Documentation
 
-Gary8 is an advanced AI agent system designed for complex code analysis, generation, and project management tasks. This documentation provides a comprehensive guide to the project's features, architecture, and development practices.
+### 1. Architecture & Setup
+- [Project Overview](architecture/OVERVIEW.md)
+- [Setup Guide](architecture/SETUP.md)
+- [Deployment Guide](architecture/DEPLOYMENT.md)
 
-## Core Components
+### 2. Core Systems
+- [Agent System](core/AGENTS.md)
+- [Canvas System](core/CANVAS.md)
+- [Search System](core/SEARCH.md)
+- [Tool Integration](core/TOOLS.md)
 
-### AI Integration
-- Multi-model routing with Groq, Perplexity, X.AI, and Anthropic
-- Tool-use capabilities via Toolhouse
-- Vector storage with Pinecone
-- RAG processing pipeline
+### 3. Integrations
+- [API Integration](integrations/API.md)
+- [Database Integration](integrations/DATABASE.md)
+- [GitHub Integration](integrations/GITHUB.md)
+- [Model Integration](integrations/MODELS.md)
 
-### Development Tools
-- Code analysis and generation
-- Project structure optimization
-- Testing assistance
-- Performance monitoring
+### 4. Development
+- [Contributing Guide](development/CONTRIBUTING.md)
+- [Testing Guide](development/TESTING.md)
+- [Security Guide](development/SECURITY.md)
+- [Performance Guide](development/PERFORMANCE.md)
 
-### Canvas System
-- Natural language design generation
-- Real-time collaborative editing
-- Component-based layouts
-- Theme support (dark/light modes)
+## Quick Links
 
-### Integrations
-- GitHub repository management
-- Firebase backend services
-- Redis caching layer
-- Multiple AI model providers
-- Vector storage for context
+### Development Resources
+- [API Reference](https://api-docs.gary8.dev)
+- [Component Library](https://components.gary8.dev)
+- [Status Dashboard](https://status.gary8.dev)
 
-## Project Structure
+### Key Features
+1. **AI Integration**
+   - Multi-model routing
+   - Tool-use framework
+   - Vector storage
+   - RAG pipeline
 
+2. **Development Tools**
+   - Code analysis
+   - Project structure
+   - Testing framework
+   - Performance monitoring
+
+3. **Canvas System**
+   - Design generation
+   - Real-time collaboration
+   - Component library
+   - Theme system
+
+4. **Integrations**
+   - GitHub integration
+   - Firebase services
+   - Redis caching
+   - Vector storage
+
+## Project Status
+
+### Current Implementation
+✅ Completed:
+- Next.js 14 setup
+- Multi-model routing
+- Basic canvas system
+- Firebase integration
+- Redis caching
+- Vector storage
+- Monitoring system
+- Error handling
+- Security middleware
+
+🚧 In Progress:
+- Advanced RAG pipeline
+- Enhanced tool capabilities
+- Performance optimization
+- Testing framework
+
+📋 Planned:
+- Advanced canvas features
+- Extended tool library
+- Enhanced security
+- Scaling infrastructure
+
+## Directory Structure
 ```bash
 gary8-project/
-├── src/                    # Source code
-│   ├── app/               # Next.js app directory
-│   │   ├── layout.tsx     # Root layout
-│   │   ├── page.tsx       # Home page
-│   │   └── globals.css    # Global styles
-│   ├── components/        # React components
-│   │   ├── canvas/       # Canvas system components
-│   │   ├── settings/     # Settings components
-│   │   └── ui/          # Common UI components
-│   ├── lib/              # Core libraries
-│   │   ├── agents/      # AI agents implementation
-│   │   ├── api/         # API clients
-│   │   ├── canvas/      # Canvas system core
-│   │   ├── tools/       # Tool implementations
-│   │   ├── utils/       # Utility functions
-│   │   └── config/      # Configuration
-│   ├── providers/        # React context providers
-│   └── types/           # TypeScript type definitions
-├── docs/                 # Documentation
-└── public/              # Static assets
+├── docs/                  # Documentation
+│   ├── architecture/     # System architecture
+│   ├── core/            # Core systems
+│   ├── integrations/    # External integrations
+│   └── development/     # Development guides
+├── src/                  # Source code
+│   ├── app/             # Next.js app
+│   ├── components/      # React components
+│   ├── lib/             # Core libraries
+│   └── types/           # TypeScript types
+├── public/              # Static assets
+└── tests/               # Test suites
 ```
-
-## Key Features
-
-### AI Models
-- Groq: Code and general tasks
-- Perplexity: Search and current information
-- X.AI (Grok): Expert-level queries
-- Anthropic (Claude): Tool-use and reasoning
-
-### Tool Integration
-- Toolhouse for structured tool use
-- Web browsing and data extraction
-- Code analysis and generation
-- Project management tools
-
-### Development Features
-- TypeScript for type safety
-- Next.js 14 for modern React
-- Tailwind CSS for styling
-- NextUI for components
 
 ## Getting Started
 
-1. **Clone and Install**
-   ```bash
-   git clone [repository-url]
-   cd gary8-project
-   npm install
-   ```
+1. **Installation**
+```bash
+git clone https://github.com/your-org/gary8-project.git
+cd gary8-project
+npm install
+```
 
 2. **Environment Setup**
-   ```bash
-   cp .env.example .env.local
-   # Configure environment variables
-   ```
+```bash
+cp .env.example .env.local
+# Configure environment variables
+```
 
-3. **Start Development**
-   ```bash
-   npm run dev
-   ```
-
-## Configuration
-
-The system uses multiple API providers that need to be configured in `.env.local`:
-
-- Groq API for LLM capabilities
-- Perplexity API for search
-- X.AI API for expert queries
-- Anthropic API for tool use
-- Toolhouse API for structured tools
-- Firebase for backend services
-- Pinecone for vector storage
-
-## Development Guidelines
-
-### Code Style
-- Use TypeScript for all new code
-- Follow ESLint configuration
-- Document complex functions
-- Write unit tests for critical paths
-
-### Security
-- Never commit API keys
-- Validate all inputs
-- Use proper error handling
-- Follow security best practices
-
-### Performance
-- Use proper caching strategies
-- Optimize API calls
-- Monitor memory usage
-- Profile response times
+3. **Development**
+```bash
+npm run dev
+```
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-For detailed contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](development/CONTRIBUTING.md) for detailed guidelines.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.

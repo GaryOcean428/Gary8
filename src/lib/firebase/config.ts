@@ -1,5 +1,8 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { getStorage, connectStorageEmulator } from 'firebase/storage';
+import { getCurrentConfig } from '../config/deployment';
 
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,8 +13,17 @@ export const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 } as const;
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-// Initialize Firestore and export db
-export const db = getFirestore(app);
+const config = getCurrentConfig();
+
+if (config.firebase.useEmulator) {
+  connectAuthEmulator(auth, `http://localhost:${config.firebase.emulatorPorts.auth}`);
+  connectFirestoreEmulator(db, 'localhost', config.firebase.emulatorPorts.firestore);
+  connectStorageEmulator(storage, 'localhost', config.firebase.emulatorPorts.storage);
+}
+
+export { app, auth, db, storage };
