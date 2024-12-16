@@ -1,4 +1,4 @@
-import { TavilyTest } from '@/components/TavilyTest';
+import { TavilyTest } from '../../../components/TavilyTest.tsx';
 
 export default function TavilyTestPage() {
   return (

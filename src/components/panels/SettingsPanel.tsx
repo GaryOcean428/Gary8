@@ -5,7 +5,7 @@ import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Switch } from '../../components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/Tabs';
 import { Input } from '../../components/ui/input';
 import { 
   Settings, 
