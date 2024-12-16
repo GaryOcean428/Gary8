@@ -1,11 +1,6 @@
 import { useState, useCallback } from 'react';
 
-interface Tool {
-  id: string;
-  name: string;
-  description: string;
-  enabled: boolean;
-}
+import { Tool } from '../tools/types';
 
 export const useTools = () => {
   const [tools, setTools] = useState<Tool[]>([]);
@@ -16,8 +11,20 @@ export const useTools = () => {
     ));
   }, []);
 
+  const executeTool = useCallback(async (tool: Tool): Promise => {
+    try {
+      console.log(`Executing tool: ${tool.id}`);
+      // Add tool execution logic here
+      return true;
+    } catch (error) {
+      console.error(`Failed to execute tool ${tool.id}:`, error);
+      return false;
+    }
+  }, []);
+
   return {
     tools,
-    toggleTool
+    toggleTool,
+    executeTool
   };
 };
