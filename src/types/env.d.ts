@@ -1,33 +1,14 @@
 declare namespace NodeJS {
   interface ProcessEnv {
-    REACT_APP_PERPLEXITY_API_KEY: string;
-    REACT_APP_GOOGLE_API_KEY: string;
-    REACT_APP_GOOGLE_SEARCH_ENGINE_ID: string;
-    REACT_APP_SERP_API_KEY: string;
-    REACT_APP_XAI_API_KEY: string;
-    REACT_APP_GROQ_API_KEY: string;
-    REACT_APP_HUGGINGFACE_TOKEN: string;
-    REACT_APP_TAVILY_API_KEY: string;
-    REACT_APP_GITHUB_TOKEN: string;
-    REACT_APP_GITHUB_USERNAME: string;
-    REACT_APP_GITHUB_USEREMAIL: string;
-    REACT_APP_LANGCHAIN_SERVICE_API_KEY: string;
-    REACT_APP_LANGCHAIN_PERSONAL_API_KEY: string;
-    REACT_APP_ANTHROPIC_API_KEY: string;
-    // Firebase
-    REACT_APP_FIREBASE_API_KEY: string;
-    REACT_APP_FIREBASE_AUTH_DOMAIN: string;
-    REACT_APP_FIREBASE_DATABASE_URL: string;
-    REACT_APP_FIREBASE_PROJECT_ID: string;
-    REACT_APP_FIREBASE_STORAGE_BUCKET: string;
-    REACT_APP_FIREBASE_MESSAGING_SENDER_ID: string;
-    REACT_APP_FIREBASE_APP_ID: string;
-    REACT_APP_FIREBASE_MEASUREMENT_ID: string;
-    // Redis
-    REACT_APP_REDIS_HOST: string;
-    REACT_APP_REDIS_PORT: string;
-    REACT_APP_REDIS_PASSWORD: string;
-    REACT_APP_REDIS_API: string;
-    REACT_APP_REDIS_USERNAME: string;
+    NODE_ENV: 'development' | 'production' | 'test';
+    NEXT_PUBLIC_FIREBASE_API_KEY: string;
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: string;
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID: string;
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: string;
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: string;
+    NEXT_PUBLIC_FIREBASE_APP_ID: string;
+    GITHUB_ID: string;
+    GITHUB_SECRET: string;
+    // Add other environment variables as needed
   }
 } 

@@ -2,31 +2,70 @@
   "name": "gary8-project",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "clean": "rimraf .next out dist",
+    "clean": "rimraf .next out",
     "prebuild": "npm run clean",
     "deploy:dev": "cross-env NODE_ENV=development tsx src/scripts/deploy.ts development",
+    "deploy:dev:preview": "cross-env NODE_ENV=development tsx src/scripts/deploy.ts development --preview",
     "deploy:prod": "cross-env NODE_ENV=production tsx src/scripts/deploy.ts production",
+    "deploy:prod:preview": "cross-env NODE_ENV=production tsx src/scripts/deploy.ts production --preview",
     "firebase:emulators": "firebase emulators:start",
     "firebase:deploy": "firebase deploy",
     "firebase:deploy:hosting": "firebase deploy --only hosting",
-    "verify:env": "tsx src/scripts/verify-env.ts"
+    "verify:env": "tsx src/scripts/verify-env.ts",
+    "setup:firebase": "tsx src/scripts/setup-firebase.ts",
+    "predeploy:dev": "npm run setup:firebase",
+    "predeploy:dev:preview": "npm run setup:firebase"
   },
   "dependencies": {
+    "@nextui-org/react": "^2.2.9",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.1",
+    "@radix-ui/react-tabs": "^1.1.1",
+    "autoprefixer": "^10.4.17",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "date-fns": "^3.0.0",
+    "fabric": "^6.5.1",
+    "framer-motion": "^10.18.0",
+    "lucide-react": "0.460.0",
+    "next": "latest",
+    "next-themes": "^0.2.1",
+    "postcss-nesting": "13.0.1",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-markdown": "^8.0.7",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.0",
     "tailwind-merge": "^2.5.4",
-    "zustand": "^4.5.5"
+    "zustand": "^4.5.5",
+    "@radix-ui/react-scroll-area": "^1.0.5",
+    "@radix-ui/react-tooltip": "^1.0.7",
+    "@radix-ui/react-select": "^2.0.0",
+    "next-auth": "^4.24.5"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "firebase-tools": "^13.27.0",
+    "postcss": "^8.4.35",
     "rimraf": "^6.0.1",
-    "tsx": "^4.19.2"
+    "tailwindcss": "^3.4.1",
+    "tsx": "^4.19.2",
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0"
+  },
+  "overrides": {
+    "glob": "^10.3.10",
+    "rimraf": "^5.0.5"
   }
 }

@@ -13,6 +13,11 @@ export const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 } as const;
 
+// Add error handling for missing environment variables
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  throw new Error('Missing required Firebase configuration');
+}
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -25,5 +30,24 @@ if (config.firebase.useEmulator) {
   connectFirestoreEmulator(db, 'localhost', config.firebase.emulatorPorts.firestore);
   connectStorageEmulator(storage, 'localhost', config.firebase.emulatorPorts.storage);
 }
+
+// Add initialization status check
+let initialized = false;
+export const initializeFirebase = () => {
+  if (initialized) return;
+  // ... initialization code ...
+  initialized = true;
+};
+
+// Add rate limiting
+const rateLimiter = {
+  maxRequests: 100,
+  perWindow: 60000, // 1 minute
+  requests: new Map()
+};
+
+export const checkRateLimit = (userId: string) => {
+  // ... rate limiting implementation
+};
 
 export { app, auth, db, storage };

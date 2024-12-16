@@ -1,31 +1,51 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { useState, useCallback } from 'react';
 
-interface SettingsState {
-  apiKey: string
-  modelName: string
-  temperature: number
-  maxTokens: number
-  setApiKey: (key: string) => void
-  setModelName: (name: string) => void
-  setTemperature: (temp: number) => void
-  setMaxTokens: (tokens: number) => void
+interface Settings {
+  analyticsEnabled: boolean;
+  autoRecoveryEnabled: boolean;
+  parallelExecutionEnabled: boolean;
+  authRequired: boolean;
+  rateLimitingEnabled: boolean;
+  groqApiKey?: string;
+  anthropicApiKey?: string;
+  perplexityApiKey?: string;
+  [key: string]: boolean | string | undefined;  // Index signature for dynamic keys
 }
 
-export const useSettings = create<SettingsState>()(
-  persist(
-    (set) => ({
-      apiKey: '',
-      modelName: 'gpt-3.5-turbo',
-      temperature: 0.7,
-      maxTokens: 2000,
-      setApiKey: (key) => set({ apiKey: key }),
-      setModelName: (name) => set({ modelName: name }),
-      setTemperature: (temp) => set({ temperature: temp }),
-      setMaxTokens: (tokens) => set({ maxTokens: tokens }),
-    }),
-    {
-      name: 'settings-storage',
+const defaultSettings: Settings = {
+  analyticsEnabled: false,
+  autoRecoveryEnabled: true,
+  parallelExecutionEnabled: true,
+  authRequired: true,
+  rateLimitingEnabled: true,
+  groqApiKey: '',
+  anthropicApiKey: '',
+  perplexityApiKey: ''
+};
+
+export const useSettings = () => {
+  const [settings, setSettings] = useState<Settings>(() => {
+    if (typeof window !== 'undefined') {
+      const savedSettings = localStorage.getItem('app-settings');
+      if (savedSettings) {
+        return JSON.parse(savedSettings);
+      }
     }
-  )
-) 
+    return defaultSettings;
+  });
+
+  const updateSettings = useCallback(async (newSettings: Partial<Settings>) => {
+    setSettings(prev => {
+      const updated = { ...prev, ...newSettings };
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('app-settings', JSON.stringify(updated));
+      }
+      return updated;
+    });
+  }, []);
+
+  return {
+    settings,
+    updateSettings
+  };
+};
