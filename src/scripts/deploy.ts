@@ -26,8 +26,13 @@ const deploy = async (environment: 'development' | 'production', isPreview = tru
     console.log('🧹 Cleaning previous builds...');
     execSync('npm run clean', { stdio: 'inherit' });
 
-    // Build the application
+    // Validate environment and build the application
     console.log('🏗️ Building application...');
+    const envValid = await verifyEnvironment();
+    if (!envValid) {
+      throw new Error('Environment validation failed');
+    }
+    
     try {
       execSync('next build', { 
         stdio: 'inherit',
