@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
+import { Card } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Switch } from '../../components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Input } from '../../components/ui/input';
 import { 
   Settings, 
   Shield, 
@@ -16,8 +16,10 @@ import {
   Key,
   Save
 } from 'lucide-react';
-import { useTheme } from '@/hooks/useTheme';
-import { useSettings } from '@/hooks/useSettings';
+import { useTheme } from '../../hooks/useTheme';
+import { useSettings } from '../../hooks/useSettings';
+
+type ApiProvider = 'groq' | 'anthropic' | 'perplexity';
 
 export function SettingsPanel() {
   const { theme, setTheme } = useTheme();
@@ -36,6 +38,11 @@ export function SettingsPanel() {
     } catch (error) {
       console.error('Failed to save settings:', error);
     }
+  };
+
+  const getApiKey = (provider: ApiProvider): string => {
+    const key = `${provider}ApiKey`;
+    return (settings[key] as string) || '';
   };
 
   return (
@@ -73,7 +80,7 @@ export function SettingsPanel() {
                 <span>Theme</span>
                 <Select
                   value={theme}
-                  onValueChange={(value) => setTheme(value)}
+                  onValueChange={(value: string) => setTheme(value)}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue />
@@ -150,7 +157,7 @@ export function SettingsPanel() {
           <Card className="p-4">
             <h3 className="text-lg font-semibold mb-4">API Configuration</h3>
             <div className="space-y-4">
-              {['groq', 'anthropic', 'perplexity'].map((provider) => (
+              {(['groq', 'anthropic', 'perplexity'] as ApiProvider[]).map((provider) => (
                 <div key={provider} className="space-y-2">
                   <label className="text-sm font-medium capitalize">
                     {provider} API Key
@@ -158,7 +165,7 @@ export function SettingsPanel() {
                   <div className="flex gap-2">
                     <Input
                       type="password"
-                      value={settings[`${provider}ApiKey`] || ''}
+                      value={getApiKey(provider)}
                       onChange={(e) => 
                         handleSettingChange(`${provider}ApiKey`, e.target.value)
                       }

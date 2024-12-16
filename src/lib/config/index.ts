@@ -60,6 +60,14 @@ export const config = {
       messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
       appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
       measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || '',
+      validateConfig: () => {
+        const requiredFields = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
+        const missingFields = requiredFields.filter(field => !config.services.firebase[field]);
+        if (missingFields.length > 0) {
+          throw new Error(`Missing required Firebase configuration fields: ${missingFields.join(', ')}`);
+        }
+        return true;
+      },
       appName: 'Gary8',
       linkedSite: 'gary8-ffec8-b37e9',
       collections: {

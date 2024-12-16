@@ -5,7 +5,6 @@ const nextConfig = {
     unoptimized: true,
   },
   reactStrictMode: true,
-  env: process.env,
   webpack: (config) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,
@@ -17,4 +16,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;
