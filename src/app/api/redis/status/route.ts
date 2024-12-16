@@ -1,4 +1,4 @@
-import { checkRedisServer } from '@/lib/redis/dev-server';
+import { checkRedisServer } from '../../../lib/redis/dev-server.ts';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
