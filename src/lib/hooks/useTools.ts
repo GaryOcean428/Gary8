@@ -11,8 +11,15 @@ export const useTools = () => {
     ));
   }, []);
 
-  const executeTool = useCallback((tool: Tool) => {
-    console.log(`Executing tool: ${tool.id}`);
+  const executeTool = useCallback(async (tool: Tool): Promise => {
+    try {
+      console.log(`Executing tool: ${tool.id}`);
+      // Add tool execution logic here
+      return true;
+    } catch (error) {
+      console.error(`Failed to execute tool ${tool.id}:`, error);
+      return false;
+    }
   }, []);
 
   return {
