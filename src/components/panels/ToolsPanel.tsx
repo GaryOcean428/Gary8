@@ -1,8 +1,8 @@
 'use client';
 
 import { Tabs, Tab } from "@nextui-org/react";
-import { Tool } from "@/lib/tools/types";
-import { useTools } from "@/lib/hooks/useTools";
+import { Tool } from '../../lib/tools/types';
+import { useTools } from '../../lib/hooks/useTools';
 
 export function ToolsPanel() {
   const { tools, executeTool } = useTools();
