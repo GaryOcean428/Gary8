@@ -27,9 +27,12 @@
   },
   "dependencies": {
     "@nextui-org/react": "^2.2.9",
+    "@radix-ui/react-scroll-area": "^1.0.5",
+    "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.1",
     "@radix-ui/react-tabs": "^1.1.1",
+    "@radix-ui/react-tooltip": "^1.0.7",
     "autoprefixer": "^10.4.17",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -38,6 +41,7 @@
     "framer-motion": "^10.18.0",
     "lucide-react": "0.460.0",
     "next": "latest",
+    "next-auth": "^4.24.5",
     "next-themes": "^0.2.1",
     "postcss-nesting": "13.0.1",
     "react": "latest",
@@ -46,13 +50,12 @@
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.0",
     "tailwind-merge": "^2.5.4",
-    "zustand": "^4.5.5",
-    "@radix-ui/react-scroll-area": "^1.0.5",
-    "@radix-ui/react-tooltip": "^1.0.7",
-    "@radix-ui/react-select": "^2.0.0",
-    "next-auth": "^4.24.5"
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
     "firebase-tools": "^13.27.0",
@@ -60,9 +63,7 @@
     "rimraf": "^6.0.1",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.19.2",
-    "@types/node": "^20.11.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0"
+    "typescript": "5.7.2"
   },
   "overrides": {
     "glob": "^10.3.10"
