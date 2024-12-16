@@ -23,7 +23,10 @@
     "verify:env": "tsx src/scripts/verify-env.ts",
     "setup:firebase": "tsx src/scripts/setup-firebase.ts",
     "predeploy:dev": "npm run setup:firebase",
-    "predeploy:dev:preview": "npm run setup:firebase"
+    "predeploy:dev:preview": "npm run setup:firebase",
+    "test": "vitest",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@nextui-org/react": "^2.2.9",
@@ -62,7 +65,9 @@
     "tsx": "^4.19.2",
     "@types/node": "^20.11.0",
     "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0"
+    "@types/react-dom": "^18.2.0",
+    "vitest": "^1.0.0",
+    "@vitest/coverage-c8": "^1.0.0"
   },
   "overrides": {
     "glob": "^10.3.10"
