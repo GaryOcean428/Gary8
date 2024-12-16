@@ -10,25 +10,29 @@ const requiredEnvVars = [
   'NEXT_PUBLIC_FIREBASE_APP_ID'
 ];
 
-const verifyEnv = () => {
-  const envFile = path.join(process.cwd(), '.env.local');
-  
-  if (!fs.existsSync(envFile)) {
-    console.error('❌ .env.local file not found');
-    process.exit(1);
+export const verifyEnvironment = async () => {
+  try {
+    const envFile = path.join(process.cwd(), '.env.local');
+    
+    if (!fs.existsSync(envFile)) {
+      console.error('❌ .env.local file not found');
+      return false;
+    }
+
+    const envContent = fs.readFileSync(envFile, 'utf8');
+    const missingVars = requiredEnvVars.filter(varName => 
+      !envContent.includes(varName)
+    );
+
+    if (missingVars.length > 0) {
+      console.error('❌ Missing required environment variables:', missingVars);
+      return false;
+    }
+
+    console.log('✅ Environment variables verified successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Environment verification failed:', error);
+    return false;
   }
-
-  const envContent = fs.readFileSync(envFile, 'utf8');
-  const missingVars = requiredEnvVars.filter(varName => 
-    !envContent.includes(varName)
-  );
-
-  if (missingVars.length > 0) {
-    console.error('❌ Missing required environment variables:', missingVars);
-    process.exit(1);
-  }
-
-  console.log('✅ Environment variables verified successfully');
-};
-
-verifyEnv(); 
+}; 

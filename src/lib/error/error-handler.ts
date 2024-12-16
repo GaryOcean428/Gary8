@@ -48,4 +48,17 @@ export class ErrorHandler {
   private static delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
+  // Add specific Firebase error handling
+  static handleFirebaseError(error: FirebaseError) {
+    switch (error.code) {
+      case 'permission-denied':
+        // Handle permission errors
+        break;
+      case 'resource-exhausted':
+        // Handle quota errors
+        break;
+      // ... other cases
+    }
+  }
 }

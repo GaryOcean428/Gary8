@@ -44,3 +44,14 @@ Code to review:
     EXPORT_STATEMENT: /export\s+.*?;?/g,
   },
 };
+
+export const COLLECTION_SCHEMA = {
+  users: {
+    required: ['id', 'email'],
+    optional: ['settings', 'preferences']
+  },
+  chats: {
+    required: ['id', 'userId', 'createdAt'],
+    optional: ['title', 'metadata']
+  }
+};

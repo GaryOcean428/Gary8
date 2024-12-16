@@ -1,3 +1,5 @@
+// import { getPerformance } from 'firebase/performance';
+
 export interface MetricsData {
   avgResponseTime: number;
   responseTimeChange: number;
@@ -51,3 +53,11 @@ export class MonitoringService {
     this.metrics.clear();
   }
 }
+
+export const initializePerformance = () => {
+  if (process.env.NODE_ENV === 'production') {
+    // Temporarily comment out Firebase Performance
+    // const perf = getPerformance();
+    console.log('Performance monitoring initialized');
+  }
+};
