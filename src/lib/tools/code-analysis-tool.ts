@@ -126,4 +126,4 @@ export class CodeAnalysisTool extends StructuredTool {
             commentCount: (code.match(/\/\/.+|\/\*[\s\S]*?\*\//g) || []).length
         };
     }
-} 
+}

@@ -24,4 +24,4 @@ export async function llmCall(messages: Anthropic.Messages.MessageParam[]) {
     system: "Respond directly, do not preface or end your responses with anything.",
     tools: await toolhouse.getTools()
   });
-} 
+}
