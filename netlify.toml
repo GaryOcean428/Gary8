@@ -1,7 +1,9 @@
-
 [build]
   publish = "dist"
   command = "npm run build"
+  cache = {
+    paths = ["node_modules/**", ".next/cache/**"]
+  }
 
 [[redirects]]
   from = "/*"
