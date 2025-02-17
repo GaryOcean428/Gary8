@@ -7,6 +7,7 @@ import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 import { agentSystem } from '../lib/agent-system';
 import { LoadingIndicator } from '../components/LoadingIndicator';
+import firebase from 'firebase';
 
 interface Config {
   firebase: {
