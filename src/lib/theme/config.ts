@@ -1,4 +1,5 @@
 import { type Config } from 'tailwindcss';
+import { nextui } from '@nextui-org/theme';
 
 export const themeConfig: Config = {
   darkMode: 'class',
@@ -24,5 +25,5 @@ export const themeConfig: Config = {
       },
     },
   },
-  plugins: [require('@nextui-org/theme')],
-}; 
+  plugins: [nextui],
+};

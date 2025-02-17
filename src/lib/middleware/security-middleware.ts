@@ -51,4 +51,4 @@ export class SecurityMiddleware {
   private static validateInput(req: NextApiRequest): void {
     // Implement input validation logic here
   }
-} 
+}

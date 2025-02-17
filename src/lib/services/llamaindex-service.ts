@@ -1,6 +1,7 @@
 import { Toolhouse, Provider } from 'toolhouse';
 import { thoughtLogger } from '../logging/thought-logger';
 import { AppError } from '../errors/AppError';
+import { toolhouse } from '@toolhouseai/sdk';
 
 export class LlamaIndexService {
   private static instance: LlamaIndexService;
@@ -62,4 +63,4 @@ export class LlamaIndexService {
       throw new AppError('Search and analysis failed', 'EXECUTION_ERROR');
     }
   }
-} 
+}

@@ -5,6 +5,7 @@ import type { Run } from 'langsmith/schemas';
 import { ToolhouseConfig } from '../config/toolhouse-config';
 import { ChatMessage } from '@langchain/core/messages';
 import { StructuredTool } from '@langchain/core/tools';
+import { Client } from 'langsmith';
 
 export class LangChainService {
     private static instance: LangChainService;
@@ -166,4 +167,4 @@ export class LangChainService {
     async getRegisteredTools(): Promise<StructuredTool[]> {
         return Array.from(this.tools.values());
     }
-} 
+}
