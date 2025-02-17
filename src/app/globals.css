@@ -54,8 +54,10 @@
 }
 
 /* Card styling */
-.card {
-  @apply bg-card text-card-foreground shadow-sm rounded-lg border border;
+@layer components {
+  .card {
+    @apply bg-card text-card-foreground shadow-sm rounded-lg border border;
+  }
 }
 
 /* Button styling */
@@ -63,4 +65,9 @@
   @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors
   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
   disabled:opacity-50 disabled:pointer-events-none ring-offset-background;
+}
+
+/* bg-card class definition */
+.bg-card {
+  background-color: var(--card);
 }

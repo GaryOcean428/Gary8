@@ -111,4 +111,4 @@
   .prose h4 {
     @apply mt-4 mb-2;
   }
-}
+}.bg-card { /* Add your styles here */ }

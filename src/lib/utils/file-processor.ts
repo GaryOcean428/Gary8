@@ -46,4 +46,4 @@ export class FileProcessor {
         throw new Error(`Unsupported file type: ${mimeType}`);
     }
   }
-} 
+}
