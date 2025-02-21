@@ -86,6 +86,17 @@ export class ErrorBoundary extends Component<Props, State> {
                 <span>Try again</span>
               )}
             </button>
+
+            <div className="mt-4 text-center">
+              <a
+                href="https://github.com/GaryOcean428/Gary8/issues/new"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:underline"
+              >
+                Report this issue
+              </a>
+            </div>
           </div>
         </div>
       );
