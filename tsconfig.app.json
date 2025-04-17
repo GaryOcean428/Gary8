@@ -26,7 +26,8 @@
     "strictBindCallApply": true,
     "strictPropertyInitialization": true,
     "noImplicitReturns": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true
   },
   "include": ["src"]
 }

@@ -4,12 +4,12 @@ import { toolRegistry } from '../lib/tools/tool-registry';
 import { thoughtLogger } from '../lib/logging/thought-logger';
 
 interface ExportButtonProps {
-  data: any[];
-  filename?: string;
-  onExport?: (success: boolean) => void;
+  readonly data: any[];
+  readonly filename?: string;
+  readonly onExport?: (success: boolean) => void;
 }
 
-export function ExportButton({ data, filename, onExport }: ExportButtonProps) {
+export function ExportButton({ data, filename, onExport }: Readonly<ExportButtonProps>) { // Mark props as read-only
   const [isExporting, setIsExporting] = React.useState(false);
 
   const handleExport = async () => {

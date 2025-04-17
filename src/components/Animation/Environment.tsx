@@ -2,11 +2,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 interface EnvironmentProps {
-  type: string;
-  theme: string;
+  readonly type: string; // Corrected: Removed duplicate, made original readonly
+  readonly theme: string;
 }
 
-export function Environment({ type, theme }: EnvironmentProps) {
+export function Environment({ type, theme }: Readonly<EnvironmentProps>) { // Mark props as read-only
   const getDynamicGradient = () => {
     switch (type) {
       case 'space':
@@ -195,9 +195,12 @@ export function Environment({ type, theme }: EnvironmentProps) {
             {/* Abstract shapes */}
             {Array.from({ length: 10 }).map((_, i) => {
               const shape = ['circle', 'square', 'triangle'][Math.floor(Math.random() * 3)];
-              const colors = theme === 'dark' 
-                ? ['#EC4899', '#8B5CF6', '#3B82F6', '#10B981', '#F59E0B'] 
-                : ['#FB7185', '#A78BFA', '#60A5FA', '#34D399', '#FBBF24'];
+              let colors: string[];
+              if (theme === 'dark') {
+                colors = ['#EC4899', '#8B5CF6', '#3B82F6', '#10B981', '#F59E0B'];
+              } else {
+                colors = ['#FB7185', '#A78BFA', '#60A5FA', '#34D399', '#FBBF24'];
+              }
               const color = colors[Math.floor(Math.random() * colors.length)];
               
               let clipPath = '';

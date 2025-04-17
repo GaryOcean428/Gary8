@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Layout } from './components/layout/Layout';
 import { Chat } from './features/chat';
@@ -15,7 +15,6 @@ import { AuthGuard } from './components/auth/AuthGuard';
 import { OptimizedChat } from './components/optimized/OptimizedChat';
 import { useLocalStorage } from './shared/hooks/useLocalStorage';
 import { WifiOff } from 'lucide-react';
-import { Brain } from 'lucide-react';
 
 export type ActivePanel = 'chat' | 'canvas' | 'agent' | 'tools' | 'settings' | 'documents' | 'profile';
 

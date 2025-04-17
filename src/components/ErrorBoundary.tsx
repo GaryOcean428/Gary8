@@ -47,7 +47,8 @@ export class ErrorBoundary extends Component<Props, State> {
       }
       
       this.setState({ hasError: false, error: null, isRetrying: false });
-    } catch (error) {
+    } catch (retryError) { // Renamed error variable
+      console.error("Error during ErrorBoundary reset attempt:", retryError); // Log the error
       this.setState({ isRetrying: false });
     }
   };
@@ -56,7 +57,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       const { message, details } = ErrorHandler.handle(this.state.error);
       
-      return this.props.fallback || (
+      return this.props.fallback ?? ( // Use ??
         <div className="flex items-center justify-center min-h-screen bg-gray-900">
           <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
             <div className="flex items-center space-x-3 mb-4 text-red-400">

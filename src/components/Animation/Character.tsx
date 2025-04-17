@@ -24,7 +24,7 @@ export function Character({
   duration = 3,
   depth = 0,
   isPlaying = true,
-}: CharacterProps) {
+}: Readonly<CharacterProps>) { // Mark props as read-only
   // Apply design variations
   const eyeStyle = Math.floor(randomBetween(0, 3));
   const mouthStyle = Math.floor(randomBetween(0, 3));

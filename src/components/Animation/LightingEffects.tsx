@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion, MotionValue, useTransform } from 'framer-motion';
+import './LightingEffects.css'; // Import CSS file
 
 interface LightingEffectsProps {
-  theme: string;
-  mouseX: MotionValue<number>;
-  mouseY: MotionValue<number>;
-  isPlaying: boolean;
+  readonly theme: string;
+  readonly mouseX: MotionValue<number>;
+  readonly mouseY: MotionValue<number>;
+  readonly isPlaying: boolean;
 }
 
 export function LightingEffects({
@@ -13,13 +14,13 @@ export function LightingEffects({
   mouseX,
   mouseY,
   isPlaying
-}: LightingEffectsProps) {
+}: Readonly<LightingEffectsProps>) { // Mark props as read-only
   // Transform mouse position into spotlight position
   const spotlightX = useTransform(mouseX, [0, 1], ['0%', '100%']);
   const spotlightY = useTransform(mouseY, [0, 1], ['0%', '100%']);
   
-  // Ambient shadow color based on theme
-  const shadowColor = theme === 'dark' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)';
+  // Ambient shadow color based on theme - Removed unused variable
+  // const shadowColor = theme === 'dark' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)';
   
   // Color theme for the lighting
   const accentColor = theme === 'dark' 
@@ -30,17 +31,15 @@ export function LightingEffects({
     ? 'rgba(255, 255, 255, 0.05)'
     : 'rgba(255, 255, 255, 0.2)';
     
+  const ambientClass = theme === 'dark' ? 'ambient-lighting-dark' : 'ambient-lighting-light';
+  const animationClass = isPlaying ? 'animate-pulse-custom' : 'no-animation';
+
   return (
     <>
       {/* Ambient lighting - subtle gradient overlay */}
       <div 
-        className="absolute inset-0 z-10 opacity-30 animate-pulse"
-        style={{
-          background: theme === 'dark' 
-            ? 'radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, rgba(0, 0, 0, 0) 70%)'
-            : 'radial-gradient(circle at center, rgba(59, 130, 246, 0.05) 0%, rgba(0, 0, 0, 0) 70%)',
-          animation: isPlaying ? 'pulse 10s ease-in-out infinite' : 'none',
-        }}
+        className={`absolute inset-0 z-10 opacity-30 ${ambientClass} ${animationClass}`}
+        // Inline styles moved to CSS
       />
       
       {/* Dynamic spotlight that follows mouse position */}

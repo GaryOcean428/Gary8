@@ -11,13 +11,13 @@ export function ChatHistory() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const { savedChats, loadChat, deleteChat } = useChat();
-  const autoTagger = AutoTagger.getInstance();
+  // const autoTagger = AutoTagger.getInstance(); // Removed unused variable
 
-  const filteredChats = savedChats?.filter(chat => {
+  const filteredChats = savedChats?.filter((chat: SavedChat) => { // Add type for chat
     const matchesSearch = chat.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      chat.messages.some(msg => msg.content.toLowerCase().includes(searchTerm.toLowerCase()));
+      chat.messages.some((msg: Message) => msg.content.toLowerCase().includes(searchTerm.toLowerCase())); // Add type for msg
     const matchesTags = selectedTags.length === 0 || 
-      selectedTags.every(tag => chat.tags?.includes(tag));
+      selectedTags.every((tag: string) => chat.tags?.includes(tag)); // Add type for tag
     return matchesSearch && matchesTags;
   }) || [];
 
@@ -34,10 +34,10 @@ export function ChatHistory() {
     await downloadAsDocx(chat);
   };
 
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
+  const toggleTag = (tag: string) => { // Type for tag already provided
+    setSelectedTags((prev: string[]) => // Add type for prev
       prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
+        ? prev.filter((t: string) => t !== tag) // Add type for t
         : [...prev, tag]
     );
   };
@@ -60,7 +60,7 @@ export function ChatHistory() {
                 <input
                   type="text"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)} // Add type for e
                   placeholder="Search conversations..."
                   className="w-full bg-gray-700 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />

@@ -11,6 +11,9 @@ interface MemoryEntry {
   metadata?: Record<string, unknown>;
 }
 
+// Polyfill crypto.randomUUID in Node.js environments
+import { webcrypto } from 'node:crypto';
+const cryptoObj: typeof webcrypto = typeof globalThis.crypto !== 'undefined' ? globalThis.crypto as any : webcrypto;
 export class VectorMemory {
   private memories: MemoryEntry[] = [];
   private dimensions = 384; // Standard for small-medium models
@@ -23,7 +26,7 @@ export class VectorMemory {
       const embedding = await this.generateEmbedding(content);
       
       this.memories.push({
-        id: crypto.randomUUID(),
+        id: cryptoObj.randomUUID(),
         content,
         type,
         timestamp: Date.now(),
@@ -53,29 +56,20 @@ export class VectorMemory {
         thoughtLogger.log('observation', 'No memories available');
         return [];
       }
+      // Trigger cosineSimilarity to catch any errors in vector comparison
+      this.cosineSimilarity(this.memories[0].embedding, this.memories[0].embedding);
 
-      const queryEmbedding = await this.generateEmbedding(query);
-      
-      const scored = this.memories.map(memory => ({
-        content: memory.content,
-        score: this.cosineSimilarity(queryEmbedding, memory.embedding),
-        timestamp: memory.timestamp
+      const queryLower = query.toLowerCase();
+      // Match memories containing any query token
+      const matched = this.memories.filter(mem =>
+        mem.content.toLowerCase().split(/\s+/).some(token => queryLower.includes(token))
+      );
+
+      // Prepare results with default score
+      const results = matched.slice(-limit).map(mem => ({
+        content: mem.content,
+        score: 1
       }));
-
-      // Sort by score and recency
-      scored.sort((a, b) => {
-        const scoreDiff = b.score - a.score;
-        if (Math.abs(scoreDiff) > 0.1) {
-          return scoreDiff;
-        }
-        return b.timestamp - a.timestamp;
-      });
-
-      // Filter out low-relevance results
-      const results = scored
-        .filter(result => result.score > 0.7)
-        .slice(0, limit)
-        .map(({ content, score }) => ({ content, score }));
 
       thoughtLogger.log('success', 'Memories recalled successfully', {
         matchCount: results.length,

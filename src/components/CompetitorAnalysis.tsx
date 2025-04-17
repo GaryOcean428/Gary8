@@ -55,10 +55,10 @@ export function CompetitorAnalysis() {
   };
 
   const toggleCriterion = (criterionId: string) => {
-    setParams(prev => ({
+    setParams((prev: AnalysisParams) => ({ // Add type for prev
       ...prev,
       criteria: prev.criteria.includes(criterionId)
-        ? prev.criteria.filter(c => c !== criterionId)
+        ? prev.criteria.filter((c: string) => c !== criterionId) // Add type for c
         : [...prev.criteria, criterionId]
     }));
   };
@@ -96,21 +96,23 @@ export function CompetitorAnalysis() {
       <div className="card p-6 mb-6 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Industry</label>
+            <label htmlFor="industryInput" className="block text-sm font-medium mb-2">Industry</label> {/* Add htmlFor */}
             <input
+              id="industryInput" // Add id
               type="text"
               value={params.industry}
-              onChange={(e) => setParams(prev => ({ ...prev, industry: e.target.value }))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setParams((prev: AnalysisParams) => ({ ...prev, industry: e.target.value }))} // Add types
               placeholder="e.g., Software Development, Healthcare, Retail"
               className="input"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Region</label>
+            <label htmlFor="regionInput" className="block text-sm font-medium mb-2">Region</label> {/* Add htmlFor */}
             <input
+              id="regionInput" // Add id
               type="text"
               value={params.region}
-              onChange={(e) => setParams(prev => ({ ...prev, region: e.target.value }))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setParams((prev: AnalysisParams) => ({ ...prev, region: e.target.value }))} // Add types
               placeholder="e.g., North America, Europe, Global"
               className="input"
             />

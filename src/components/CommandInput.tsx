@@ -2,11 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 
 interface CommandInputProps {
-  onSendMessage: (content: string) => void;
-  isProcessing: boolean;
+  readonly onSendMessage: (content: string) => void; // Corrected duplicate identifier
+  readonly isProcessing: boolean;
 }
 
-export function CommandInput({ onSendMessage, isProcessing }: CommandInputProps) {
+export function CommandInput({ onSendMessage, isProcessing }: Readonly<CommandInputProps>) { // Mark props as read-only
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -29,7 +29,7 @@ export function CommandInput({ onSendMessage, isProcessing }: CommandInputProps)
           ref={inputRef}
           type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} // Add type for e
           className="flex-1 bg-transparent text-white px-4 py-2 focus:outline-none font-mono"
           placeholder={isProcessing ? 'Waiting for response...' : 'Enter a command...'}
           disabled={isProcessing}
@@ -38,6 +38,7 @@ export function CommandInput({ onSendMessage, isProcessing }: CommandInputProps)
           type="submit"
           disabled={isProcessing || !input.trim()}
           className="p-2 text-green-400 hover:text-green-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="Send command" // Add aria-label
         >
           <Send className="w-5 h-5" />
         </button>

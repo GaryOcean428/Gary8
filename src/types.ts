@@ -5,3 +5,11 @@ export interface Message {
   timestamp: number;
   model?: string;
 }
+
+export interface SavedChat {
+  id: string;
+  title: string;
+  messages: Message[];
+  timestamp: number;
+  tags?: string[];
+}

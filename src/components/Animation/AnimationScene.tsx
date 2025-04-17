@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { motion, useAnimation, AnimatePresence, MotionValue, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import { motion, useAnimation, AnimatePresence, useMotionValue } from 'framer-motion'; // Removed unused MotionValue, useTransform, useSpring
 import { Sun, Moon, Cloud, Stars, Wind, Zap } from 'lucide-react';
+import './AnimationScene.css'; // Import the CSS file
 import { Character } from './Character';
 import { Environment } from './Environment';
 import { ParticleSystem } from './ParticleSystem';
@@ -13,8 +14,8 @@ interface AnimationSceneProps {
   height?: number;
   theme?: 'light' | 'dark';
   sceneType?: 'nature' | 'space' | 'abstract' | 'underwater';
-  characterCount?: number;
-  className?: string;
+  readonly characterCount?: number;
+  readonly className?: string;
 }
 
 export function AnimationScene({
@@ -24,7 +25,7 @@ export function AnimationScene({
   sceneType = 'nature',
   characterCount = 3,
   className = '',
-}: AnimationSceneProps) {
+}: Readonly<AnimationSceneProps>) { // Mark props as read-only
   const containerRef = useRef<HTMLDivElement>(null);
   const mainControls = useAnimation();
   const mouseX = useMotionValue(0);
@@ -101,19 +102,21 @@ export function AnimationScene({
   }, [mainControls]);
 
   return (
-    <div 
-      className={`perspective-container overflow-hidden relative rounded-xl ${className}`}
-      style={{ width, height }}
+    <div
+      role="group" // Added role for accessibility
+      tabIndex={0} // Added tabIndex for accessibility
+      className={`animation-scene-container perspective-container overflow-hidden relative rounded-xl ${className}`} // Use CSS class
+      style={{ width, height }} // Keep width/height as inline style as they are dynamic props
       onMouseMove={handleMouseMove}
     >
       {/* Main scene container with perspective effect */}
       <motion.div
         ref={containerRef}
-        className="w-full h-full relative"
-        style={{ 
+        className="perspective-transform-container" // Use CSS class
+        style={{
           rotateX,
           rotateY,
-          transformStyle: 'preserve-3d',
+          // transformStyle is now in CSS
         }}
         initial={{ opacity: 0, scale: 0.9 }}
         animate={mainControls}
@@ -177,14 +180,16 @@ function ForegroundElements({
   isPlaying 
 }: { 
   type: string;
-  theme: string;
-  width: number;
-  height: number;
-  isPlaying: boolean;
-}) {
+  readonly theme: string;
+  readonly width: number;
+  readonly height: number;
+  readonly isPlaying: boolean;
+}) { // Mark props as read-only
   // Different foreground elements based on scene type
   switch (type) {
-    case 'space':
+    case 'space': { // Use block scope for case
+      const iconColor = theme === 'dark' ? '#E2E8F0' : '#FFA500';
+      const IconComponent = theme === 'dark' ? Moon : Sun;
       return (
         <>
           <AnimatedIcon
@@ -205,17 +210,20 @@ function ForegroundElements({
             delay={0.5}
           />
           <AnimatedIcon
-            Icon={theme === 'dark' ? Moon : Sun}
+            Icon={IconComponent}
             x={width * 0.85}
             y={height * 0.15}
             size={48}
-            color={theme === 'dark' ? '#E2E8F0' : '#FFA500'}
+            color={iconColor}
             isPlaying={isPlaying}
             delay={0.2}
           />
         </>
       );
-    case 'nature':
+    }
+    case 'nature': { // Use block scope for case
+      const cloudColor = theme === 'dark' ? '#718096' : '#E2E8F0';
+      const windColor = theme === 'dark' ? '#A0AEC0' : '#CBD5E0';
       return (
         <>
           <AnimatedIcon
@@ -223,7 +231,7 @@ function ForegroundElements({
             x={width * 0.1}
             y={height * 0.2}
             size={36}
-            color={theme === 'dark' ? '#718096' : '#E2E8F0'}
+            color={cloudColor}
             isPlaying={isPlaying}
           />
           <AnimatedIcon
@@ -231,7 +239,7 @@ function ForegroundElements({
             x={width * 0.7}
             y={height * 0.1}
             size={48}
-            color={theme === 'dark' ? '#718096' : '#E2E8F0'}
+            color={cloudColor}
             isPlaying={isPlaying}
             delay={0.3}
           />
@@ -240,12 +248,13 @@ function ForegroundElements({
             x={width * 0.6}
             y={height * 0.5}
             size={24}
-            color={theme === 'dark' ? '#A0AEC0' : '#CBD5E0'}
+            color={windColor}
             isPlaying={isPlaying}
             delay={0.7}
           />
         </>
       );
+    }
     case 'underwater':
       return (
         <>
@@ -261,7 +270,7 @@ function ForegroundElements({
               }}
               animate={isPlaying ? {
                 y: [0, -height],
-                x: (i % 2 === 0) ? [0, 20, 0, -20, 0] : [0, -20, 0, 20, 0],
+                x: (i % 2 === 0) ? [0, 20, 0, -20, 0] : [0, -20, 0, 20, 0], // Array index used for variation, not key
               } : {}}
               transition={{
                 y: {
@@ -306,27 +315,33 @@ function ForegroundElements({
             { shape: 'circle', x: 0.2, y: 0.7, size: 60, color: '#0EA5E9' },
             { shape: 'triangle', x: 0.8, y: 0.2, size: 50, color: '#8B5CF6' },
             { shape: 'rectangle', x: 0.5, y: 0.5, size: 40, color: '#EC4899' },
-          ].map((item, index) => (
-            <motion.div
-              key={`shape-${index}`}
-              className="absolute rounded-full backdrop-blur-md"
-              style={{
-                left: `${item.x * width}px`,
-                top: `${item.y * height}px`,
-                width: `${item.size}px`,
-                height: item.shape === 'rectangle' ? `${item.size * 0.6}px` : `${item.size}px`,
-                backgroundColor: `${item.color}40`,
-                borderRadius: item.shape === 'circle' ? '50%' : item.shape === 'rectangle' ? '4px' : '0%',
-                clipPath: item.shape === 'triangle' ? 'polygon(50% 0%, 100% 100%, 0% 100%)' : 'none',
-                zIndex: 5,
-              }}
-              animate={isPlaying ? {
-                y: [0, -20, 0],
-                rotate: [0, item.shape === 'rectangle' ? 360 : 180, 0],
-                scale: [1, 1.1, 1],
-              } : {}}
-              transition={{
-                duration: randomBetween(4, 8),
+          ].map((item, index) => {
+            const shapeHeight = item.shape === 'rectangle' ? `${item.size * 0.6}px` : `${item.size}px`;
+            const borderRadius = item.shape === 'circle' ? '50%' : item.shape === 'rectangle' ? '4px' : '0%';
+            const clipPath = item.shape === 'triangle' ? 'polygon(50% 0%, 100% 100%, 0% 100%)' : 'none';
+            const rotation = item.shape === 'rectangle' ? 360 : 180;
+
+            return (
+              <motion.div
+                key={`shape-${item.shape}-${index}`} // Use more descriptive key
+                className="absolute rounded-full backdrop-blur-md"
+                style={{
+                  left: `${item.x * width}px`,
+                  top: `${item.y * height}px`,
+                  width: `${item.size}px`,
+                  height: shapeHeight,
+                  backgroundColor: `${item.color}40`,
+                  borderRadius: borderRadius,
+                  clipPath: clipPath,
+                  zIndex: 5,
+                }}
+                animate={isPlaying ? {
+                  y: [0, -20, 0],
+                  rotate: [0, rotation, 0],
+                  scale: [1, 1.1, 1],
+                } : {}}
+                transition={{
+                  duration: randomBetween(4, 8),
                 repeat: Infinity,
                 ease: "easeInOut",
                 delay: index * 0.2,
@@ -352,11 +367,11 @@ function AnimatedIcon({
   Icon: React.ComponentType<any>;
   x: number;
   y: number;
-  size: number;
-  color: string;
-  isPlaying: boolean;
-  delay?: number;
-}) {
+  readonly size: number;
+  readonly color: string;
+  readonly isPlaying: boolean;
+  readonly delay?: number;
+}) { // Mark props as read-only
   return (
     <motion.div
       className="absolute z-10 filter drop-shadow-lg"
@@ -380,23 +395,13 @@ function AnimatedIcon({
 
 function getRandomColor(theme: string): string {
   const lightPalette = [
-    '#3B82F6', // blue
-    '#EC4899', // pink
-    '#10B981', // emerald
-    '#F59E0B', // amber
-    '#8B5CF6', // purple
-    '#06B6D4', // cyan
+    '#3B82F6', '#EC4899', '#10B981', '#F59E0B', '#8B5CF6', '#06B6D4'
   ];
-  
   const darkPalette = [
-    '#60A5FA', // blue
-    '#F472B6', // pink
-    '#34D399', // emerald
-    '#FBBF24', // amber
-    '#A78BFA', // purple
-    '#22D3EE', // cyan
+    '#60A5FA', '#F472B6', '#34D399', '#FBBF24', '#A78BFA', '#22D3EE'
   ];
-  
+
   const palette = theme === 'light' ? lightPalette : darkPalette;
-  return palette[Math.floor(Math.random() * palette.length)];
+  const randomIndex = Math.floor(Math.random() * palette.length);
+  return palette[randomIndex];
 }

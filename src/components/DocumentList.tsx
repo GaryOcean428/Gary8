@@ -4,13 +4,18 @@ import type { Document } from '../lib/documents/types';
 import { formatDistanceToNow } from 'date-fns';
 
 interface DocumentListProps {
-  documents: Document[];
-  viewMode: 'grid' | 'list';
-  isLoading: boolean;
-  selectedTags: string[];
-  onTagSelect: (tags: string[]) => void;
-  onRefresh: () => void;
-  onSearch: (query: string) => void;
+  readonly documents: Document[];
+  readonly viewMode: 'grid' | 'list';
+  readonly isLoading: boolean;
+  readonly selectedTags: string[];
+  readonly onTagSelect: (tags: string[]) => void;
+  readonly onRefresh: () => void;
+  readonly onSearch: (query: string) => void;
+}
+
+// Define props for sub-components
+interface DocumentItemProps {
+  readonly document: Document;
 }
 
 export function DocumentList({
@@ -21,15 +26,19 @@ export function DocumentList({
   onTagSelect,
   onRefresh,
   onSearch
-}: DocumentListProps) {
+}: Readonly<DocumentListProps>) { // Mark props as read-only
   const [searchQuery, setSearchQuery] = React.useState('');
-  const allTags = Array.from(
-    new Set(documents.flatMap(doc => doc.tags))
-  ).sort();
+  
+  // Sort tags using localeCompare
+  const allTags = React.useMemo(() => 
+    Array.from(new Set(documents.flatMap(doc => doc.tags ?? []))) // Handle potentially undefined tags
+         .sort((a, b) => a.localeCompare(b)), 
+    [documents]
+  );
 
-  const handleTagClick = (tag: string) => {
+  const handleTagClick = (tag: string) => { // Type already provided, but ensure filter callback has type
     if (selectedTags.includes(tag)) {
-      onTagSelect(selectedTags.filter(t => t !== tag));
+      onTagSelect(selectedTags.filter((t: string) => t !== tag)); // Add type for t
     } else {
       onTagSelect([...selectedTags, tag]);
     }
@@ -91,7 +100,7 @@ export function DocumentList({
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)} // Add type for e
               placeholder="Search documents..."
               className="w-full bg-gray-800/50 text-gray-100 rounded-lg pl-10 pr-10 py-2 border border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -101,6 +110,7 @@ export function DocumentList({
                 type="button"
                 onClick={clearSearch}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                aria-label="Clear search" // Add aria-label
               >
                 <X size={18} />
               </button>
@@ -113,25 +123,41 @@ export function DocumentList({
             <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p>No documents found</p>
           </div>
-        ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {documents.map(doc => (
-              <DocumentCard key={doc.id} document={doc} />
-            ))}
-          </div>
         ) : (
-          <div className="space-y-2">
-            {documents.map(doc => (
-              <DocumentRow key={doc.id} document={doc} />
-            ))}
-          </div>
+          // Extracted conditional rendering
+          viewMode === 'grid' 
+            ? <DocumentGrid documents={documents} /> 
+            : <DocumentListItems documents={documents} />
         )}
       </div>
     </div>
   );
 }
 
-function DocumentCard({ document }: { document: Document }) {
+// Extracted Grid Component
+function DocumentGrid({ documents }: { readonly documents: Document[] }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {documents.map(doc => (
+        <DocumentCard key={doc.id} document={doc} />
+      ))}
+    </div>
+  );
+}
+
+// Extracted List Component
+function DocumentListItems({ documents }: { readonly documents: Document[] }) {
+  return (
+    <div className="space-y-2">
+      {documents.map(doc => (
+        <DocumentRow key={doc.id} document={doc} />
+      ))}
+    </div>
+  );
+}
+
+
+function DocumentCard({ document }: Readonly<DocumentItemProps>) { // Use defined props interface
   return (
     <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 hover:bg-gray-800/70 transition-colors border border-gray-700/50">
       <div className="flex items-start justify-between">
@@ -145,10 +171,10 @@ function DocumentCard({ document }: { document: Document }) {
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <button className="text-gray-400 hover:text-gray-300">
+          <button className="text-gray-400 hover:text-gray-300" aria-label="Open document"> {/* Add aria-label */}
             <ExternalLink size={16} />
           </button>
-          <button className="text-gray-400 hover:text-red-400">
+          <button className="text-gray-400 hover:text-red-400" aria-label="Delete document"> {/* Add aria-label */}
             <Trash2 size={16} />
           </button>
         </div>
@@ -170,7 +196,7 @@ function DocumentCard({ document }: { document: Document }) {
   );
 }
 
-function DocumentRow({ document }: { document: Document }) {
+function DocumentRow({ document }: Readonly<DocumentItemProps>) { // Use defined props interface
   return (
     <div className="flex items-center justify-between bg-gray-800/50 backdrop-blur-sm rounded-lg p-3 hover:bg-gray-800/70 transition-colors border border-gray-700/50">
       <div className="flex items-center space-x-3">
@@ -198,10 +224,10 @@ function DocumentRow({ document }: { document: Document }) {
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        <button className="p-2 text-gray-400 hover:text-gray-300 rounded">
+        <button className="p-2 text-gray-400 hover:text-gray-300 rounded" aria-label="Open document"> {/* Add aria-label */}
           <ExternalLink size={16} />
         </button>
-        <button className="p-2 text-gray-400 hover:text-red-400 rounded">
+        <button className="p-2 text-gray-400 hover:text-red-400 rounded" aria-label="Delete document"> {/* Add aria-label */}
           <Trash2 size={16} />
         </button>
       </div>
