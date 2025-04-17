@@ -1,0 +1,112 @@
+/* Color System - Modern CSS using LCH color space for perceptually uniform colors */
+
+:root {
+  /* Base colors for dark theme */
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  
+  --card: 222.2 84% 6.9%;
+  --card-foreground: 210 40% 98%;
+  
+  --popover: 222.2 84% 6.9%;
+  --popover-foreground: 210 40% 98%;
+  
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 210 40% 98%;
+  
+  --secondary: 262.1 83.3% 57.8%;
+  --secondary-foreground: 210 40% 98%;
+  
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  
+  --accent: 263.4 70% 50.4%;
+  --accent-foreground: 210 40% 98%;
+  
+  --destructive: 0 62.8% 50.6%;
+  --destructive-foreground: 210 40% 98%;
+  
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 224.3 76.3% 48%;
+
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 0%;
+  
+  --success: 142 71% 45%;
+  --success-foreground: 210 40% 98%;
+  
+  /* RGB versions for CSS variables */
+  --primary-rgb: 59, 130, 246;
+  --secondary-rgb: 139, 92, 246;
+  --accent-rgb: 167, 139, 250;
+  --destructive-rgb: 239, 68, 68;
+  --success-rgb: 34, 197, 94;
+  
+  /* Neon palette */
+  --neon-blue: 0, 145, 255;
+  --neon-purple: 160, 32, 240;
+  --neon-pink: 255, 16, 240;
+  --neon-green: 0, 255, 127;
+  
+  /* Shadow styles */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  
+  /* Glow effects */
+  --shadow-primary-glow: 0 0 15px 3px rgba(var(--primary-rgb), 0.25);
+  --shadow-secondary-glow: 0 0 15px 3px rgba(var(--secondary-rgb), 0.25);
+  --shadow-accent-glow: 0 0 15px 3px rgba(var(--accent-rgb), 0.25);
+  --shadow-warning-glow: 0 0 15px 3px rgba(var(--warning-rgb), 0.25);
+  --shadow-success-glow: 0 0 15px 3px rgba(var(--success-rgb), 0.25);
+  --shadow-destructive-glow: 0 0 15px 3px rgba(var(--destructive-rgb), 0.25);
+}
+
+/* Light theme colors */
+[data-theme="light"] {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  
+  --secondary: 262.1 83.3% 57.8%;
+  --secondary-foreground: 210 40% 98%;
+  
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  
+  --accent: 263.4 70% 50.4%;
+  --accent-foreground: 210 40% 98%;
+  
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
+
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 0%;
+  
+  --success: 142 70% 45%;
+  --success-foreground: 210 40% 98%;
+  
+  /* Shadow styles - lighter for light mode */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.07);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.07), 0 8px 10px -6px rgb(0 0 0 / 0.07);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+}

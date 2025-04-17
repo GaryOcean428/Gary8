@@ -1,0 +1,272 @@
+@import './styles/color-system.css';
+@import './styles/typography-system.css';
+@import './styles/animation-system.css';
+@import './styles/spatial-system.css';
+
+/* Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased min-h-screen;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Define scrollbar styles */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(var(--muted-foreground), 0.5);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--muted-foreground), 0.8);
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(var(--background), 0.95);
+    border-radius: 999px;
+  }
+
+  /* Better focus styles for accessibility */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+  }
+}
+
+@layer components {
+  /* Glass effect utility */
+  .glass {
+    @apply bg-background/60 backdrop-blur-md border border-border/50;
+  }
+  
+  /* Highlight effects */
+  .highlight-top {
+    @apply before:absolute before:top-0 before:left-0 before:right-0 before:h-[1px] before:bg-gradient-to-r before:from-transparent before:via-border/70 before:to-transparent;
+  }
+  
+  .highlight-left {
+    @apply after:absolute after:top-0 after:left-0 after:bottom-0 after:w-[1px] after:bg-gradient-to-b after:from-transparent after:via-border/70 after:to-transparent;
+  }
+
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:glow-primary hover:translate-y-[-2px] active:translate-y-0 shadow-md;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:glow-secondary hover:translate-y-[-2px] active:translate-y-0 shadow-md;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent hover:bg-muted text-foreground hover:translate-y-[-2px] active:translate-y-0;
+  }
+
+  .btn-destructive {
+    @apply bg-destructive text-destructive-foreground hover:glow-destructive hover:translate-y-[-2px] active:translate-y-0 shadow-md;
+  }
+
+  .input {
+    @apply w-full min-w-0 flex-1 bg-input text-foreground rounded-lg px-4 py-2.5 border border-border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all;
+    @apply text-base leading-6;
+    @apply placeholder:text-muted-foreground;
+    min-height: 42px;
+  }
+
+  .card {
+    @apply bg-card text-card-foreground rounded-lg shadow-lg border border-border backdrop-blur-sm transition-all duration-200 hover:shadow-xl;
+  }
+
+  /* Modern glass cards with customizable background opacity */
+  .card-glass {
+    @apply glass highlight-top highlight-left;
+  }
+
+  /* Card with 3D effect */
+  .card-elevated {
+    @apply transform shadow-md transition-all duration-300 hover:translate-y-[-5px] hover:shadow-lg;
+  }
+
+  /* Badge variants */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors;
+  }
+
+  .badge-primary {
+    @apply bg-primary/10 text-primary-foreground border border-primary/20;
+  }
+
+  .badge-secondary {
+    @apply bg-secondary/10 text-secondary-foreground border border-secondary/20;
+  }
+
+  .badge-outline {
+    @apply bg-transparent border border-border text-foreground;
+  }
+
+  .badge-success {
+    @apply bg-success/10 text-success-foreground border border-success/20;
+  }
+
+  .badge-warning {
+    @apply bg-warning/10 text-warning-foreground border border-warning/20;
+  }
+
+  .badge-error {
+    @apply bg-destructive/10 text-destructive-foreground border border-destructive/20;
+  }
+  
+  /* Modern dropdown styles */
+  .dropdown {
+    @apply relative inline-block;
+  }
+  
+  .dropdown-content {
+    @apply absolute z-50 min-w-[12rem] overflow-hidden rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-md;
+    @apply glass animate-in fade-in-80 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2;
+  }
+  
+  .dropdown-item {
+    @apply relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors;
+    @apply hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground;
+  }
+
+  /* Modernized loader */
+  .loader {
+    @apply relative inline-flex h-10 w-10;
+  }
+
+  .loader::before,
+  .loader::after {
+    content: "";
+    @apply absolute inset-0 rounded-full;
+  }
+
+  .loader::before {
+    @apply animate-ping bg-primary/30;
+    animation-duration: 1.5s;
+  }
+
+  .loader::after {
+    @apply animate-spin bg-primary;
+    animation-duration: 1s;
+    clip-path: polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%);
+  }
+
+  /* Blinking cursor for streaming responses */
+  .streaming-cursor {
+    @apply after:inline-block after:w-[2px] after:h-[1em] after:align-[-0.1em] after:bg-primary;
+    @apply after:animate-blink;
+  }
+
+  /* Phase-specific cursor colors */
+  .streaming-cursor-search {
+    @apply after:bg-warning;
+  }
+
+  .streaming-cursor-process {
+    @apply after:bg-accent;
+  }
+
+  .streaming-cursor-reasoning {
+    @apply after:bg-secondary;
+  }
+
+  .streaming-cursor-final {
+    @apply after:bg-primary;
+  }
+
+  /* Result type icons */
+  .result-icon {
+    @apply mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full;
+  }
+
+  .result-icon-web {
+    @apply bg-accent/20 text-accent-foreground;
+  }
+
+  .result-icon-code {
+    @apply bg-secondary/20 text-secondary-foreground;
+  }
+
+  .result-icon-doc {
+    @apply bg-primary/20 text-primary-foreground;
+  }
+}
+
+.bg-grid-white {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.02)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 10px 2px rgba(var(--primary-rgb), 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px 5px rgba(var(--primary-rgb), 0.7);
+  }
+}
+
+@layer utilities {
+  .animate-blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  .animate-glow {
+    animation: glow 1.5s ease-in-out infinite;
+    --glow-color: rgba(var(--primary-rgb), 0.5);
+  }
+
+  .glow-primary {
+    box-shadow: var(--shadow-primary-glow);
+  }
+
+  .glow-secondary {
+    box-shadow: var(--shadow-secondary-glow);
+  }
+
+  .glow-accent {
+    box-shadow: var(--shadow-accent-glow);
+  }
+  
+  .glow-destructive {
+    box-shadow: var(--shadow-destructive-glow);
+    --glow-color: rgba(var(--destructive-rgb), 0.5);
+  }
+  
+  .glow-success {
+    box-shadow: var(--shadow-success-glow);
+    --glow-color: rgba(var(--success-rgb), 0.5);
+  }
+  
+  /* Focus glow utility */
+  .focus-glow:focus {
+    box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring), 0 0 15px var(--shadow-primary-glow);
+  }
+}

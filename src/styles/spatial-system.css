@@ -1,0 +1,152 @@
+/* Spatial System - 3D space and depth perception */
+
+:root {
+  /* Elevation levels */
+  --elevation-1: 1;
+  --elevation-2: 2;
+  --elevation-3: 3;
+  --elevation-4: 4;
+  --elevation-5: 5;
+  
+  /* Base elevation unit (pixels) */
+  --elevation-unit: 4px;
+  
+  /* Perspective values */
+  --perspective-distance: 1000px;
+  --perspective-origin-x: 50%;
+  --perspective-origin-y: 50%;
+  
+  /* Z-index layers */
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal-backdrop: 1040;
+  --z-index-modal: 1050;
+  --z-index-popover: 1060;
+  --z-index-tooltip: 1070;
+}
+
+/* Core elevation styles */
+.elevation-1 {
+  z-index: var(--elevation-1);
+  box-shadow: var(--shadow-sm);
+  transform: translateZ(calc(var(--elevation-1) * var(--elevation-unit)));
+}
+
+.elevation-2 {
+  z-index: var(--elevation-2);
+  box-shadow: var(--shadow-md);
+  transform: translateZ(calc(var(--elevation-2) * var(--elevation-unit)));
+}
+
+.elevation-3 {
+  z-index: var(--elevation-3);
+  box-shadow: var(--shadow-lg);
+  transform: translateZ(calc(var(--elevation-3) * var(--elevation-unit)));
+}
+
+.elevation-4 {
+  z-index: var(--elevation-4);
+  box-shadow: var(--shadow-xl);
+  transform: translateZ(calc(var(--elevation-4) * var(--elevation-unit)));
+}
+
+.elevation-5 {
+  z-index: var(--elevation-5);
+  box-shadow: var(--shadow-2xl);
+  transform: translateZ(calc(var(--elevation-5) * var(--elevation-unit)));
+}
+
+/* 3D card effects */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+}
+
+.card-3d-sm {
+  transform: translateZ(4px);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-3d-med {
+  transform: translateZ(8px);
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-3d-lg {
+  transform: translateZ(12px);
+  box-shadow: var(--shadow-xl);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Interactive 3D hover effects */
+.card-3d-hover:hover {
+  transform: translateZ(16px) translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Glass morphism effects */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* 3D Transform Container */
+.perspective-container {
+  perspective: var(--perspective-distance);
+  perspective-origin: var(--perspective-origin-x) var(--perspective-origin-y);
+}
+
+/* Depth-based blur effects */
+.blur-near {
+  filter: blur(0px);
+}
+
+.blur-mid {
+  filter: blur(1px);
+}
+
+.blur-far {
+  filter: blur(2px);
+}
+
+/* Scrolling parallax effects */
+.parallax-container {
+  overflow-x: hidden;
+  overflow-y: auto;
+  perspective: 1px;
+}
+
+.parallax-layer-back {
+  transform: translateZ(-1px) scale(2);
+}
+
+.parallax-layer-base {
+  transform: translateZ(0);
+}
+
+.parallax-layer-front {
+  transform: translateZ(1px);
+}
+
+/* Responsive behaviors for spatial elements */
+@media (max-width: 768px) {
+  :root {
+    --elevation-unit: 2px;
+  }
+  
+  .card-3d-hover:hover {
+    transform: translateZ(8px) translateY(-2px);
+  }
+}

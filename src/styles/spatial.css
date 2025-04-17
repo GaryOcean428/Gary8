@@ -1,0 +1,67 @@
+/* 3D Transform Effects */
+.card-3d-med {
+  transform: translateZ(5px);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-3d-hover:hover {
+  transform: translateZ(10px) translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Glass effect utilities */
+.glass {
+  @apply bg-background/60 backdrop-blur-md border border-border/50;
+  position: relative;
+}
+
+.highlight-top {
+  position: relative;
+}
+
+.highlight-top::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border), transparent);
+}
+
+.highlight-left {
+  position: relative;
+}
+
+.highlight-left::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--border), transparent);
+}
+
+/* Perspective container for 3D cards */
+.perspective-container {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+/* Elevated card with shadow */
+.card-elevated {
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-elevated:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Focus glow effect for inputs and other focused elements */
+.focus-glow:focus {
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring), 0 0 15px 2px var(--shadow-primary-glow);
+}

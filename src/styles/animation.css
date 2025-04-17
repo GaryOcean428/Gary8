@@ -1,0 +1,185 @@
+/* Additional animation styles for AnimationScene */
+
+/* Noise texture background */
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+/* Animation for ambient light pulse */
+@keyframes ambientPulse {
+  0%, 100% {
+    opacity: 0.3;
+    filter: blur(20px);
+  }
+  50% {
+    opacity: 0.5;
+    filter: blur(30px);
+  }
+}
+
+.ambient-light {
+  animation: ambientPulse 10s ease-in-out infinite;
+}
+
+/* Volumetric light rays */
+.light-ray {
+  opacity: 0.2;
+  filter: blur(10px);
+  transform: skewX(45deg);
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+/* Character shadow */
+.character-shadow {
+  filter: blur(10px);
+  transform: scaleY(0.2);
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.3) 0%, transparent 70%);
+}
+
+/* Particle animations */
+@keyframes floatUp {
+  from { transform: translateY(0) translateX(0); }
+  to { transform: translateY(-100vh) translateX(calc(sin(var(--particle-angle)) * 20px)); }
+}
+
+.particle {
+  --particle-angle: 0deg;
+  position: absolute;
+  border-radius: 50%;
+}
+
+/* Underwater effect */
+.underwater-effect {
+  animation: underwaterWave 8s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes underwaterWave {
+  0%, 100% { 
+    filter: blur(0px);
+    transform: scale(1) rotate(0deg); 
+  }
+  
+  50% { 
+    filter: blur(1px);
+    transform: scale(1.02) rotate(0.5deg); 
+  }
+}
+
+/* Space nebula effect */
+.nebula-effect {
+  filter: blur(40px);
+  mix-blend-mode: screen;
+  opacity: 0.3;
+}
+
+/* Abstract fluid animations */
+@keyframes fluidMotion {
+  0% {
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  }
+  25% {
+    border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%;
+  }
+  50% {
+    border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%;
+  }
+  75% {
+    border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%;
+  }
+  100% {
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  }
+}
+
+.fluid-blob {
+  animation: fluidMotion 20s ease-in-out infinite;
+}
+
+/* Character animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.breathe-animation {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+/* Shadow animations */
+@keyframes shadowPulse {
+  0%, 100% {
+    transform: scaleX(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scaleX(0.8);
+    opacity: 0.3;
+  }
+}
+
+.shadow-pulse {
+  animation: shadowPulse 4s ease-in-out infinite;
+}
+
+/* Glow effects */
+.glow-effect {
+  filter: drop-shadow(0 0 5px var(--glow-color, rgba(59, 130, 246, 0.5)));
+}
+
+.blue-glow {
+  --glow-color: rgba(59, 130, 246, 0.5);
+}
+
+.purple-glow {
+  --glow-color: rgba(139, 92, 246, 0.5);
+}
+
+.green-glow {
+  --glow-color: rgba(16, 185, 129, 0.5);
+}
+
+.pink-glow {
+  --glow-color: rgba(236, 72, 153, 0.5);
+}
+
+/* Shimmer effect on text */
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    to right,
+    var(--foreground) 8%,
+    var(--primary) 18%,
+    var(--foreground) 33%
+  );
+  background-size: 800px 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}

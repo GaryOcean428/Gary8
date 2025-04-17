@@ -1,0 +1,155 @@
+/* Animation System - Micro-interactions and motion design */
+
+:root {
+  /* Animation timing */
+  --animation-duration-fast: 150ms;
+  --animation-duration-normal: 250ms;
+  --animation-duration-slow: 350ms;
+  --animation-duration-slower: 500ms;
+  
+  /* Animation easing */
+  --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Base animation utilities */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+    animation-timing-function: var(--ease-bounce);
+  }
+  50% {
+    transform: translateY(-10px);
+    animation-timing-function: var(--ease-bounce);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Utility classes for animations */
+.animate-fade-in {
+  animation: fadeIn var(--animation-duration-normal) var(--ease-out) forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp var(--animation-duration-normal) var(--ease-out) forwards;
+}
+
+.animate-fade-in-right {
+  animation: fadeInRight var(--animation-duration-normal) var(--ease-out) forwards;
+}
+
+.animate-pulse {
+  animation: pulse 2s var(--ease-in-out) infinite;
+}
+
+.animate-bounce {
+  animation: bounce 1s var(--ease-bounce) infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-ping {
+  animation: ping 1s var(--ease-out) infinite;
+}
+
+/* Scroll-driven animations (with fallbacks) */
+@supports (animation-timeline: scroll()) {
+  .reveal-up {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp var(--animation-duration-slow) var(--ease-out) forwards;
+    animation-timeline: view();
+    animation-range: entry 5% cover 30%;
+  }
+  
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(-30px);
+    animation: fadeInRight var(--animation-duration-slow) var(--ease-out) forwards;
+    animation-timeline: view();
+    animation-range: entry 5% cover 30%;
+  }
+  
+  .reveal-stagger > * {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp var(--animation-duration-slow) var(--ease-out) forwards;
+    animation-timeline: view();
+    animation-range: entry 5% cover 30%;
+  }
+  
+  .reveal-stagger > *:nth-child(1) { animation-delay: 0ms; }
+  .reveal-stagger > *:nth-child(2) { animation-delay: 100ms; }
+  .reveal-stagger > *:nth-child(3) { animation-delay: 200ms; }
+  .reveal-stagger > *:nth-child(4) { animation-delay: 300ms; }
+  .reveal-stagger > *:nth-child(5) { animation-delay: 400ms; }
+  .reveal-stagger > *:nth-child(6) { animation-delay: 500ms; }
+  .reveal-stagger > *:nth-child(n+7) { animation-delay: 600ms; }
+}
+
+/* Fallback for browsers without scroll-driven animations using Intersection Observer (handled in JS) */
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
