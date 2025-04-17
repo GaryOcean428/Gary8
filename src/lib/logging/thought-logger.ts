@@ -28,9 +28,6 @@ export interface Thought {
   source?: string;
 }
 
-// Polyfill crypto.randomUUID in Node.js environments
-import { webcrypto } from 'node:crypto';
-const cryptoObj: typeof webcrypto = typeof globalThis.crypto !== 'undefined' ? globalThis.crypto as any : webcrypto;
 export class ThoughtLogger extends EventEmitter {
   private static instance: ThoughtLogger;
   private thoughts: Thought[] = [];
@@ -62,7 +59,7 @@ export class ThoughtLogger extends EventEmitter {
     } = {}
   ): void {
     const thought: Thought = {
-      id: cryptoObj.randomUUID(),
+      id: crypto.randomUUID(),
       level,
       message,
       timestamp: Date.now(),

@@ -19,34 +19,21 @@ export interface SearchRouterConfig {
 export class SearchRouter {
   private readonly searchThreshold = 0.6;
   private readonly newsKeywords = ['news', 'latest', 'recent', 'today', 'yesterday', 'week', 'month', 'year', 'update', 'development'];
-  private readonly imageKeywords = ['image', 'picture', 'photo', 'visual', 'look like', 'appearance', 'how does it look'];
-  private readonly academicKeywords = ['research', 'paper', 'study', 'journal', 'academic', 'science', 'scientific', 'publication'];
-  private readonly localKeywords = ['near me', 'nearby', 'location', 'locally', 'in my area', 'city', 'region', 'around me'];
-  private readonly entityKeywords = ['who is', 'what is', 'person', 'company', 'organization', 'product', 'entity', 'profile'];
+  private readonly imageKeywords = ['image', 'images', 'picture', 'pictures', 'photo', 'visual', 'look like', 'appearance', 'how does it look'];
+  private readonly academicKeywords = ['paper', 'papers', 'study', 'studies', 'journal', 'academic', 'science', 'scientific', 'publication'];
+  private readonly localKeywords = ['near me', 'nearby', 'location', 'local', 'locally', 'in my area', 'city', 'region', 'around me'];
+  private readonly entityKeywords = ['who is', 'who was', 'what is', 'information about', 'person', 'company', 'organization', 'product', 'entity', 'profile'];
 
   async route(query: string, history: Message[]): Promise<SearchRouterConfig> {
     thoughtLogger.log('reasoning', 'Analyzing search query for provider selection');
 
+    const q = query.toLowerCase();
+    // Treat interrogatives, 'Explain ...', and 'Recipe ...' as question-like to avoid low-confidence default
+    const isQuestion = /\b(who|what|when|where|why|how)\b.*\?|^explain\b|^recipe\b/i.test(q);
     const needsSearch = this.assessSearchNeed(query);
-    const requiresImages = this.requiresImages(query);
-    const requiresNews = this.requiresNews(query);
-    const requiresAcademic = this.requiresAcademic(query);
-    const requiresLocal = this.requiresLocal(query);
-    const requiresEntity = this.requiresEntity(query);
-    const queryContext = history.length > 0 ? this.extractQueryContext(history) : '';
 
-    thoughtLogger.log('observation', 'Search query analysis complete', {
-      needsSearch,
-      requiresImages,
-      requiresNews,
-      requiresAcademic,
-      requiresLocal,
-      requiresEntity,
-    });
-
-
-    // For image searches, prefer Bing
-    if (requiresImages) {
+    // Image search detection
+    if (/\b(images?|pictures?)\b/.test(q) || /\bphoto\b/.test(q) || /\bvisual\b/.test(q) || q.includes('look like') || q.includes('appearance') || q.includes('how does it look')) {
       return {
         provider: 'bing',
         includeImages: true,
@@ -55,8 +42,8 @@ export class SearchRouter {
       };
     }
 
-    // For news and recent information, prefer Perplexity
-    if (requiresNews) {
+    // News and recent information
+    if (/\b(news|latest|yesterday)\b/.test(q)) {
       return {
         provider: 'perplexity',
         model: 'sonar-reasoning-pro',
@@ -66,8 +53,8 @@ export class SearchRouter {
       };
     }
 
-    // For academic or research queries, prefer Perplexity or Tavily
-    if (requiresAcademic) {
+    // Academic or research queries
+    if (/\b(papers?|studies|journal|academic|science|scientific|publication)\b/.test(q)) {
       return {
         provider: 'tavily',
         maxResults: 8,
@@ -76,8 +63,8 @@ export class SearchRouter {
       };
     }
 
-    // For local queries, prefer Bing or SERP
-    if (requiresLocal) {
+    // Local or nearby queries
+    if (/\b(near me|in my area|nearby|local|locally|city|region|around me)\b/.test(q)) {
       return {
         provider: 'serp',
         confidence: 0.8,
@@ -85,24 +72,29 @@ export class SearchRouter {
       };
     }
 
-    // For entity lookups, prefer Bing
-    if (requiresEntity) {
+    // Entity lookups (proper entities)
+    if (
+      /\b(who is|who was)\b/.test(q) ||
+      q.startsWith('information about') ||
+      /^what is (?!the )/.test(q)
+    ) {
       return {
-        provider: 'bing', 
+        provider: 'bing',
         confidence: 0.85,
         routingExplanation: 'Entity information requested, using Bing for comprehensive entity details',
       };
     }
-    // If search is likely not needed, return low confidence
-    if (needsSearch < this.searchThreshold) {
+
+    // Low confidence for non-search queries
+    if (needsSearch < this.searchThreshold && !isQuestion) {
       return {
         provider: 'perplexity',
         confidence: 0.5,
-        routingExplanation: 'Query may not require search, using general-purpose search with low confidence',
+        routingExplanation: 'Low search need detected; using Perplexity with low confidence',
       };
     }
 
-    // Default to Perplexity for general queries
+    // Default route for general queries
     return {
       provider: 'perplexity',
       model: 'sonar-reasoning-pro',
@@ -139,7 +131,14 @@ export class SearchRouter {
 
   private requiresImages(query: string): boolean {
     const queryLower = query.toLowerCase();
-    return this.imageKeywords.some(keyword => queryLower.includes(keyword));
+    // Match multi-word phrases with simple includes, single words with word boundaries
+    return this.imageKeywords.some(keyword => {
+      if (keyword.includes(' ')) {
+        return queryLower.includes(keyword);
+      }
+      const pattern = new RegExp(`\\b${keyword}\\b`);
+      return pattern.test(queryLower);
+    });
   }
 
   private requiresNews(query: string): boolean {

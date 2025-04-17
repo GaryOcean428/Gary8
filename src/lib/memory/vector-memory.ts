@@ -11,9 +11,6 @@ interface MemoryEntry {
   metadata?: Record<string, unknown>;
 }
 
-// Polyfill crypto.randomUUID in Node.js environments
-import { webcrypto } from 'node:crypto';
-const cryptoObj: typeof webcrypto = typeof globalThis.crypto !== 'undefined' ? globalThis.crypto as any : webcrypto;
 export class VectorMemory {
   private memories: MemoryEntry[] = [];
   private dimensions = 384; // Standard for small-medium models
@@ -26,7 +23,7 @@ export class VectorMemory {
       const embedding = await this.generateEmbedding(content);
       
       this.memories.push({
-        id: cryptoObj.randomUUID(),
+        id: crypto.randomUUID(),
         content,
         type,
         timestamp: Date.now(),

@@ -133,6 +133,10 @@ interface MemoryEntry {
    - Long-term storage
    - Search capabilities
 
+6. **Testing & Configuration**
+   - Polyfilled Node.js globals (crypto.randomUUID, navigator.onLine) in setupTests.ts
+   - Updated AI model lineup in configuration to match ai-models.md
+
 ### In Progress 🚧
 
 1. **Performance**
@@ -147,7 +151,13 @@ interface MemoryEntry {
    - Error boundaries
    - Data encryption
 
-3. **Integration**
+3. **Routing & API Modernization**
+   - Modernize SearchRouter to satisfy routing tests and updated AI models
+   - Modernize ModelRouter to use latest model lineup and pass calibration tests
+   - Refactor APIClient to use OpenAI Responses API and Agents SDK; fix config store usage
+   - Update RetryHandler to correctly handle offline detection and circuit-breaker behavior
+
+4. **Integration**
    - Additional API providers
    - External services
    - Data sources
