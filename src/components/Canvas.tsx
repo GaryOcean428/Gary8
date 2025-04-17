@@ -10,9 +10,17 @@ import { useLoading } from '../hooks/useLoading';
 import { CanvasSandbox } from './canvas/CanvasSandbox';
 import { ToolManager, Tool } from './canvas/ToolManager';
 import { AgentRegistry } from '../lib/agents/core/agent-registry';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/Tabs';
+import { Tabs, TabsList, TabsTrigger } from './ui/Tabs'; // Removed TabsContent
 import { Button } from './ui/Button';
-import { Brush, Code, PenTool, Bot, Wrench, Cpu } from 'lucide-react';
+import { Brush, Code, Bot, Wrench, Cpu } from 'lucide-react'; // Removed PenTool, reverted alias
+
+// Define a basic Agent type (replace with actual import if available)
+interface Agent {
+  id: string;
+  name: string;
+  role: string;
+  capabilities: string[];
+}
 
 export interface CanvasMode {
   mode: 'design' | 'sandbox' | 'tools' | 'agents' | 'mcp';
@@ -26,7 +34,7 @@ export function Canvas() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [mode, setMode] = useState<CanvasMode['mode']>('design');
   const [sandboxCode, setSandboxCode] = useState('');
-  const [sandboxLanguage, setSandboxLanguage] = useState('javascript');
+  // const [sandboxLanguage, setSandboxLanguage] = useState('javascript'); // Removed unused state
   const [agents, setAgents] = useState<any[]>([]);
   const { addToast } = useToast();
   const { setLoading } = useLoading();
@@ -49,8 +57,8 @@ export function Canvas() {
     canvasManager.initialize(fabricCanvas);
 
     // Set up event listeners
-    fabricCanvas.on('selection:created', (e) => {
-      setSelectedObject(e.selected?.[0] || null);
+    fabricCanvas.on('selection:created', (e: fabric.IEvent<Event>) => { // Add type for e
+      setSelectedObject(e.selected?.[0] ?? null); // Use ??
     });
 
     fabricCanvas.on('selection:cleared', () => {
@@ -212,6 +220,7 @@ export function Canvas() {
         duration: 3000
       });
     } catch (error) {
+      console.error("Failed to export code:", error); // Log error
       addToast({
         type: 'error',
         message: 'Failed to export code',
@@ -220,47 +229,22 @@ export function Canvas() {
     }
   };
 
-  const handleSandboxCodeChange = (code: string) => {
-    setSandboxCode(code);
-  };
+  // Removed unused function handleSandboxCodeChange
+  // const handleSandboxCodeChange = (code: string) => {
+  //   setSandboxCode(code);
+  // };
 
-  // Helper to convert tool to chat prompt
-  const executeToolFromCanvas = (tool: Tool) => {
-    if (!tool) return;
-    
-    // Prepare example parameters based on tool
-    let exampleParams = '';
-    if (tool.name === 'Web Scraper') {
-      exampleParams = 'url="https://example.com" selector=".main-content"';
-    } else if (tool.name === 'Data Formatter') {
-      exampleParams = 'data="{\"name\":\"Test\"}" fromFormat="json" toFormat="csv"';
-    } else if (tool.name === 'Chart Generator') {
-      exampleParams = 'type="bar" labels="[\"Jan\",\"Feb\"]" values="[10,20]"';
-    }
-    
-    // Insert tool usage into text area and move to chat
-    const toolCommand = `/tool ${tool.name} ${exampleParams}`;
-    
-    // Just an example - in a real app, you'd integrate with the Chat component
-    addToast({
-      type: 'info',
-      title: 'Tool Selected',
-      message: `Tool command "${toolCommand}" copied to clipboard. Switch to Chat to use it.`,
-      duration: 5000
-    });
-    
-    // Copy to clipboard
-    navigator.clipboard.writeText(toolCommand);
-  };
+  // Removed unused function executeToolFromCanvas
+  // const executeToolFromCanvas = (tool: Tool) => { ... };
 
   return (
     <div className="relative w-full h-full bg-card overflow-hidden flex flex-col">
       {/* Mode Tabs */}
       <div className="p-2 border-b border-border bg-muted/30">
-        <Tabs value={mode} onValueChange={(value) => setMode(value as CanvasMode['mode'])}>
+        <Tabs value={mode} onValueChange={(value: string) => setMode(value as CanvasMode['mode'])}> {/* Add type for value */}
           <TabsList className="grid grid-cols-5 h-9">
             <TabsTrigger value="design" className="flex items-center gap-1">
-              <Brush className="w-4 h-4" />
+              <Brush className="w-4 h-4" /> {/* Use original name */}
               <span className="hidden sm:inline">Design</span>
             </TabsTrigger>
             <TabsTrigger value="sandbox" className="flex items-center gap-1">
@@ -320,7 +304,7 @@ export function Canvas() {
           <div className="p-4">
             <CanvasSandbox
               initialCode={sandboxCode}
-              language={sandboxLanguage}
+              // language={sandboxLanguage} // Removed unused prop
               height="calc(100vh - 120px)"
               onExecute={(result) => {
                 console.log('Sandbox execution result:', result);
@@ -364,7 +348,7 @@ export function Canvas() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {agents.map(agent => (
+                  {agents.map((agent: Agent) => ( // Add Agent type
                     <div key={agent.id} className="bg-card/80 border border-border rounded-lg p-4 hover:shadow-md transition-shadow">
                       <div className="flex items-start justify-between">
                         <div>
@@ -429,7 +413,7 @@ export function Canvas() {
 }
 
 // This is a component that will be replaced with the actual component when it loads
-function DynamicImport({ name }: { name: string }) {
+function DynamicImport({ name }: Readonly<{ name: string }>) { // Mark props as read-only
   const [Component, setComponent] = useState<React.ComponentType | null>(null);
 
   useEffect(() => {

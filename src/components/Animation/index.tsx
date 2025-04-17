@@ -18,7 +18,7 @@ function AnimationControls({
   sceneType, 
   onSceneTypeChange, 
   onReset 
-}: AnimationControlsProps) {
+}: Readonly<AnimationControlsProps>) { // Mark props as read-only
   const [showControls, setShowControls] = useState(false);
   
   return (
@@ -96,7 +96,7 @@ export function Animation() {
 
   // Reset animation with new key to force remount
   const handleReset = () => {
-    setKey(prevKey => prevKey + 1);
+    setKey((prevKey: number) => prevKey + 1); // Add type for prevKey
   };
   
   return (

@@ -3,18 +3,19 @@ import { Upload, X, FileText, AlertCircle } from 'lucide-react';
 import { DocumentManager } from '../lib/documents/document-manager';
 import { thoughtLogger } from '../lib/logging/thought-logger';
 import { useAuth } from '../lib/auth/AuthProvider';
+import './DocumentUpload.css'; // Import CSS file
 
 interface DocumentUploadProps {
-  workspaceId?: string;
-  onUploadComplete?: () => void;
-  onUploadError?: (error: Error) => void;
+  readonly workspaceId?: string;
+  readonly onUploadComplete?: () => void;
+  readonly onUploadError?: (error: Error) => void;
 }
 
 export function DocumentUpload({ 
   workspaceId, 
   onUploadComplete, 
   onUploadError 
-}: DocumentUploadProps) {
+}: Readonly<DocumentUploadProps>) { // Props marked as read-only
   const [isDragging, setIsDragging] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -24,36 +25,63 @@ export function DocumentUpload({
   const documentManager = DocumentManager.getInstance();
   const { user } = useAuth();
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => { // Type added
     e.preventDefault();
     setIsDragging(true);
   };
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => { // Type added
     e.preventDefault();
     setIsDragging(false);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => { // Type added
     e.preventDefault();
     setIsDragging(false);
     setError(null);
     
     const droppedFiles = Array.from(e.dataTransfer.files);
-    setFiles(prev => [...prev, ...droppedFiles]);
+    setFiles((prev: File[]) => [...prev, ...droppedFiles]); // Type added
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => { // Type added
     if (e.target.files) {
       setError(null);
       const selectedFiles = Array.from(e.target.files);
-      setFiles(prev => [...prev, ...selectedFiles]);
+      setFiles((prev: File[]) => [...prev, ...selectedFiles]); // Type added
     }
   };
 
   const removeFile = (index: number) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
+    setFiles((prev: File[]) => prev.filter((_: File, i: number) => i !== index)); // Types added
     setError(null);
+  };
+
+  // Extracted function to handle single file upload logic (Refactor for nesting)
+  const uploadSingleFile = async (file: File, targetWorkspaceId: string) => {
+    try {
+      setUploadProgress((prev: Record<string, number>) => ({ ...prev, [file.name]: 0 })); // Type added
+      
+      // Simulate progress updates (replace with actual progress if available)
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev: Record<string, number>) => ({ // Type added
+          ...prev,
+          [file.name]: Math.min((prev[file.name] ?? 0) + 10, 90) // Use ??
+        }));
+      }, 200);
+
+      // Upload document with workspace ID
+      await documentManager.addDocument(targetWorkspaceId, file);
+      
+      clearInterval(progressInterval);
+      setUploadProgress((prev: Record<string, number>) => ({ ...prev, [file.name]: 100 })); // Type added
+      
+      thoughtLogger.log('success', 'Document uploaded successfully', { fileName: file.name });
+    } catch (uploadError) { // Renamed error variable
+      thoughtLogger.log('error', `Failed to upload ${file.name}`, { error: uploadError });
+      setError(`Failed to upload ${file.name}: ${uploadError instanceof Error ? uploadError.message : 'Unknown error'}`);
+      throw uploadError; // Re-throw to be caught by Promise.all
+    }
   };
 
   const uploadFiles = async () => {
@@ -73,47 +101,20 @@ export function DocumentUpload({
       });
 
       // Use user ID as workspace if not specified
-      const targetWorkspaceId = workspaceId || user.id;
+      const targetWorkspaceId = workspaceId ?? user.id; // Use ??
 
-      await Promise.all(
-        files.map(async (file, index) => {
-          try {
-            setUploadProgress(prev => ({ ...prev, [file.name]: 0 }));
-            
-            // Simulate progress updates
-            const progressInterval = setInterval(() => {
-              setUploadProgress(prev => ({
-                ...prev,
-                [file.name]: Math.min((prev[file.name] || 0) + 10, 90)
-              }));
-            }, 200);
+      // Use the extracted function within Promise.all
+      await Promise.all(files.map(file => uploadSingleFile(file, targetWorkspaceId)));
 
-            // Upload document with workspace ID
-            await documentManager.addDocument(targetWorkspaceId, file);
-            
-            clearInterval(progressInterval);
-            setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
-            
-            thoughtLogger.log('success', 'Document uploaded successfully', {
-              fileName: file.name
-            });
-          } catch (error) {
-            thoughtLogger.log('error', `Failed to upload ${file.name}`, { error });
-            setError(`Failed to upload ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-            throw error;
-          }
-        })
-      );
-
-      setFiles([]);
+      setFiles([]); // Clear files after successful upload
       onUploadComplete?.();
-    } catch (error) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
+    } catch (uploadError) { // Renamed error variable
+      const errorMessage = uploadError instanceof Error 
+        ? uploadError.message 
         : 'Upload failed';
         
       setError(errorMessage);
-      onUploadError?.(error instanceof Error ? error : new Error(errorMessage));
+      onUploadError?.(uploadError instanceof Error ? uploadError : new Error(errorMessage));
     } finally {
       setIsUploading(false);
     }
@@ -121,48 +122,55 @@ export function DocumentUpload({
 
   return (
     <div className="space-y-4">
-      {/* Drop Zone */}
-      <div
+      {/* Drop Zone - Added role, tabIndex, onKeyDown and wrapped input in label */}
+      <label 
+        htmlFor="fileUploadInput" // Associate label with input
+        role="button" // Make it behave like a button for accessibility
+        tabIndex={0} // Make it focusable
+        onKeyDown={(e: React.KeyboardEvent<HTMLLabelElement>) => { // Handle keyboard interaction
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            fileInputRef.current?.click();
+          }
+        }}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-colors ${
+        className={`block border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-colors cursor-pointer ${
           isDragging
             ? 'border-primary bg-primary/5'
             : 'border-border hover:border-muted-foreground/50'
         }`}
       >
         <input
+          id="fileUploadInput" // Add id for label association
           ref={fileInputRef}
           type="file"
           multiple
           onChange={handleFileSelect}
-          className="hidden"
+          className="hidden" // Keep input hidden
           accept=".pdf,.docx,.txt,.md"
+          aria-label="File upload input" // Added aria-label for screen readers
         />
-
+        {/* Content inside the label acts as the visible control */}
         <Upload className="h-12 w-12 mx-auto text-muted-foreground" />
         <p className="mt-2 text-sm text-foreground">
           Drag and drop files here, or{' '}
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="text-primary hover:text-primary/80 font-medium"
-            type="button"
-          >
+          <span className="text-primary hover:text-primary/80 font-medium">
             browse
-          </button>
+          </span>
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
           Supported formats: PDF, DOCX, TXT, MD
         </p>
-      </div>
+      </label>
 
       {/* File List */}
       {files.length > 0 && (
         <div className="space-y-2">
-          {files.map((file, index) => (
+          {files.map((file: File) => ( // Add type for file
             <div
-              key={index}
+              key={file.name} // Use file.name as key
               className="flex items-center justify-between bg-card/50 backdrop-blur-sm rounded-lg p-3 border border-border"
             >
               <div className="flex items-center space-x-3 flex-1 min-w-0">
@@ -171,19 +179,21 @@ export function DocumentUpload({
                   <p className="text-sm truncate">{file.name}</p>
                   {uploadProgress[file.name] !== undefined && (
                     <div className="mt-1 h-1 w-full bg-muted rounded-full overflow-hidden">
+                      {/* Apply CSS class and keep dynamic width */}
                       <div 
-                        className="h-full bg-primary transition-all duration-200"
-                        style={{ width: `${uploadProgress[file.name]}%` }}
+                        className="upload-progress-bar" // Apply CSS class
+                        style={{ width: `${uploadProgress[file.name]}%` }} 
                       />
                     </div>
                   )}
                 </div>
               </div>
               <button
-                onClick={() => removeFile(index)}
+                onClick={() => removeFile(files.indexOf(file))} // Find index for removal
                 className="ml-2 p-1.5 text-muted-foreground hover:text-destructive rounded-md hover:bg-destructive/10 transition-colors"
                 disabled={isUploading}
                 type="button"
+                aria-label="Remove file" // Add aria-label
               >
                 <X className="w-4 h-4" />
               </button>

@@ -2,11 +2,11 @@ import React from 'react';
 import { LogSource } from './types';
 
 interface LogFilterProps {
-  activeFilters: Set<LogSource>;
-  onFilterChange: (filters: Set<LogSource>) => void;
+  readonly activeFilters: Set<LogSource>;
+  readonly onFilterChange: (filters: Set<LogSource>) => void;
 }
 
-export function LogFilter({ activeFilters, onFilterChange }: LogFilterProps) {
+export function LogFilter({ activeFilters, onFilterChange }: Readonly<LogFilterProps>) { // Mark props as read-only
   const sources: LogSource[] = [
     'primary-agent',
     'specialist-agent',

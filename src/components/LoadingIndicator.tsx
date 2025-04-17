@@ -14,10 +14,10 @@ export type ProcessingState =
   | undefined;
 
 interface LoadingIndicatorProps {
-  state: ProcessingState;
+  readonly state: ProcessingState; // Corrected duplicate identifier
 }
 
-export function LoadingIndicator({ state }: LoadingIndicatorProps) {
+export function LoadingIndicator({ state }: Readonly<LoadingIndicatorProps>) { 
   if (!state) return null;
 
   const getIcon = () => {

@@ -5,109 +5,136 @@ import { APIClient } from '../lib/api-client';
 import { motion } from 'framer-motion';
 import { getNetworkStatus, testSupabaseConnection } from '../core/supabase/supabase-client';
 
+type StatusType = 'checking' | 'connected' | 'disconnected';
+
 export function ApiStatusDisplay() {
   const configStore = useConfigStore();
-  const [apiStatus, setApiStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
+  const [apiStatus, setApiStatus] = useState<StatusType>('checking');
   const [connectedProviders, setConnectedProviders] = useState<string[]>([]);
   const [failedProviders, setFailedProviders] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
-  const [supabaseStatus, setSupabaseStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
+  const [supabaseStatus, setSupabaseStatus] = useState<StatusType>('checking');
   const [networkStatus, setNetworkStatus] = useState<boolean>(getNetworkStatus());
-  const [edgeFunctionsStatus, setEdgeFunctionsStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
+  const [edgeFunctionsStatus, setEdgeFunctionsStatus] = useState<StatusType>('checking');
   const [edgeFunctionDetails, setEdgeFunctionDetails] = useState<Record<string, boolean>>({});
   const [isRefreshing, setIsRefreshing] = useState(false);
   const apiClient = APIClient.getInstance();
 
-  const checkApiStatus = async () => {
+  // --- Refactored Helper Functions ---
+
+  const checkSupabaseStatus = async (): Promise<boolean> => {
+    setSupabaseStatus('checking');
+    const isConnected = await testSupabaseConnection();
+    setSupabaseStatus(isConnected ? 'connected' : 'disconnected');
+    return isConnected;
+  };
+
+  const checkEdgeFunctionsStatus = async (): Promise<boolean> => {
+    setEdgeFunctionsStatus('checking');
     try {
-      setApiStatus('checking');
-      setError(null);
-      setConnectedProviders([]);
+      const edgeFunctionStatuses = await apiClient.getEdgeFunctionStatuses();
+      console.log('Edge Function Statuses:', edgeFunctionStatuses);
+      setEdgeFunctionDetails(edgeFunctionStatuses);
+      const anyFunctionWorking = Object.values(edgeFunctionStatuses).some(status => status);
+      setEdgeFunctionsStatus(anyFunctionWorking ? 'connected' : 'disconnected');
+      return anyFunctionWorking;
+    } catch (error) {
+      console.error('Edge Function check failed:', error);
+      setEdgeFunctionsStatus('disconnected');
+      return false;
+    }
+  };
+
+  const checkApiProviders = async (): Promise<boolean> => {
+    // Assuming apiKeys is Record<string, string | undefined | null>
+    const apiKeys = configStore.getState().apiKeys as Record<string, string | undefined | null>;
+    // Fix: Access key by index for type predicate
+    const providersWithKeys = Object.entries(apiKeys)
+      .filter((entry): entry is [string, string] => typeof entry[1] === 'string' && entry[1].trim().length > 10) 
+      .map(([provider]) => provider);
+
+    if (providersWithKeys.length === 0) {
+      setApiStatus('disconnected');
+      setError('No API keys configured. Please add at least one API key in settings.');
+      return false;
+    }
+
+    try {
+      const connectedProvs: string[] = [];
+      const failedProvs: Record<string, string> = {};
+
+      for (const provider of providersWithKeys) {
+        try {
+          console.log(`Testing connection for provider: ${provider}`);
+          // Assume testConnection returns { success: boolean, message?: string, error?: string }
+          const result = await apiClient.testConnection(provider); 
+
+          if (result.success) {
+            connectedProvs.push(provider);
+            console.log(`✅ Provider ${provider} connected successfully`);
+          } else {
+            // Refined error message handling
+            const errorMessage = (result as any).message || (result as any).error || 'Unknown connection error';
+            failedProvs[provider] = errorMessage;
+            console.error(`❌ Provider ${provider} connection failed:`, errorMessage);
+          }
+        } catch (providerError) {
+          failedProvs[provider] = providerError instanceof Error ?
+            providerError.message : 'Connection test failed';
+          console.error(`❌ Provider ${provider} test threw error:`, providerError);
+        }
+      }
+
+      setConnectedProviders(connectedProvs);
+      setFailedProviders(failedProvs);
+
+      if (connectedProvs.length > 0) {
+        setApiStatus('connected');
+        return true;
+      } else {
+        setApiStatus('disconnected');
+        setError('Could not connect to any API providers with the configured keys.');
+        return false;
+      }
+    } catch (error) {
+      console.error('API provider checks failed:', error);
+      setApiStatus('disconnected');
+      setError(error instanceof Error ? error.message : String(error));
+      return false;
+    }
+  };
+
+  // --- Main Status Check Function ---
+
+  const checkApiStatus = async () => {
+    setIsRefreshing(true);
+    try {
+      setApiStatus('checking'); // Reset API status at the beginning
+      setError(null); // Clear previous errors
+      setConnectedProviders([]); // Reset provider lists
       setFailedProviders({});
-      setIsRefreshing(true);
-      
-      // First check network connectivity
+      setEdgeFunctionDetails({}); // Reset edge function details
+
+      // 1. Check Network
       const isOnline = getNetworkStatus();
       setNetworkStatus(isOnline);
-      
       if (!isOnline) {
+        setError('Network connection unavailable. Please check your internet connection.');
         setApiStatus('disconnected');
         setSupabaseStatus('disconnected');
         setEdgeFunctionsStatus('disconnected');
-        setError('Network connection unavailable. Please check your internet connection.');
-        return;
+        return; // Stop checks if offline
       }
-      
-      // Check Supabase connection
-      setSupabaseStatus('checking');
-      const isSupabaseConnected = await testSupabaseConnection();
-      setSupabaseStatus(isSupabaseConnected ? 'connected' : 'disconnected');
-      
-      // Check Edge Functions
-      setEdgeFunctionsStatus('checking');
-      try {
-        const edgeFunctionStatuses = await apiClient.getEdgeFunctionStatuses();
-        console.log('Edge Function Statuses:', edgeFunctionStatuses);
-        setEdgeFunctionDetails(edgeFunctionStatuses);
-        
-        // If any edge function is working, consider it connected
-        const anyFunctionWorking = Object.values(edgeFunctionStatuses).some(status => status);
-        setEdgeFunctionsStatus(anyFunctionWorking ? 'connected' : 'disconnected');
-      } catch (error) {
-        console.error('Edge Function check failed:', error);
-        setEdgeFunctionsStatus('disconnected');
-      }
-      
-      // Check API providers
-      const apiKeys = configStore.getState().apiKeys;
-      const providersWithKeys = Object.entries(apiKeys)
-        .filter(([_, key]) => key && key.trim().length > 10)
-        .map(([provider]) => provider);
-        
-      if (providersWithKeys.length === 0) {
-        setApiStatus('disconnected');
-        setError('No API keys configured. Please add at least one API key in settings.');
-        return;
-      }
-        
-      // Test each provider with a key
-      try {
-        const connectedProvs = [];
-        const failedProvs: Record<string, string> = {};
-        
-        for (const provider of providersWithKeys) {
-          try {
-            console.log(`Testing connection for provider: ${provider}`);
-            const result = await apiClient.testConnection(provider);
-            
-            if (result.success) {
-              connectedProvs.push(provider);
-              console.log(`✅ Provider ${provider} connected successfully`);
-            } else {
-              failedProvs[provider] = result.error || 'Unknown error';
-              console.error(`❌ Provider ${provider} connection failed:`, result.error);
-            }
-          } catch (providerError) {
-            failedProvs[provider] = providerError instanceof Error ? 
-              providerError.message : 'Connection test failed';
-            console.error(`❌ Provider ${provider} test threw error:`, providerError);
-          }
-        }
-        
-        setConnectedProviders(connectedProvs);
-        setFailedProviders(failedProvs);
-        
-        if (connectedProvs.length > 0) {
-          setApiStatus('connected');
-        } else {
-          setApiStatus('disconnected');
-          setError('Could not connect to any API providers with the configured keys.');
-        }
-      } catch (error) {
-        console.error('API provider checks failed:', error);
-        setApiStatus('disconnected');
-        setError(error instanceof Error ? error.message : String(error));
-      }
+
+      // 2. Check Supabase (Database)
+      await checkSupabaseStatus();
+
+      // 3. Check Edge Functions
+      await checkEdgeFunctionsStatus();
+
+      // 4. Check API Providers (only sets apiStatus and related states)
+      await checkApiProviders();
+
     } catch (error) {
       console.error('Uncaught error in checkApiStatus:', error);
       setError('An unexpected error occurred while checking connections');
@@ -136,10 +163,15 @@ export function ApiStatusDisplay() {
     window.addEventListener('offline', handleOffline);
     
     // Re-check API status when API keys change
+    // Assuming state type has apiKeys: Record<string, string | undefined | null>
+    type ApiKeysState = { apiKeys: Record<string, string | undefined | null> }; 
     const unsubscribe = useConfigStore.subscribe(
-      state => state.apiKeys,
+      (state: ApiKeysState) => state.apiKeys, // Add type to state
       () => checkApiStatus(),
-      { equalityFn: (a, b) => JSON.stringify(a) === JSON.stringify(b) }
+      { 
+        equalityFn: (a: Record<string, string | undefined | null> | undefined, b: Record<string, string | undefined | null> | undefined) => 
+          JSON.stringify(a) === JSON.stringify(b) // Add types to a, b
+      }
     );
     
     // Periodic check for status changes
@@ -156,10 +188,10 @@ export function ApiStatusDisplay() {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []);
+  }, []); // Keep dependencies minimal for initial load and setup
 
   // Display status icon based on API connection state
-  const getStatusIcon = (status: 'checking' | 'connected' | 'disconnected') => {
+  const getStatusIcon = (status: StatusType) => { // Use StatusType
     switch (status) {
       case 'checking':
         return <Loader size={16} className="text-primary animate-spin" />;
@@ -168,6 +200,32 @@ export function ApiStatusDisplay() {
       case 'disconnected':
         return <XCircle size={16} className="text-destructive" />;
     }
+  };
+
+  // Helper to get status text and class (addresses nested ternary warnings)
+  const getStatusTextAndClass = (status: StatusType): { text: string; className: string } => {
+    switch (status) {
+      case 'checking':
+        return { text: 'Checking...', className: 'text-muted-foreground' };
+      case 'connected':
+        return { text: 'Connected', className: 'text-success' };
+      case 'disconnected':
+        return { text: 'Disconnected', className: 'text-destructive' };
+    }
+  };
+
+  // Helper to render status item (addresses nested ternary warnings)
+  const renderStatusItem = (label: string, status: StatusType) => {
+    const { text, className } = getStatusTextAndClass(status);
+    return (
+      <div className="flex items-center justify-between mb-3 p-2 rounded-md bg-muted/30">
+        <span className="text-sm">{label}</span>
+        <div className="flex items-center gap-1.5">
+          {getStatusIcon(status)}
+          <span className={`text-xs ${className}`}>{text}</span>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -202,38 +260,10 @@ export function ApiStatusDisplay() {
       </div>
       
       {/* Supabase Status */}
-      <div className="flex items-center justify-between mb-3 p-2 rounded-md bg-muted/30">
-        <span className="text-sm">Database Connection</span>
-        <div className="flex items-center gap-1.5">
-          {getStatusIcon(supabaseStatus)}
-          <span className={`text-xs ${
-            supabaseStatus === 'connected' ? 'text-success' :
-            supabaseStatus === 'disconnected' ? 'text-destructive' :
-            'text-muted-foreground'
-          }`}>
-            {supabaseStatus === 'checking' ? 'Checking...' :
-             supabaseStatus === 'connected' ? 'Connected' :
-             'Disconnected'}
-          </span>
-        </div>
-      </div>
+      {renderStatusItem("Database Connection", supabaseStatus)}
       
       {/* Edge Functions Status */}
-      <div className="flex items-center justify-between mb-3 p-2 rounded-md bg-muted/30">
-        <span className="text-sm">Edge Functions</span>
-        <div className="flex items-center gap-1.5">
-          {getStatusIcon(edgeFunctionsStatus)}
-          <span className={`text-xs ${
-            edgeFunctionsStatus === 'connected' ? 'text-success' :
-            edgeFunctionsStatus === 'disconnected' ? 'text-destructive' :
-            'text-muted-foreground'
-          }`}>
-            {edgeFunctionsStatus === 'checking' ? 'Checking...' :
-             edgeFunctionsStatus === 'connected' ? 'Connected' :
-             'Disconnected'}
-          </span>
-        </div>
-      </div>
+      {renderStatusItem("Edge Functions", edgeFunctionsStatus)}
       
       {/* Edge Functions Details (collapsible) */}
       {Object.keys(edgeFunctionDetails).length > 0 && (
@@ -242,40 +272,26 @@ export function ApiStatusDisplay() {
             <span className="text-sm font-medium">Edge Function Details</span>
           </div>
           <div className="mt-2 space-y-1">
-            {Object.entries(edgeFunctionDetails).map(([name, status]) => (
-              <div key={name} className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">{name}</span>
-                <div className="flex items-center gap-1">
-                  {status ? 
-                    <CheckCircle size={12} className="text-success" /> : 
-                    <XCircle size={12} className="text-destructive" />
-                  }
-                  <span className={status ? 'text-success' : 'text-destructive'}>
-                    {status ? 'Working' : 'Failed'}
-                  </span>
+            {Object.entries(edgeFunctionDetails).map(([name, status]) => {
+              const statusText = status ? 'Working' : 'Failed';
+              const statusClass = status ? 'text-success' : 'text-destructive';
+              const StatusIcon = status ? CheckCircle : XCircle;
+              return (
+                <div key={name} className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">{name}</span>
+                  <div className="flex items-center gap-1">
+                    <StatusIcon size={12} className={statusClass} />
+                    <span className={statusClass}>{statusText}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
       
       {/* API Status */}
-      <div className="flex items-center justify-between mb-3 p-2 rounded-md bg-muted/30">
-        <span className="text-sm">API Services</span>
-        <div className="flex items-center gap-1.5">
-          {getStatusIcon(apiStatus)}
-          <span className={`text-xs ${
-            apiStatus === 'connected' ? 'text-success' :
-            apiStatus === 'disconnected' ? 'text-destructive' :
-            'text-muted-foreground'
-          }`}>
-            {apiStatus === 'checking' ? 'Checking...' :
-             apiStatus === 'connected' ? 'Connected' :
-             'Disconnected'}
-          </span>
-        </div>
-      </div>
+      {renderStatusItem("API Services", apiStatus)}
       
       {/* API Provider Details */}
       {(connectedProviders.length > 0 || Object.keys(failedProviders).length > 0) && (
@@ -284,7 +300,7 @@ export function ApiStatusDisplay() {
             <span className="text-sm font-medium">API Provider Details</span>
           </div>
           <div className="mt-2 space-y-1">
-            {connectedProviders.map(provider => (
+            {connectedProviders.map((provider: string) => ( 
               <div key={provider} className="flex items-center justify-between text-xs">
                 <span className="text-muted-foreground">{provider.charAt(0).toUpperCase() + provider.slice(1)}</span>
                 <div className="flex items-center gap-1">
@@ -294,15 +310,19 @@ export function ApiStatusDisplay() {
               </div>
             ))}
             
-            {Object.entries(failedProviders).map(([provider, errorMsg]) => (
-              <div key={provider} className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">{provider.charAt(0).toUpperCase() + provider.slice(1)}</span>
-                <div className="flex items-center gap-1">
-                  <XCircle size={12} className="text-destructive" />
-                  <span className="text-destructive" title={errorMsg}>Failed</span>
+            {Object.entries(failedProviders).map((entry) => {
+              // Fix: Assert entry type here
+              const [provider, errorMsg] = entry as [string, string]; 
+              return (
+                <div key={provider} className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">{provider.charAt(0).toUpperCase() + provider.slice(1)}</span>
+                  <div className="flex items-center gap-1">
+                    <XCircle size={12} className="text-destructive" />
+                    <span className="text-destructive" title={errorMsg}>Failed</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -330,7 +350,7 @@ export function ApiStatusDisplay() {
                   Edge Functions
                 </motion.span>
               )}
-              {connectedProviders.map(provider => (
+              {connectedProviders.map((provider: string) => ( 
                 <motion.span 
                   key={provider}
                   initial={{ opacity: 0, scale: 0.8 }}

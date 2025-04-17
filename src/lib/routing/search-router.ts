@@ -44,14 +44,6 @@ export class SearchRouter {
       requiresEntity,
     });
 
-    // If search is likely not needed, return low confidence
-    if (needsSearch < this.searchThreshold) {
-      return {
-        provider: 'perplexity',
-        confidence: 0.5,
-        routingExplanation: 'Query may not require search, using general-purpose search with low confidence',
-      };
-    }
 
     // For image searches, prefer Bing
     if (requiresImages) {
@@ -99,6 +91,14 @@ export class SearchRouter {
         provider: 'bing', 
         confidence: 0.85,
         routingExplanation: 'Entity information requested, using Bing for comprehensive entity details',
+      };
+    }
+    // If search is likely not needed, return low confidence
+    if (needsSearch < this.searchThreshold) {
+      return {
+        provider: 'perplexity',
+        confidence: 0.5,
+        routingExplanation: 'Query may not require search, using general-purpose search with low confidence',
       };
     }
 

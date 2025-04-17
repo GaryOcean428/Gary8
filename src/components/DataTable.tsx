@@ -3,10 +3,10 @@ import { Download } from 'lucide-react';
 import { toolRegistry } from '../lib/tools/tool-registry';
 
 interface DataTableProps {
-  data: any[];
+  readonly data: any[]; // Corrected duplicate identifier
 }
 
-export function DataTable({ data }: DataTableProps) {
+export function DataTable({ data }: Readonly<DataTableProps>) { 
   if (!data || data.length === 0) {
     return null;
   }
@@ -49,9 +49,10 @@ export function DataTable({ data }: DataTableProps) {
           </thead>
           <tbody className="divide-y divide-gray-700">
             {data.map((row, i) => (
-              <tr key={i} className="hover:bg-gray-700">
+              // Use row.id if available, otherwise fallback to index with prefix
+              <tr key={row.id ?? `row-${i}`} className="hover:bg-gray-700"> 
                 {headers.map(header => (
-                  <td key={header} className="px-4 py-3 text-sm">
+                  <td key={`${row.id ?? `row-${i}`}-${header}`} className="px-4 py-3 text-sm"> {/* Also make cell key more unique */}
                     {row[header]}
                   </td>
                 ))}

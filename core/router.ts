@@ -505,7 +505,7 @@ export class AIModelRouter {
     // Basic metrics
     const wordCount = query.split(/\s+/).length;
     const sentenceCount = (query.match(/[.!?]+/g) || []).length + 1;
-    const avgWordLength = query.split(/\s+/).reduce((acc, word) => acc + word.length, 0) / Math.max(wordCount, 1);
+    // const avgWordLength = query.split(/\s+/).reduce((acc, word) => acc + word.length, 0) / Math.max(wordCount, 1); // Removed unused variable
     
     // Complexity indicators
     const technicalTerms = [
@@ -549,6 +549,43 @@ export class AIModelRouter {
     // Calculate final score, ensuring it's in 0-1 range
     complexityScore = wordCountScore + sentenceScore + technicalScore + questionScore;
     return Math.min(Math.max(complexityScore, 0), 1);
+  }
+
+  /**
+   * Calculate a score for a model based on capabilities and context size.
+   */
+  private calculateModelScore(
+    model: ModelConfig,
+    capabilities: Capability[],
+    contextSize: number,
+    taskType: string
+  ): number {
+    let score = 0;
+
+    // Context window capacity check (essential)
+    if (model.contextWindow < contextSize) {
+      return -1; // Indicate model is unsuitable
+    }
+    score += 2; // Base score for meeting context requirement
+
+    // Capability support scoring
+    capabilities.forEach(capability => {
+      if (capability === 'REASONING' && model.supportsReasoning) score += 2;
+      if (capability === 'SEARCH' && model.supportsSearch) score += 2;
+      if (capability === 'COMPUTER_USE' && model.supportsComputerUse) score += 2;
+    });
+
+    // Specialized domain match scoring
+    if (model.specializedDomains.some(domain => domain.toLowerCase() === taskType.toLowerCase())) {
+      score += 3;
+    }
+
+    // Streaming optimization scoring (if needed)
+    if (capabilities.includes('REALTIME') && model.streamingOptimized) {
+      score += 2;
+    }
+
+    return score;
   }
 
   /**
@@ -713,37 +750,18 @@ export class AIModelRouter {
     const tierModels = this.models[tier];
     let bestModel: ModelConfig | null = null;
     let bestScore = -1;
-    
+    const taskType = this.determineTaskType(capabilities.join(' ')); // Determine task type once
+
     for (const [, model] of Object.entries(tierModels)) {
-      let score = 0;
-      
-      // Context window capacity
-      if (model.contextWindow >= contextSize) {
-        score += 2;
-      } else {
-        continue; // Skip models that can't handle the context
+      const score = this.calculateModelScore(model, capabilities, contextSize, taskType);
+
+      // Skip unsuitable models or those with lower scores
+      if (score === -1 || score < bestScore) {
+        continue;
       }
-      
-      // Capability support
-      capabilities.forEach(capability => {
-        if (capability === 'REASONING' && model.supportsReasoning) score += 2;
-        if (capability === 'SEARCH' && model.supportsSearch) score += 2;
-        if (capability === 'COMPUTER_USE' && model.supportsComputerUse) score += 2;
-      });
-      
-      // Specialized domain match
-      const taskType = this.determineTaskType(capabilities.join(' '));
-      if (model.specializedDomains.some(domain => domain.toLowerCase() === taskType.toLowerCase())) {
-        score += 3;
-      }
-      
-      // Streaming optimization if needed
-      if (capabilities.includes('REALTIME') && model.streamingOptimized) {
-        score += 2;
-      }
-      
-      // If scores are tied, prefer lower cost
-      if (score > bestScore || (score === bestScore && model.costTier < (bestModel?.costTier || Infinity))) {
+
+      // Update best model if score is higher, or if score is equal but cost is lower
+      if (score > bestScore || (score === bestScore && model.costTier < (bestModel?.costTier ?? Infinity))) {
         bestScore = score;
         bestModel = model;
       }
@@ -837,11 +855,18 @@ export class AIModelRouter {
     capabilities: Capability[],
     taskType: string
   ): string {
-    const complexityLevel = 
-      complexity < 0.3 ? "simple" :
-      complexity < 0.5 ? "moderate" :
-      complexity < 0.7 ? "significant" :
-      complexity < 0.9 ? "high" : "very high";
+    let complexityLevel: string;
+    if (complexity < 0.3) {
+      complexityLevel = "simple";
+    } else if (complexity < 0.5) {
+      complexityLevel = "moderate";
+    } else if (complexity < 0.7) {
+      complexityLevel = "significant";
+    } else if (complexity < 0.9) {
+      complexityLevel = "high";
+    } else {
+      complexityLevel = "very high";
+    }
       
     const capabilitiesText = capabilities.length > 0 
       ? `requiring capabilities: ${capabilities.join(', ')}`

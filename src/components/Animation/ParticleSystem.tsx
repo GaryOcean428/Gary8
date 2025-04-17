@@ -7,12 +7,22 @@ interface ParticleSystemProps {
   type: 'stars' | 'dust' | 'bubbles';
   width: number;
   height: number;
-  isPlaying: boolean;
+  readonly isPlaying: boolean;
 }
 
-export function ParticleSystem({ count, type, width, height, isPlaying }: ParticleSystemProps) {
+interface Particle {
+  id: string;
+  x: number;
+  y: number;
+  size: number;
+  opacity: number;
+  delay: number;
+  duration: number;
+}
+
+export function ParticleSystem({ count, type, width, height, isPlaying }: Readonly<ParticleSystemProps>) { // Mark props as read-only
   // Generate particles with random positions and properties
-  const particles = useMemo(() => {
+  const particles: Particle[] = useMemo(() => { // Add Particle type
     return Array.from({ length: count }).map((_, i) => {
       const size = getParticleSize(type);
       const delay = randomBetween(0, 5);
@@ -47,7 +57,7 @@ export function ParticleSystem({ count, type, width, height, isPlaying }: Partic
   };
 
   // Define particle animations based on type
-  const getParticleAnimation = (type: string, particle: any) => {
+  const getParticleAnimation = (type: string, particle: Particle) => { // Use Particle type
     switch (type) {
       case 'stars':
         return isPlaying ? {
@@ -72,7 +82,7 @@ export function ParticleSystem({ count, type, width, height, isPlaying }: Partic
   };
 
   // Define particle transition timing based on type
-  const getParticleTransition = (type: string, particle: any) => {
+  const getParticleTransition = (type: string, particle: Particle) => { // Use Particle type
     switch (type) {
       case 'stars':
         return {

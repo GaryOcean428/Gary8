@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
+// Removed duplicate import line below
 import { DocumentList } from './DocumentList';
 import { DocumentUpload } from './DocumentUpload';
 import { DocumentManager } from '../lib/documents/document-manager';
 import { useAuth } from '../lib/auth/AuthProvider';
-import { Search, Grid, List, Plus, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Grid, List, Plus, AlertCircle, ArrowLeft } from 'lucide-react'; // Removed Search
 import type { Document, SearchOptions } from '../lib/documents/types';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -105,6 +106,7 @@ export function DocumentWorkspace() {
                   ? 'bg-muted text-primary'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
+              aria-label="Grid View" // Add aria-label
             >
               <Grid size={20} />
             </button>
@@ -115,6 +117,7 @@ export function DocumentWorkspace() {
                   ? 'bg-muted text-primary'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
+              aria-label="List View" // Add aria-label
             >
               <List size={20} />
             </button>

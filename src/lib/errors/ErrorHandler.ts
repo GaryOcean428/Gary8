@@ -7,11 +7,13 @@ export class ErrorHandler {
     let details: any;
 
     if (error instanceof APIError) {
-      message = this.getAPIErrorMessage(error);
+      // Use the original message for API errors
+      message = error.message;
+      // Include status code and response, and any additional details
       details = {
         statusCode: error.statusCode,
         response: error.response,
-        ...error.details
+        ...(error.details || {})
       };
     } else if (error instanceof AppError) {
       message = error.message;
@@ -62,10 +64,10 @@ export class ErrorHandler {
   }
 
   static isNetworkError(error: unknown): boolean {
-    return (
-      error instanceof TypeError &&
-      error.message.includes('Failed to fetch')
-    ) || !navigator.onLine;
+    const isFetchError = error instanceof TypeError &&
+      (error as Error).message.includes('Failed to fetch');
+    const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+    return isFetchError || isOffline;
   }
 
   static isAPIError(error: unknown): error is APIError {

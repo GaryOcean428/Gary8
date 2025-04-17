@@ -1,0 +1,7 @@
+.upload-progress-bar {
+  height: 8px;
+  /* width is set dynamically via inline style */
+  background-color: #3b82f6; /* blue-500 */
+  border-radius: 9999px; /* rounded-full */
+  transition: width 0.3s ease-in-out;
+}

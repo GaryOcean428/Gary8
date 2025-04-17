@@ -34,22 +34,22 @@ export class ContextEnhancer {
       // Technical terms
       {
         pattern: /\b(api|function|component|database|server|client|endpoint)\b/gi,
-        enhance: (match) => `[Technical Context] The conversation involves technical concepts, specifically: ${match[0]}`;
+        enhance: (match, message) => `[Technical Context] The conversation involves technical concepts, specifically: ${match[0]}`
       },
       // Questions and inquiries
       {
         pattern: /\b(how|what|why|when|where|who|can you|could you)\b.*\?/gi,
-        enhance: (match) => `[Question Context] The user is asking for information about: ${match[0]}`;
+        enhance: (match, message) => `[Question Context] The user is asking for information about: ${match[0]}`
       },
       // Action requests
       {
         pattern: /\b(create|make|build|implement|add|update|delete|remove)\b/gi,
-        enhance: (match) => `[Action Context] The user wants to perform an action: ${match[0]}`;
+        enhance: (match, message) => `[Action Context] The user wants to perform an action: ${match[0]}`
       },
       // Error-related context
       {
         pattern: /\b(error|bug|issue|problem|fail|crash)\b/gi,
-        enhance: (match) => `[Error Context] The user is experiencing issues: ${match[0]}`;
+        enhance: (match, message) => `[Error Context] The user is experiencing issues: ${match[0]}`
       }
     ];
   }

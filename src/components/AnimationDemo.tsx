@@ -4,7 +4,7 @@ import { Button } from './ui/Button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from './ui/Card';
 import { Badge } from './ui/Badge';
 import { motion } from 'framer-motion';
-import { Palette, RefreshCw, Zap, Play, ArrowRight } from 'lucide-react';
+import { Palette, RefreshCw, Zap, Play } from 'lucide-react'; // Removed ArrowRight
 import { useNavigate } from 'react-router-dom';
 
 export function AnimationDemo() {
@@ -13,11 +13,14 @@ export function AnimationDemo() {
   const [key, setKey] = useState(0);
   const navigate = useNavigate();
   
+  type SceneType = 'nature' | 'space' | 'abstract' | 'underwater';
+  type ThemeType = 'dark' | 'light';
+
   // Auto-change scene types for demo effect
   useEffect(() => {
     const interval = setInterval(() => {
-      setSceneType(prev => {
-        const types: Array<'nature' | 'space' | 'abstract' | 'underwater'> = ['nature', 'space', 'abstract', 'underwater'];
+      setSceneType((prev: SceneType) => { // Add type for prev
+        const types: Array<SceneType> = ['nature', 'space', 'abstract', 'underwater'];
         const currentIndex = types.indexOf(prev);
         const nextIndex = (currentIndex + 1) % types.length;
         return types[nextIndex];
@@ -81,7 +84,7 @@ export function AnimationDemo() {
             variant="outline"
             size="sm"
             leftIcon={<Palette size={16} />}
-            onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
+            onClick={() => setTheme((prev: ThemeType) => prev === 'dark' ? 'light' : 'dark')} // Add type for prev
           >
             {theme === 'dark' ? 'Light Theme' : 'Dark Theme'}
           </Button>
@@ -103,7 +106,7 @@ export function AnimationDemo() {
             variant="ghost"
             size="sm"
             leftIcon={<RefreshCw size={16} />}
-            onClick={() => setKey(prevKey => prevKey + 1)}
+            onClick={() => setKey((prevKey: number) => prevKey + 1)} // Add type for prevKey
           >
             Reset
           </Button>
