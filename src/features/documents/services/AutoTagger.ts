@@ -124,7 +124,7 @@ export class AutoTagger {
     return languages;
   }
 
-  generateTagsFromMessages(messages: any[]): string[] {
+  generateTagsFromMessages(messages: { content: string }[]): string[] {
     const tags = new Set<string>();
     const content = messages.map(m => m.content).join(' ').toLowerCase();
 

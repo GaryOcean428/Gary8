@@ -253,6 +253,8 @@ stages:
 
 - Document code decisions and non-obvious implementations
 - Keep documentation updated when code changes
+- Always update roadmap, planning or fix related .md's:
+    - i.e. those that track a multistep implementation like a feature inclusion, a corrective set of actions, etc...
 - Document APIs using standardized JSDoc or similar conventions
 - Follow markdown linting rules for documentation files
 - Include language specifiers in code blocks

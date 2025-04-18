@@ -76,7 +76,7 @@ export function DocumentUpload({
       const targetWorkspaceId = workspaceId || user.id;
 
       await Promise.all(
-        files.map(async (file, index) => {
+        files.map(async (file, _index) => {
           try {
             setUploadProgress(prev => ({ ...prev, [file.name]: 0 }));
             

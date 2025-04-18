@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Sparkles, MoreHorizontal, GaugeCircle, Clock, Newspaper, X, ArrowUpDown, Filter, Book, Image, AlertCircle, Loader, RefreshCw } from 'lucide-react';
+import { Search, Sparkles, GaugeCircle, Newspaper, X, ArrowUpDown, Filter, Book, Image, AlertCircle, RefreshCw } from 'lucide-react';
 import { useSearch } from '../context/SearchContext';
 import SearchResults from './SearchResults';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Button } from './ui/Button';
-import { Badge } from './ui/Badge';
 
 export default function SearchInterface() {
   const [query, setQuery] = useState('');
@@ -22,7 +21,6 @@ export default function SearchInterface() {
     results, 
     isStreaming, 
     streamingPhase, 
-    isCached, 
     error,
     retrySearch,
     cancelSearch
@@ -62,6 +60,7 @@ export default function SearchInterface() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     // If the user presses Enter, start search
     if (e.key === 'Enter') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       handleSearch(e as any);
     }
     

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExternalLink, Code, Search, FileText, Calendar, User, Star, Image, Newspaper, Book, Database } from 'lucide-react';
+import { ExternalLink, Code, Search, FileText, Image, Newspaper, Book, Database } from 'lucide-react';
 import { useSearch } from '../context/SearchContext';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';

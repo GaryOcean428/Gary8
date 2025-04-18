@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Trash2, Tag, ExternalLink, Search, X } from 'lucide-react';
+import { FileText, Trash2, Tag, ExternalLink, Search, X, RefreshCw } from 'lucide-react';
 import type { Document } from '../types';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -57,7 +57,17 @@ export function DocumentList({
     <div className="h-full flex flex-col lg:flex-row">
       {/* Tag Sidebar */}
       <div className="w-full lg:w-64 bg-card/50 backdrop-blur-sm p-4 flex-shrink-0 border-b lg:border-b-0 lg:border-r border-border">
-        <h3 className="text-sm font-medium mb-4">Document Tags</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-medium">Document Tags</h3>
+          <button
+            type="button"
+            onClick={onRefresh}
+            className="p-1 rounded hover:bg-muted transition-colors"
+            aria-label="Refresh Documents"
+          >
+            <RefreshCw size={16} />
+          </button>
+        </div>
         <div className="flex flex-wrap lg:flex-col gap-2">
           {allTags.map(tag => (
             <button

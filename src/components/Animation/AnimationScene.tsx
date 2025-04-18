@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { motion, useAnimation, AnimatePresence, useMotionValue } from 'framer-motion'; // Removed unused MotionValue, useTransform, useSpring
-// Removed unused icon imports
+import { motion, useAnimation, AnimatePresence, useMotionValue } from 'framer-motion';
+import { Moon, Sun, Stars, Cloud, Wind, Zap } from 'lucide-react';
 import './AnimationScene.css'; // Import the CSS file
 import { Character } from './Character';
 import { Environment } from './Environment';

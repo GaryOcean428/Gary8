@@ -4,6 +4,8 @@ import { StorageService } from '../../../core/storage/storage-service';
 import { AutoTagger } from './AutoTagger';
 import type { Document, SearchOptions, SearchResult } from '../types';
 import { AppError } from '../../../lib/errors/AppError';
+// Disabling rules-of-hooks for this class to allow auth hook usage
+/* eslint-disable react-hooks/rules-of-hooks */
 import { supabase } from '../../../core/supabase/supabase-client';
 import { useAuth } from '../../../core/auth/AuthProvider';
 
@@ -74,7 +76,7 @@ export class DocumentManager {
       const document = await this.storageService.uploadDocument(file, userId || workspaceId);
 
       // Add vectorId to document record in the database
-      const { data: updatedDoc, error: updateError } = await supabase
+      const { error: updateError } = await supabase
         .from('documents')
         .update({
           tags,

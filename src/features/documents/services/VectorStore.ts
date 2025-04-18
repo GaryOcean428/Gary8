@@ -1,5 +1,4 @@
 import { thoughtLogger } from '../../../lib/logging/thought-logger';
-import { supabase } from '../../../core/supabase/supabase-client';
 import { AppError } from '../../../lib/errors/AppError';
 
 interface VectorEntry {
