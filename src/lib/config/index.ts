@@ -51,13 +51,19 @@ export const config = {
     openai: {
       baseUrl: 'https://api.openai.com/v1',
       models: {
-        latest: 'chatgpt-4o-latest',          // 128K context, versatile flagship
-        mini: 'gpt-4o-mini',                  // 128K context, fast & affordable
-        o1: 'o1',                             // 200K context, complex reasoning
-        o1mini: 'o1-mini',                    // 128K context, fast reasoning
-        o3mini: 'o3-mini-2025-01-31',         // 200K context, STEM tasks
-        gpt45: 'gpt-4.5-preview',             // 128K context, creative thinking
-        realtime: 'gpt-4o-realtime-preview'   // Real-time audio/text responses
+        // OpenAI model variants
+        chatgpt41: 'chatgpt-4.1',              // Improved reasoning and creativity
+        gpt41mini: 'gpt-4.1-mini',             // Compact chat variant
+        gpt4o: 'gpt-4o-latest',                // Versatile flagship
+        gpt4oMini: 'gpt-4o-mini',              // Fast & affordable
+        o1Pro: 'o1-pro',                       // Pro performance
+        o1: 'o1',                              // Complex reasoning
+        o1Mini: 'o1-mini',                     // Fast reasoning
+        o3Mini: 'o3-mini-2025-01-31',          // STEM tasks
+        o3: 'o3',                              // Versatile mid-tier GPT-o3
+        o4Mini: 'o4-mini',                     // Cost-sensitive tasks
+        gpt45: 'gpt-4.5-preview',              // Creative generation
+        realtime: 'gpt-4o-realtime-preview'    // Real-time audio/text responses
       },
       maxTokens: 100000,
       temperature: 0.7
@@ -110,10 +116,11 @@ export const config = {
     google: {
       baseUrl: 'https://generativelanguage.googleapis.com/v1',
       models: {
-        flash: 'gemini-2.0-flash-thinking-exp',   // 1M context, reasoning
-        pro: 'gemini-2.5-pro-exp-03-25',          // State-of-the-art reasoning
-        proExp: 'gemini-2.0-pro-experimental',    // 2M context, best-in-class coding
-        lite: 'gemini-2.0-flash-lite'             // 128K context, cost-efficient
+        flashBase: 'gemini-2.0-flash',                 // General-purpose, fast and efficient
+        flashThinking: 'gemini-2.0-flash-thinking-exp', // Advanced reasoning
+        pro: 'gemini-2.5-pro-exp-03-25',               // State-of-the-art reasoning
+        proExp: 'gemini-2.0-pro-experimental',         // Best-in-class coding
+        lite: 'gemini-2.0-flash-lite'                  // Cost-efficient
       },
       maxTokens: 64000,
       temperature: 0.7

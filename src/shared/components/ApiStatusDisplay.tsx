@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Shield, CheckCircle, XCircle, AlertCircle, Loader } from 'lucide-react';
 import { useConfigStore } from '../../lib/config';
 import { APIClient } from '../../lib/api-client';
 import { motion } from 'framer-motion';
-import { getNetworkStatus, testSupabaseConnection } from '../../core/supabase/supabase-client';
-import { supabase } from '../../core/supabase/supabase-client';
+import { getNetworkStatus, testSupabaseConnection, supabase } from '../../core/supabase/supabase-client';
 import { useSettings } from '../../features/settings/hooks/useSettings';
 
 export function ApiStatusDisplay() {
@@ -43,7 +42,7 @@ export function ApiStatusDisplay() {
       // Check Edge Functions
       setEdgeFunctionsStatus('checking');
       try {
-        const { data, error } = await supabase.functions.invoke('test-connection', {
+        const { error } = await supabase.functions.invoke('test-connection', {
           body: { provider: 'openai' } // Just checking if the function works
         });
         
@@ -63,7 +62,7 @@ export function ApiStatusDisplay() {
       }
       
       // Check API providers if edge functions are disabled or failed
-      const apiKeys = configStore.getState().apiKeys;
+      const apiKeys = configStore.apiKeys;
       const providersWithKeys = Object.entries(apiKeys)
         .filter(([_, key]) => key && key.trim().length > 10)
         .map(([provider]) => provider);
@@ -120,11 +119,9 @@ export function ApiStatusDisplay() {
     window.addEventListener('offline', handleOffline);
     
     // Re-check API status when API keys change
-    const unsubscribe = useConfigStore.subscribe(
-      state => state.apiKeys,
-      () => checkApiStatus(),
-      { equalityFn: (a, b) => JSON.stringify(a) === JSON.stringify(b) }
-    );
+    const unsubscribe = useConfigStore.subscribe(() => {
+      checkApiStatus();
+    });
     
     // Periodic check for status changes
     const intervalId = setInterval(() => {
@@ -146,11 +143,11 @@ export function ApiStatusDisplay() {
   const getStatusIcon = (status: 'checking' | 'connected' | 'disconnected') => {
     switch (status) {
       case 'checking':
-        return <Loader size={16} className="text-primary animate-spin" />;
+        return <Loader width={16} height={16} className="text-primary animate-spin" />;
       case 'connected':
-        return <CheckCircle size={16} className="text-success" />;
+        return <CheckCircle width={16} height={16} className="text-success" />;
       case 'disconnected':
-        return <XCircle size={16} className="text-destructive" />;
+        return <XCircle width={16} height={16} className="text-destructive" />;
     }
   };
 
@@ -158,7 +155,7 @@ export function ApiStatusDisplay() {
     <div className="rounded-lg p-4 bg-card/50 backdrop-blur-sm border border-border">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Shield size={16} className="text-primary" />
+          <Shield width={16} height={16} className="text-primary" />
           <h3 className="font-medium">Connection Status</h3>
         </div>
       </div>
@@ -167,9 +164,9 @@ export function ApiStatusDisplay() {
       <div className="flex items-center justify-between mb-3 p-2 rounded-md bg-muted/30">
         <span className="text-sm">Network Connection</span>
         <div className="flex items-center gap-1.5">
-          {networkStatus ? 
-            <CheckCircle size={16} className="text-success" /> : 
-            <XCircle size={16} className="text-destructive" />
+          {networkStatus ?
+            <CheckCircle width={16} height={16} className="text-success" /> :
+            <XCircle width={16} height={16} className="text-destructive" />
           }
           <span className={`text-xs ${networkStatus ? 'text-success' : 'text-destructive'}`}>
             {networkStatus ? 'Online' : 'Offline'}
@@ -250,7 +247,7 @@ export function ApiStatusDisplay() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-success/10 text-success border border-success/20"
                 >
-                  <CheckCircle size={12} className="mr-1" />
+                  <CheckCircle width={12} height={12} className="mr-1" />
                   Edge Functions
                 </motion.span>
               )}
@@ -261,7 +258,7 @@ export function ApiStatusDisplay() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-success/10 text-success border border-success/20"
                 >
-                  <CheckCircle size={12} className="mr-1" />
+                  <CheckCircle width={12} height={12} className="mr-1" />
                   {provider.charAt(0).toUpperCase() + provider.slice(1)}
                 </motion.span>
               ))}

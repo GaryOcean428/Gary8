@@ -15,22 +15,29 @@ export interface RouterConfig {
 export class ModelRouter {
   private readonly threshold = 0.63;
   private readonly models = {
-    local: 'ibm-granite/granite-3b-code-base-2k',
-    low: 'llama-3.2-3b-preview',
-    mid: 'llama-3.2-7b-preview',
-    high: 'llama-3.2-70b-preview',
-    superior: 'grok-beta',
-    search: 'sonar-reasoning-pro'  // Updated to use Perplexity's reasoning model
+    // Claude 3.7 for code and high-complexity tasks
+    local: 'claude-3-7-sonnet-20250219',
+    // Versatile open-source LLaMA
+    low: 'llama-3.3-70b-versatile',
+    // Claude Haiku for moderate tasks
+    mid: 'claude-3.5-haiku-latest',
+    // Claude Sonnet for high-complexity
+    high: 'claude-3-7-sonnet-20250219',
+    // GPT-4.5 for creative generation
+    superior: 'gpt-4.5-preview',
+    // Perplexity Sonar Reasoning Pro for up-to-date search
+    search: 'sonar-reasoning-pro'
   };
 
   async route(query: string, history: Message[]): Promise<RouterConfig> {
     thoughtLogger.log('reasoning', 'Analyzing query for model selection');
 
-    const complexity = this.assessComplexity(query);
+    const q = query.toLowerCase();
+    const complexity = this.assessComplexity(q);
     const contextLength = this.calculateContextLength(history);
-    const requiresSearch = this.requiresSearch(query);
-    const requiresCode = this.requiresCodeExecution(query);
-    const questionType = this.classifyQuestion(query);
+    const requiresSearch = this.requiresSearch(q);
+    const requiresCode = this.requiresCodeExecution(q);
+    const questionType = this.classifyQuestion(q);
 
     thoughtLogger.log('observation', 'Query analysis complete', {
       complexity,
@@ -41,21 +48,36 @@ export class ModelRouter {
     });
 
     const consideredModels: string[] = [];
-
+    // Branch: code-related tasks
     if (requiresCode) {
       consideredModels.push(this.models.local);
       return {
         model: this.models.local,
-        maxTokens: 2048,
+        maxTokens: 8192,
         temperature: 0.7,
-        confidence: 0.85,
+        confidence: 0.9,
         responseStrategy: 'code_generation',
-        routingExplanation: 'Using Granite model for code-related task',
+        routingExplanation: 'Code-related task detected; using Claude 3.7 for code generation',
         questionType,
         consideredModels
       };
     }
-
+    // Branch: creative generation
+    // Creative generation tasks (e.g., stories, ideas, innovations)
+    if (/\b(story|stories|generate|ideas?|innovative|creative|create|joke|jokes)\b/.test(q)) {
+      consideredModels.push(this.models.superior);
+      return {
+        model: this.models.superior,
+        maxTokens: 4096,
+        temperature: 0.8,
+        confidence: 0.8,
+        responseStrategy: 'creative_generation',
+        routingExplanation: 'Creative task detected; using GPT-4.5 for creative generation',
+        questionType,
+        consideredModels
+      };
+    }
+    // Branch: search queries
     if (requiresSearch) {
       consideredModels.push(this.models.search);
       return {
@@ -63,13 +85,83 @@ export class ModelRouter {
         maxTokens: 4096,
         temperature: 0.7,
         confidence: 0.9,
-        responseStrategy: 'search',
-        routingExplanation: 'Search query detected, using Perplexity Sonar Reasoning Pro model for up-to-date information',
+        responseStrategy: 'search_and_synthesize',
+        routingExplanation: 'Search query detected; using Perplexity Sonar Reasoning Pro',
         questionType,
         consideredModels
       };
     }
-
+    // Branch: multi-step reasoning
+    if (/\b(then|after|before|finally)\b/.test(q)) {
+      consideredModels.push(this.models.high);
+      return {
+        model: this.models.high,
+        maxTokens: 8192,
+        temperature: 0.7,
+        confidence: 0.9,
+        responseStrategy: 'chain_of_thought',
+        routingExplanation: 'Multi-step reasoning detected; using chain-of-thought on Claude 3.7',
+        questionType,
+        consideredModels
+      };
+    }
+    // Branch: comparative analysis questions
+    if (questionType === 'analysis') {
+      consideredModels.push(this.models.high);
+      return {
+        model: this.models.high,
+        maxTokens: 8192,
+        temperature: 0.7,
+        confidence: 0.9,
+        responseStrategy: 'comparative_analysis',
+        routingExplanation: 'Comparative analysis detected; using Claude 3.7',
+        questionType,
+        consideredModels
+      };
+    }
+    // Branch: problem-solving queries (moderate complexity)
+    if (questionType === 'problem_solving') {
+      consideredModels.push(this.models.mid);
+      return {
+        model: this.models.mid,
+        maxTokens: 4096,
+        temperature: 0.7,
+        confidence: 0.85,
+        responseStrategy: 'chain_of_thought',
+        routingExplanation: 'Problem-solving query detected; using chain-of-thought on Claude Haiku',
+        questionType,
+        consideredModels
+      };
+    }
+    // Branch: factual questions (direct answers)
+    if (questionType === 'factual') {
+      consideredModels.push(this.models.low);
+      return {
+        model: this.models.low,
+        maxTokens: 2048,
+        temperature: 0.7,
+        confidence: 0.8,
+        responseStrategy: 'direct_answer',
+        routingExplanation: 'Factual question detected; using LLaMA versatile model for direct answer',
+        questionType,
+        consideredModels
+      };
+    }
+    // Branch: extended context - prefer high-capacity model if conversation is long
+    if (history.length > 10) {
+      consideredModels.push(this.models.high);
+      return {
+        model: this.models.high,
+        maxTokens: 8192,
+        temperature: 0.7,
+        confidence: 0.9,
+        responseStrategy: 'default',
+        routingExplanation: 'Extended context detected; using advanced model',
+        questionType,
+        consideredModels
+      };
+    }
+    // Branch: simple queries (low complexity)
     if (complexity < 0.3 && contextLength < 1000) {
       consideredModels.push(this.models.low);
       return {
@@ -78,7 +170,7 @@ export class ModelRouter {
         temperature: 0.7,
         confidence: 0.8,
         responseStrategy: 'default',
-        routingExplanation: 'Simple query detected, using lightweight model',
+        routingExplanation: 'Simple query detected; using versatile LLaMA model',
         questionType,
         consideredModels
       };
@@ -92,7 +184,7 @@ export class ModelRouter {
         temperature: 0.7,
         confidence: 0.85,
         responseStrategy: 'default',
-        routingExplanation: 'Moderate complexity detected, using balanced model',
+        routingExplanation: 'Moderate complexity detected; using Claude Haiku for balanced tasks',
         questionType,
         consideredModels
       };
@@ -106,12 +198,13 @@ export class ModelRouter {
         temperature: 0.7,
         confidence: 0.9,
         responseStrategy: 'default',
-        routingExplanation: 'High complexity detected, using advanced model',
+        routingExplanation: 'High complexity detected; using Claude Sonnet for advanced reasoning',
         questionType,
         consideredModels
       };
     }
 
+    // Fallback to creative flagship for very complex or uncategorized tasks
     consideredModels.push(this.models.superior);
     return {
       model: this.models.superior,
@@ -119,7 +212,7 @@ export class ModelRouter {
       temperature: 0.7,
       confidence: 0.95,
       responseStrategy: 'default',
-      routingExplanation: 'Complex query detected, using superior model',
+      routingExplanation: 'Complex or uncategorized query; using GPT-4.5 flagship',
       questionType,
       consideredModels
     };
@@ -128,10 +221,10 @@ export class ModelRouter {
   private assessComplexity(query: string): number {
     const factors = {
       length: Math.min(query.length / 500, 1),
-      questionWords: (query.match(/\b(how|why|what|when|where|who)\b/gi) || []).length * 0.1,
-      technicalTerms: (query.match(/\b(algorithm|function|process|system|analyze)\b/gi) || []).length * 0.15,
-      codeRelated: /\b(code|program|debug|function|api)\b/i.test(query) ? 0.3 : 0,
-      multipleSteps: (query.match(/\b(and|then|after|before|finally)\b/gi) || []).length * 0.1
+      questionWords: (query.match(/\b(how|why|what|when|where|who|explain)\b/gi) || []).length * 0.1,
+      technicalTerms: (query.match(/\b(algorithm|function|process|system|analyze|architecture|performance|reliability|security)\b/gi) || []).length * 0.15,
+      codeRelated: /\b(code|program|debug|function|api|schema|implement|optimize)\b/i.test(query) ? 0.3 : 0,
+      multipleSteps: 0 // multi-step handled separately
     };
 
     return Math.min(
@@ -151,19 +244,24 @@ export class ModelRouter {
       'program',
       'algorithm',
       'implement',
+      'optimize',
       'debug',
       'compile',
-      'execute'
+      'execute',
+      'schema'
     ];
-
-    return codeKeywords.some(keyword => 
-      query.toLowerCase().includes(keyword)
-    );
+    const text = query.toLowerCase();
+    return codeKeywords.some(keyword => {
+      const pattern = new RegExp(`\\b${keyword}\\b`);
+      return pattern.test(text);
+    });
   }
 
   private requiresSearch(query: string): boolean {
     const searchTerms = [
+      'research',
       'search',
+      'weather',
       'find',
       'look up',
       'latest',

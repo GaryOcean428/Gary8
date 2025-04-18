@@ -1,31 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { APIClient } from '../../lib/api-client';
-import { ModelRouter } from '../../lib/routing/router';
-
-// Mock dependencies
-vi.mock('../../lib/routing/router', () => ({
-  ModelRouter: vi.fn().mockImplementation(() => ({
-    route: vi.fn().mockResolvedValue({
-      model: 'gpt-4o',
-      maxTokens: 8192,
-      temperature: 0.7,
-      confidence: 0.9,
-    })
-  }))
-}));
-
+// Mock dependencies before importing modules
 vi.mock('../../lib/config', () => ({
   useConfigStore: {
     getState: vi.fn().mockReturnValue({
-      apiKeys: {
-        openai: 'test-openai-key',
-        groq: 'test-groq-key'
-      }
+      apiKeys: { openai: 'test-openai-key', groq: 'test-groq-key' }
     }),
     setState: vi.fn(),
     subscribe: vi.fn().mockReturnValue(() => {}),
   }
 }));
+vi.mock('../../lib/routing/model-router', () => ({
+  ModelRouter: vi.fn().mockImplementation(() => ({
+    route: vi.fn().mockResolvedValue({ model: 'gpt-4o', maxTokens: 8192, temperature: 0.7, confidence: 0.9 })
+  }))
+}));
+import { APIClient } from '../../lib/api-client';
+import { ModelRouter } from '../../lib/routing/model-router';
+import { useConfigStore } from '../../lib/config';
+
+// (Mocks for config and model-router moved to top)
 
 vi.mock('../../lib/api/openai-api', () => ({
   OpenAIAPI: {
@@ -107,10 +100,8 @@ describe('APIClient', () => {
     });
     
     it('should handle missing API key', async () => {
-      const { useConfigStore } = require('../../lib/config');
-      useConfigStore.getState.mockReturnValueOnce({
-        apiKeys: { openai: '' }
-      });
+      // Override config store to simulate missing key
+      useConfigStore.getState.mockReturnValueOnce({ apiKeys: { openai: '' } });
       
       const result = await apiClient.testConnection('openai');
       

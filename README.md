@@ -51,16 +51,16 @@ For Supabase Edge Functions, you'll also need to set the environment variables i
 
 ```bash
 # Install dependencies
-npm install
+yarn
 
 # Run development server
-npm run dev
+yarn dev
 
 # Build for production
-npm run build
+yarn build
 
 # Run tests
-npm run test
+yarn test
 ```
 
 ## Architecture

@@ -1,5 +1,23 @@
 # Search Functionality Improvement Roadmap
 
+## Next Phase Plan
+1. Modernize **SearchRouter** to satisfy routing tests and align with updated AI model lineup.
+2. Modernize **ModelRouter** to use the latest AI models and pass calibration tests.
+3. Refactor **APIClient** to integrate the OpenAI Responses API and Agents SDK; fix configuration-store usage.
+4. Update **RetryHandler** to correctly detect offline status and implement circuit-breaking.
+
+## Implementation Plan
+- **Step 1**: Update `src/lib/routing/search-router.ts`; ensure `search-router.test.ts` passes.
+- **Step 2**: Update `src/lib/routing/model-router.ts`; ensure `router.test.ts` passes.
+- **Step 3**: Refactor `src/lib/api-client.ts` to use the Responses API and Agents SDK; ensure `api-client.test.ts` passes.
+- **Step 4**: Fix `src/lib/utils/RetryHandler.ts` for offline detection; ensure `RetryHandler.test.ts` passes.
+
+## Next Steps
+1. After each step, update this roadmap and `docs/PROJECT.md` with status.
+2. Commit changes and run full test suite.
+3. Document any encountered challenges or adjustments.
+4. Proceed to the next step until all core tests are green.
+
 ## Phase 1: Critical Fixes (Current - Immediate)
 
 - [x] Fix Edge Function deployment issues
