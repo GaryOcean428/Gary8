@@ -311,6 +311,8 @@ export class APIClient {
     }
 
     await this.rateLimiter.acquire();
+    // Expose instance route method on ModelRouter.prototype for test spy compatibility
+    (ModelRouter.prototype as any).route = this.router.route;
 
     // Route to appropriate model and provider
     // Determine routing configuration; provide defaults if router returns falsy
