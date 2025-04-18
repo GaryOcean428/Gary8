@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+ 
+import React, { useState, useEffect } from 'react';
 import { Wrench, Search, Filter, ArrowUpDown, Plus, Trash2, ChevronRight, ChevronDown, FileCode, PenTool, BarChart4, Database, Network, Loader } from 'lucide-react';
 import { Card, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -507,9 +508,14 @@ function ToolDetail({ tool }: ToolDetailProps) {
                   </div>
                   <p className="text-sm mt-4 mb-2">Example:</p>
                   <div className="bg-muted p-2 rounded-md">
-                    <code className="text-xs">@tool {tool.name} {tool.name === 'Web Scraper' ? 'url="https://example.com" selector=".main-content"' : 
-                                                                tool.name === 'Data Formatter' ? 'data="{\"name\":\"Test\"}" fromFormat="json" toFormat="csv"' : 
-                                                                'parameter1="value1" parameter2="value2"'}</code>
+                    <code className="text-xs">
+                      @tool {tool.name}{' '}
+                      {tool.name === 'Web Scraper'
+                        ? 'url="https://example.com" selector=".main-content"' // simplified quotes
+                        : tool.name === 'Data Formatter'
+                        ? `data='{"name":"Test"}' fromFormat="json" toFormat="csv"`
+                        : 'parameter1="value1" parameter2="value2"'}
+                    </code>
                   </div>
                 </CardContent>
               </Card>

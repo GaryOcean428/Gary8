@@ -547,7 +547,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:9.24.0":
+"@eslint/js@npm:9.24.0, @eslint/js@npm:^9.24.0":
   version: 9.24.0
   resolution: "@eslint/js@npm:9.24.0"
   checksum: 10c0/efe22e29469e4140ac3e2916be8143b1bcfd1084a6edf692b7a58a3e54949d53c67f7f979bc0a811db134d9cc1e7bff8aa71ef1376b47eecd7e226b71206bb36
@@ -2352,6 +2352,7 @@ __metadata:
   resolution: "Gary8@workspace:."
   dependencies:
     "@anthropic-ai/claude-code": "npm:^0.2.69"
+    "@eslint/js": "npm:^9.24.0"
     "@octokit/auth-oauth-app": "npm:^8.1.4"
     "@octokit/rest": "npm:^21.1.1"
     "@primer/octicons-react": "npm:^19.15.1"
@@ -2381,6 +2382,7 @@ __metadata:
     eslint-plugin-react-refresh: "npm:^0.4.19"
     fabric: "npm:^5.5.2"
     framer-motion: "npm:^12.6.5"
+    globals: "npm:^16.0.0"
     idb: "npm:^8.0.2"
     lodash.throttle: "npm:^4.1.1"
     lucide-react: "npm:^0.488.0"
@@ -4165,6 +4167,13 @@ __metadata:
   version: 14.0.0
   resolution: "globals@npm:14.0.0"
   checksum: 10c0/b96ff42620c9231ad468d4c58ff42afee7777ee1c963013ff8aabe095a451d0ceeb8dcd8ef4cbd64d2538cef45f787a78ba3a9574f4a634438963e334471302d
+  languageName: node
+  linkType: hard
+
+"globals@npm:^16.0.0":
+  version: 16.0.0
+  resolution: "globals@npm:16.0.0"
+  checksum: 10c0/8906d5f01838df64a81d6c2a7b7214312e2216cf65c5ed1546dc9a7d0febddf55ffa906cf04efd5b01eec2534d6f14859a89535d1a68241832810e41ef3fd5bb
   languageName: node
   linkType: hard
 

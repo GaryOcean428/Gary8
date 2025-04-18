@@ -3,7 +3,7 @@ import { fabric } from 'fabric';
 
 interface CanvasPropertiesProps {
   selectedObject: fabric.Object | null;
-  onPropertyChange: (property: string, value: any) => void;
+  onPropertyChange: (property: string, value: unknown) => void;
 }
 
 export function CanvasProperties({

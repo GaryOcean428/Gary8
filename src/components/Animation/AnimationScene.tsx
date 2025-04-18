@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { motion, useAnimation, AnimatePresence, useMotionValue } from 'framer-motion'; // Removed unused MotionValue, useTransform, useSpring
-import { Sun, Moon, Cloud, Stars, Wind, Zap } from 'lucide-react';
+// Removed unused icon imports
 import './AnimationScene.css'; // Import the CSS file
 import { Character } from './Character';
 import { Environment } from './Environment';
@@ -268,23 +268,20 @@ function ForegroundElements({
                 width: `${randomBetween(5, 15)}px`,
                 height: `${randomBetween(5, 15)}px`,
               }}
-              animate={isPlaying ? {
-                y: [0, -height],
-                x: (i % 2 === 0) ? [0, 20, 0, -20, 0] : [0, -20, 0, 20, 0], // Array index used for variation, not key
-              } : {}}
+              animate={
+                isPlaying
+                  ? {
+                      y: [0, -height],
+                      x:
+                        i % 2 === 0
+                          ? [0, 20, 0, -20, 0]
+                          : [0, -20, 0, 20, 0],
+                    }
+                  : {}
+              }
               transition={{
-                y: {
-                  duration: randomBetween(10, 20),
-                  repeat: Infinity,
-                  ease: "linear",
-                  delay: i * 0.5,
-                },
-                x: {
-                  duration: randomBetween(3, 6),
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: i * 0.5,
-                }
+                y: { duration: randomBetween(10, 20), repeat: Infinity, ease: 'linear', delay: i * 0.5 },
+                x: { duration: randomBetween(3, 6), repeat: Infinity, ease: 'easeInOut', delay: i * 0.5 },
               }}
             />
           ))}
@@ -315,33 +312,31 @@ function ForegroundElements({
             { shape: 'circle', x: 0.2, y: 0.7, size: 60, color: '#0EA5E9' },
             { shape: 'triangle', x: 0.8, y: 0.2, size: 50, color: '#8B5CF6' },
             { shape: 'rectangle', x: 0.5, y: 0.5, size: 40, color: '#EC4899' },
-          ].map((item, index) => {
-            const shapeHeight = item.shape === 'rectangle' ? `${item.size * 0.6}px` : `${item.size}px`;
-            const borderRadius = item.shape === 'circle' ? '50%' : item.shape === 'rectangle' ? '4px' : '0%';
-            const clipPath = item.shape === 'triangle' ? 'polygon(50% 0%, 100% 100%, 0% 100%)' : 'none';
-            const rotation = item.shape === 'rectangle' ? 360 : 180;
-
-            return (
-              <motion.div
-                key={`shape-${item.shape}-${index}`} // Use more descriptive key
-                className="absolute rounded-full backdrop-blur-md"
-                style={{
-                  left: `${item.x * width}px`,
-                  top: `${item.y * height}px`,
-                  width: `${item.size}px`,
-                  height: shapeHeight,
-                  backgroundColor: `${item.color}40`,
-                  borderRadius: borderRadius,
-                  clipPath: clipPath,
-                  zIndex: 5,
-                }}
-                animate={isPlaying ? {
-                  y: [0, -20, 0],
-                  rotate: [0, rotation, 0],
-                  scale: [1, 1.1, 1],
-                } : {}}
-                transition={{
-                  duration: randomBetween(4, 8),
+          ].map((item, index) => (
+            <motion.div
+              key={`shape-${item.shape}-${index}`}
+              className="absolute rounded-full backdrop-blur-md"
+              style={{
+                left: `${item.x * width}px`,
+                top: `${item.y * height}px`,
+                width: `${item.size}px`,
+                height: item.shape === 'rectangle' ? `${item.size * 0.6}px` : `${item.size}px`,
+                backgroundColor: `${item.color}40`,
+                borderRadius: item.shape === 'circle' ? '50%' : item.shape === 'rectangle' ? '4px' : '0%',
+                clipPath: item.shape === 'triangle' ? 'polygon(50% 0%, 100% 100%, 0% 100%)' : 'none',
+                zIndex: 5,
+              }}
+              animate={
+                isPlaying
+                  ? {
+                      y: [0, -20, 0],
+                      rotate: [0, item.shape === 'rectangle' ? 360 : 180, 0],
+                      scale: [1, 1.1, 1],
+                    }
+                  : {}
+              }
+              transition={{
+                duration: randomBetween(4, 8),
                 repeat: Infinity,
                 ease: "easeInOut",
                 delay: index * 0.2,

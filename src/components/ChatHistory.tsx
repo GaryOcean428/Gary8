@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { History, Search, Download, Tag, Clock, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useChat } from '../hooks/useChat';
-import { SavedChat } from '../types';
-import { AutoTagger } from '../lib/auto-tagger';
+import type { SavedChat, Message } from '../types';
 import { downloadAsDocx } from '../utils/export';
 
 export function ChatHistory() {

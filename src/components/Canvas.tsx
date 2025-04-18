@@ -8,7 +8,7 @@ import { CanvasManager } from '../lib/canvas/canvas-manager';
 import { useToast } from '../hooks/useToast';
 import { useLoading } from '../hooks/useLoading';
 import { CanvasSandbox } from './canvas/CanvasSandbox';
-import { ToolManager, Tool } from './canvas/ToolManager';
+import { ToolManager } from './canvas/ToolManager';
 import { AgentRegistry } from '../lib/agents/core/agent-registry';
 import { Tabs, TabsList, TabsTrigger } from './ui/Tabs'; // Removed TabsContent
 import { Button } from './ui/Button';
@@ -33,9 +33,9 @@ export function Canvas() {
   const [selectedObject, setSelectedObject] = useState<fabric.Object | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [mode, setMode] = useState<CanvasMode['mode']>('design');
-  const [sandboxCode, setSandboxCode] = useState('');
-  // const [sandboxLanguage, setSandboxLanguage] = useState('javascript'); // Removed unused state
-  const [agents, setAgents] = useState<any[]>([]);
+  // Code sandbox state
+  const [sandboxCode] = useState(''); // initial code for sandbox
+  const [agents, setAgents] = useState<Agent[]>([]);
   const { addToast } = useToast();
   const { setLoading } = useLoading();
   
@@ -101,7 +101,7 @@ export function Canvas() {
       agentRegistry.off('agent-added', handleAgentUpdate);
       agentRegistry.off('agent-removed', handleAgentUpdate);
     };
-  }, []);
+  }, [canvasManager, agentRegistry, addToast]);
 
   const handlePromptSubmit = async (prompt: string) => {
     if (!canvas) return;
@@ -116,7 +116,7 @@ export function Canvas() {
         message: 'Design generated successfully',
         duration: 3000
       });
-    } catch (error) {
+    } catch (error: unknown) {
       addToast({
         type: 'error',
         title: 'Generation Failed',
@@ -195,7 +195,7 @@ export function Canvas() {
     canvas.renderAll();
   };
 
-  const handlePropertyChange = (property: string, value: any) => {
+  const handlePropertyChange = (property: string, value: unknown) => {
     if (!canvas || !selectedObject) return;
 
     selectedObject.set(property, value);

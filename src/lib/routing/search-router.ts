@@ -24,7 +24,7 @@ export class SearchRouter {
   private readonly localKeywords = ['near me', 'nearby', 'location', 'local', 'locally', 'in my area', 'city', 'region', 'around me'];
   private readonly entityKeywords = ['who is', 'who was', 'what is', 'information about', 'person', 'company', 'organization', 'product', 'entity', 'profile'];
 
-  async route(query: string, history: Message[]): Promise<SearchRouterConfig> {
+  async route(query: string, _history: Message[]): Promise<SearchRouterConfig> {
     thoughtLogger.log('reasoning', 'Analyzing search query for provider selection');
 
     const q = query.toLowerCase();
