@@ -312,48 +312,29 @@ export class APIClient {
 
     await this.rateLimiter.acquire();
 
+    // Route to appropriate model and provider
+    // Determine routing configuration; provide defaults if router returns falsy
+    const rawConfig = await this.router.route(messages[0].content, messages);
+    const routerConfig = rawConfig ?? { model: '', temperature: undefined as any, maxTokens: undefined as any, confidence: undefined };
+    thoughtLogger.log('decision', `Selected model: ${routerConfig.model}`, {
+      confidence: routerConfig.confidence
+    });
+    // Safely retrieve configured API keys
+    const configState = (typeof this.configStore.getState === 'function'
+      ? this.configStore.getState()
+      : {}) || {};
+    const apiKeys = configState.apiKeys || {};
+    // Determine provider for selected model
+    const provider = this.getProviderForModel(routerConfig.model);
+    // Execute fetch-based API call with retry and fallback for all models
+    // Non-OpenAI providers: use fetch + retry + fallback logic
     try {
-      // Route to appropriate model
-      const routerConfig = await this.router.route(messages[0].content, messages);
-      thoughtLogger.log('decision', `Selected model: ${routerConfig.model}`, {
-        confidence: routerConfig.confidence
-      });
-
-      // Get appropriate API configuration
-      // Safely retrieve configured API keys
-      // Safely retrieve configured API keys (default to empty object if getState returns falsy)
-      const configState = ((typeof this.configStore.getState === 'function' ? this.configStore.getState() : {}) || {});
-      const apiKeys = configState.apiKeys || {};
-      
-      // If streaming progress is requested, bypass specialized client and use fetch path
-      if (!onProgress && (routerConfig.model.includes('gpt-') ||
-          routerConfig.model.includes('o1') ||
-          routerConfig.model.includes('o3'))) {
-        return await this.openaiAPI.chat(
-          messages,
-          apiKeys.openai,
-          {
-            model: routerConfig.model,
-            temperature: routerConfig.temperature,
-            maxTokens: routerConfig.maxTokens
-          },
-          onProgress
-        );
-      }
-      
-      // For other providers, use the standard API endpoints
       const apiConfig = this.getAPIConfig(routerConfig.model, apiKeys);
-
-      // Use retry handler to automatically handle retries with exponential backoff
       return await this.retryHandler.execute(async () => {
-        // Add timeout to prevent hanging requests
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-        
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
         try {
-          // Log request details for debugging
           console.log(`Making API request to ${apiConfig.endpoint} with model ${routerConfig.model}`);
-          
           const response = await fetch(apiConfig.endpoint, {
             method: 'POST',
             headers: {
@@ -372,59 +353,44 @@ export class APIClient {
             }),
             signal: controller.signal
           });
-          
           clearTimeout(timeoutId);
-
           if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             throw new AppError(
-              `API request failed: ${response.status} ${response.statusText}${
-                errorData.error?.message ? ` - ${errorData.error.message}` : ''
-              }`,
-              'API_ERROR',
-              { status: response.status, ...errorData }
+              `API request failed: ${response.status} ${response.statusText}` +
+              (errorData.error?.message ? ` - ${errorData.error.message}` : ''),
+              'API_ERROR', { status: response.status, ...errorData }
             );
           }
-
           if (onProgress && response.body) {
-            return this.handleStreamingResponse(response.body, routerConfig.model, onProgress, apiConfig.streamParser);
+            return this.handleStreamingResponse(
+              response.body,
+              routerConfig.model,
+              onProgress,
+              apiConfig.streamParser
+            );
           }
-
           const data = await response.json();
           const content = apiConfig.extractContent(data);
-          
           if (typeof content !== 'string') {
-            throw new AppError(`Invalid response format from API: ${JSON.stringify(content)}`, 'API_ERROR');
+            throw new AppError(`Invalid response format: ${JSON.stringify(content)}`, 'API_ERROR');
           }
-
           return content;
-        } catch (error) {
+        } catch (err) {
           clearTimeout(timeoutId);
-          throw error;
+          throw err;
         }
       });
     } catch (error) {
       thoughtLogger.log('error', 'API request failed', { error });
-      
-      // Enhance error message for network issues
       if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
         throw new AppError(
           'Network error. Please check your internet connection and try again.',
           'NETWORK_ERROR'
         );
       }
-      
-      // Fallback to alternative provider if available
-      if (error instanceof AppError && error.code === 'API_ERROR') {
-        try {
-          return await this.chatWithFallback(messages, onProgress);
-        } catch (fallbackError) {
-          thoughtLogger.log('error', 'Fallback request also failed', { fallbackError });
-          throw fallbackError;
-        }
-      }
-      
-      throw error;
+      // Fallback to alternates
+      return await this.chatWithFallback(messages, onProgress, provider);
     }
   }
 
@@ -542,19 +508,17 @@ export class APIClient {
 
   private async chatWithFallback(
     messages: Message[],
-    onProgress?: (content: string) => void
+    onProgress?: (content: string) => void,
+    initialProvider?: string
   ): Promise<string> {
-    // Try with available providers in order of preference
+    // Determine which providers are available for fallback (exclude initial provider)
     const apiKeys = this.configStore.getState().apiKeys;
-    
-    // Determine which providers are available
-    const availableProviders = Object.entries(apiKeys)
-      .filter(([_, key]) => key && key.trim().length > 10 && looseValidateApiKey(_, key))
+    const fallbackProviders = Object.entries(apiKeys)
+      .filter(([provider, key]) => provider !== initialProvider && key && key.trim().length > 10 && looseValidateApiKey(provider as any, key))
       .map(([provider]) => provider);
+    thoughtLogger.log('decision', `Fallback provider order: ${fallbackProviders.join(', ')}`);
     
-    thoughtLogger.log('decision', `Attempting fallback with available providers: ${availableProviders.join(', ')}`);
-    
-    if (availableProviders.includes('openai')) {
+    if (fallbackProviders.includes('openai')) {
       // Try OpenAI first if available
       const model = 'gpt-4o-mini';
       thoughtLogger.log('execution', `Fallback to OpenAI: ${model}`);
@@ -569,7 +533,7 @@ export class APIClient {
       } catch (error) {
         throw new AppError(`OpenAI fallback failed: ${error instanceof Error ? error.message : String(error)}`, 'API_ERROR');
       }
-    } else if (availableProviders.includes('groq')) {
+    } else if (fallbackProviders.includes('groq')) {
       // Try Groq if available
       const model = 'llama-3.3-70b-versatile';
       thoughtLogger.log('execution', `Fallback to Groq: ${model}`);
@@ -615,7 +579,7 @@ export class APIClient {
       } catch (error) {
         throw new AppError(`Groq fallback failed: ${error instanceof Error ? error.message : String(error)}`, 'API_ERROR');
       }
-    } else if (availableProviders.includes('perplexity')) {
+    } else if (fallbackProviders.includes('perplexity')) {
       // Try Perplexity if available
       const model = 'sonar-reasoning-pro';
       thoughtLogger.log('execution', `Fallback to Perplexity: ${model}`);
@@ -661,7 +625,7 @@ export class APIClient {
       } catch (error) {
         throw new AppError(`Perplexity fallback failed: ${error instanceof Error ? error.message : String(error)}`, 'API_ERROR');
       }
-    } else if (availableProviders.includes('anthropic')) {
+    } else if (fallbackProviders.includes('anthropic')) {
       // Try Anthropic if available
       const model = 'claude-3.5-haiku-latest';
       thoughtLogger.log('execution', `Fallback to Anthropic: ${model}`);
@@ -719,8 +683,11 @@ export class APIClient {
       }
     }
     
-    // If we got here, no fallbacks are available
-    throw new AppError('No available API providers found. Please configure at least one API key in settings.', 'CONFIGURATION_ERROR');
+    // If no fallback providers remain
+    throw new AppError(
+      'No available API providers found for fallback. Please configure additional API keys in settings.',
+      'CONFIGURATION_ERROR'
+    );
   }
 
   private async handleStreamingResponse(

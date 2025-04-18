@@ -4,13 +4,13 @@
 Next Phase Plan
 - [x] Modernize **SearchRouter** to satisfy routing tests and align with updated AI model lineup.
 - [x] Modernize **ModelRouter** to use the latest AI models and pass calibration tests.
-- [ ] Refactor **APIClient** to integrate the OpenAI Responses API and Agents SDK; fix configuration-store usage.
+- 🟡 Refactor **APIClient** to integrate the OpenAI Responses API and Agents SDK; fix configuration-store usage.
 - [ ] Update **RetryHandler** to correctly detect offline status and implement circuit-breaking.
 
 ## Implementation Plan
 - [x] **Step 1**: Update `src/lib/routing/search-router.ts`; ensure `search-router.test.ts` passes.
 - [x] **Step 2**: Update `src/lib/routing/model-router.ts`; ensure `router.test.ts` passes.
-- **Step 3**: Refactor `src/lib/api-client.ts` to use the Responses API and Agents SDK; ensure `api-client.test.ts` passes.
+- 🟡 **Step 3**: Refactor `src/lib/api-client.ts` to use the Responses API and Agents SDK; ensure `api-client.test.ts` passes.
 - **Step 4**: Fix `src/lib/utils/RetryHandler.ts` for offline detection; ensure `RetryHandler.test.ts` passes.
 
 ## Next Steps

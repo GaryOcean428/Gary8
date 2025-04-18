@@ -8,7 +8,7 @@ export default defineConfig({
     setupFiles: './src/setupTests.ts',
     // Include all .test.ts and .test.tsx files, except APIClient & RetryHandler
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
-    exclude: ['src/tests/lib/api-client.test.ts', 'src/tests/utils/RetryHandler.test.ts'],
+    exclude: ['src/tests/utils/RetryHandler.test.ts'],
     // Note: All test suites are now enabled
     // Exclude patterns can be configured here if needed
   }
