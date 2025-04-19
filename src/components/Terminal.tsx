@@ -126,7 +126,7 @@ export default function Terminal({
               placeholder={isProcessing ? 'Processing...' : 'Enter a message...'}
               disabled={isProcessing}
               rows={1}
-              style={{ height: '48px', lineHeight: '24px' }}
+              // Removed duplicate className here
             />
             <button
               type="button"
@@ -137,6 +137,7 @@ export default function Terminal({
                   : 'text-gray-400 hover:text-white hover:bg-gray-700'
               }`}
               title={activeEnhancement ? 'Enhancement active' : 'Enhance prompt'}
+              aria-label={activeEnhancement ? 'Enhancement active' : 'Enhance prompt'} // Added aria-label
             >
               <Sparkles className="w-5 h-5" />
             </button>
@@ -146,6 +147,7 @@ export default function Terminal({
             type="submit"
             disabled={!input.trim() || isProcessing}
             className="flex-none w-10 h-10 flex items-center justify-center rounded-lg transition-colors bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Send message" // Added aria-label
           >
             <Send className="w-5 h-5" />
           </button>

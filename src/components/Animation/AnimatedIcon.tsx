@@ -22,8 +22,7 @@ export function AnimatedIcon({
 }: AnimatedIconProps) {
   return (
     <motion.div
-      className="animated-icon" // Ensure this class exists and is styled in a relevant CSS file (e.g., AnimationScene.css)
-      style={{ position: 'absolute', left: x, top: y, color }} // Added position absolute
+      className={`animated-icon absolute left-${x} top-${y} text-${color}`}
       animate={isPlaying ? {
         y: [0, -10, 0],
         rotate: [0, 5, -5, 0],

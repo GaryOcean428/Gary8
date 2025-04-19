@@ -35,7 +35,31 @@ interface Settings {
     logTaskPlanning: boolean;
     logAgentComm: boolean;
   };
+  theme: { // Added theme property
+    mode: 'light' | 'dark' | 'system';
+    colors: Record<string, string>;
+  };
 }
+
+// Define default theme colors matching ThemeSettings.tsx presets
+const defaultThemeColors = {
+  dark: {
+    primary: '#3B82F6',
+    secondary: '#6B7280',
+    accent: '#10B981',
+    background: '#111827',
+    surface: '#1F2937',
+    text: '#F3F4F6'
+  },
+  light: {
+    primary: '#2563EB',
+    secondary: '#4B5563',
+    accent: '#059669',
+    background: '#F9FAFB',
+    surface: '#FFFFFF',
+    text: '#111827'
+  }
+};
 
 const defaultSettings: Settings = {
   performance: {
@@ -69,6 +93,10 @@ const defaultSettings: Settings = {
     parallelTasks: 2,
     logTaskPlanning: true,
     logAgentComm: true
+  },
+  theme: { // Added default theme settings
+    mode: 'dark', // Default to dark mode
+    colors: defaultThemeColors.dark 
   }
 };
 

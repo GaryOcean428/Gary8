@@ -1,0 +1,98 @@
+/* src/styles/theme.css */
+:root {
+  /* Default Dark Theme Colors (can be overridden by JS based on settings) */
+  --color-primary: #3B82F6; /* blue-500 */
+  --color-secondary: #6B7280; /* gray-500 */
+  --color-accent: #10B981; /* emerald-500 */
+  --color-background: #111827; /* gray-900 */
+  --color-surface: #1F2937; /* gray-800 */
+  --color-text: #F3F4F6; /* gray-100 */
+  --color-muted-foreground: #9CA3AF; /* gray-400 */
+  --color-destructive: #EF4444; /* red-500 */
+  --color-destructive-foreground: #FEE2E2; /* red-100 */
+  --color-success: #22C55E; /* green-500 */
+  --color-success-foreground: #DCFCE7; /* green-100 */
+  --color-warning: #F59E0B; /* amber-500 */
+  --color-warning-foreground: #FFFBEB; /* amber-100 */
+  --color-input: #374151; /* gray-700 */
+  --color-border: #374151; /* gray-700 */
+  --color-card: #1F2937; /* gray-800 */
+  --color-card-foreground: #F3F4F6; /* gray-100 */
+  --color-muted: #374151; /* gray-700 */
+
+  /* Typography */
+  --font-family-sans: 'Inter', sans-serif;
+  --font-family-mono: 'Fira Code', monospace;
+
+  /* Spacing */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+
+  /* Borders */
+  --border-radius: 0.5rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Specific Component Styles */
+  --input-height: 48px;
+  --terminal-input-height: 48px; /* Corresponds to terminal-input-height class */
+  --sidebar-width: 400px; /* Corresponds to sidebar-width class */
+}
+
+/* Apply base styles */
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-family-sans);
+}
+
+/* Utility classes based on theme variables */
+.input-height {
+  min-height: var(--input-height);
+  line-height: calc(var(--input-height) / 2); /* Adjust line height for centering */
+}
+
+.terminal-input-height {
+  min-height: var(--terminal-input-height);
+  line-height: calc(var(--terminal-input-height) / 2); /* Adjust line height */
+}
+
+.sidebar-width.visible {
+  width: var(--sidebar-width);
+}
+
+.sidebar-width.hidden {
+  width: 0;
+}
+
+/* Example progress bar styling */
+.progress-bar {
+  height: 100%;
+  background-color: var(--color-primary);
+  transition: width 0.3s ease-in-out;
+  border-radius: inherit; /* Inherit border radius from parent */
+}
+
+/* Dynamically generate width classes (example for progress bar) */
+/* In a real app, Tailwind JIT or similar would handle this */
+.width-0 { width: 0%; }
+.width-10 { width: 10%; }
+.width-20 { width: 20%; }
+.width-30 { width: 30%; }
+.width-40 { width: 40%; }
+.width-50 { width: 50%; }
+.width-60 { width: 60%; }
+.width-70 { width: 70%; }
+.width-80 { width: 80%; }
+.width-90 { width: 90%; }
+.width-100 { width: 100%; }
+
+/* Add other shared styles or utility classes as needed */

@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Pause, Play, Sparkles, RotateCcw, Share2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { AgentSystem } from '../../lib/agent-system';
-import { LoadingIndicator } from '../LoadingIndicator';
-import { useChat } from '../../hooks/useChat';
+import { LoadingIndicator, ProcessingState } from '../LoadingIndicator'; // Import ProcessingState
+import { useChat, Message } from '../../hooks/useChat'; // Import Message type
 import { thoughtLogger } from '../../lib/logging/thought-logger';
 import { SaveChatButton } from '../SaveChatButton';
 import { useInView } from '../../hooks/useInView';
@@ -66,7 +66,7 @@ export function OptimizedChat() {
         break;
       case 'retrieving':
       case 'processing':
-        setProcessingPhase('processing');
+        setProcessingPhase("processing" as ProcessingPhase); // Cast to fix type mismatch
         break;
       case 'thinking':
       case 'reasoning':
@@ -86,9 +86,10 @@ export function OptimizedChat() {
       messageCount: messages.length
     });
 
-    const userMessage = {
+    // Ensure role matches the Message type definition
+    const userMessage: Message = { 
       id: crypto.randomUUID(),
-      role: 'user',
+      role: "user", // Explicitly use "user"
       content: input.trim(),
       timestamp: Date.now()
     };
@@ -99,7 +100,7 @@ export function OptimizedChat() {
     setAutoScroll(true);
 
     if (textareaRef.current) {
-      textareaRef.current.style.height = '48px';
+      textareaRef.current.style.height = '48px'; // Reset height
     }
 
     try {
@@ -107,9 +108,10 @@ export function OptimizedChat() {
       
       await addMessage(userMessage);
 
-      const assistantMessage = {
+      // Ensure role matches the Message type definition
+      const assistantMessage: Message = { 
         id: crypto.randomUUID(),
-        role: 'assistant',
+        role: "assistant", // Explicitly use "assistant"
         content: '',
         timestamp: Date.now()
       };
@@ -134,7 +136,8 @@ export function OptimizedChat() {
             if (shouldUpdate) {
               addMessage(_messages => {
                 const lastMessage = _messages[_messages.length - 1];
-                if (lastMessage && lastMessage.role === 'assistant') {
+                // Ensure role check matches Message type
+                if (lastMessage && lastMessage.role === 'assistant') { 
                   return _messages.map(_msg => 
                     _msg.id === assistantMessage.id
                       ? { ..._msg, content: currentContent }
@@ -166,9 +169,10 @@ export function OptimizedChat() {
     } catch (error) {
       thoughtLogger.log('error', 'Failed to process message', { error });
       
-      await addMessage({
+      // Ensure role matches the Message type definition
+      await addMessage({ 
         id: crypto.randomUUID(),
-        role: 'system',
+        role: "system", // Explicitly use "system"
         content: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
         timestamp: Date.now()
       });
@@ -270,7 +274,8 @@ export function OptimizedChat() {
         {isProcessing && !messages.some(_m => _m.role === 'assistant' && _m.content === '') && (
           <div className="flex justify-start">
             <div className="bg-card backdrop-blur-sm rounded-lg p-3 shadow-lg">
-              <LoadingIndicator state={processingPhase} />
+              {/* Ensure state matches ProcessingState type */}
+              <LoadingIndicator state={processingPhase as ProcessingState} /> 
             </div>
           </div>
         )}
@@ -317,13 +322,13 @@ export function OptimizedChat() {
                 }
               }}
               placeholder={isProcessing ? 'Processing...' : 'Send a message...'}
-              className="w-full bg-input text-foreground rounded-lg pl-4 pr-12 py-3 resize-none min-h-[48px] max-h-[200px] border border-border focus:outline-none focus:ring-2 focus:ring-primary transition-all focus-glow"
+              className="w-full bg-input text-foreground rounded-lg pl-4 pr-12 py-3 resize-none min-h-[48px] max-h-[200px] border border-border focus:outline-none focus:ring-2 focus:ring-primary transition-all focus-glow input-height" // Added class back
               disabled={isProcessing}
               rows={1}
-              style={{ height: '48px' }}
             />
             <button
               type="button"
+              aria-label="AI Suggestions" // Added aria-label
               className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-muted-foreground hover:text-accent rounded-lg transition-colors"
               title="AI Suggestions"
             >
@@ -349,6 +354,7 @@ export function OptimizedChat() {
                 type="button"
                 className="flex-none p-3 text-primary hover:text-primary-foreground hover:bg-primary/20 rounded-lg transition-colors"
                 title="Share"
+                aria-label="Share chat" // Added aria-label
               >
                 <Share2 className="w-5 h-5" />
               </button>

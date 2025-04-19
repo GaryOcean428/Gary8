@@ -1,0 +1,63 @@
+.canvas-sandbox-container {
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color, hsl(240, 5.9%, 90%));
+  background-color: var(--card-bg, hsl(0, 0%, 100%));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.canvas-sandbox-height {
+  height: var(--sandbox-height, 400px);
+}
+
+.sandbox-hidden {
+  display: none;
+}
+
+.sandbox-header {
+  background-color: var(--muted-bg, hsla(240, 5%, 96%, 0.5));
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border-color, hsl(240, 5.9%, 90%));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sandbox-footer {
+  background-color: var(--muted-bg, hsla(240, 5%, 96%, 0.5));
+  padding: 0.5rem;
+  border-top: 1px solid var(--border-color, hsl(240, 5.9%, 90%));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sandbox-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sandbox-editor {
+  flex: 1;
+  overflow: auto;
+  background-color: var(--card-bg, hsl(0, 0%, 100%));
+  position: relative;
+}
+
+.sandbox-output {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
+  font-family: monospace;
+  font-size: 0.875rem; /* 14px */
+  position: relative;
+  background-color: hsla(240, 5%, 96%, 0.2);
+}
+
+.sandbox-error {
+  color: var(--destructive, red);
+}

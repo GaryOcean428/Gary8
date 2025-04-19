@@ -74,7 +74,7 @@ export function VirtualizedMessage({
   const Row = useMemo(() => {
     // Throttle to prevent too many rerenders during scrolling
     return throttle(({ index, style }: { index: number; style: React.CSSProperties }) => (
-      <div style={style} className="px-1 py-1">
+      <div className={`px-1 py-1 ${className}`} style={style}>
         <ReactMarkdown>{blocks[index]}</ReactMarkdown>
       </div>
     ), 50);

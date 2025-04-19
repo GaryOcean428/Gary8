@@ -1,35 +1,79 @@
 .animation-scene-container {
-  perspective: 1000px; /* Added for potential 3D effects if needed */
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem; /* xl */
+  background-color: var(--scene-background, rgba(0, 0, 0, 0.8));
 }
 
-/* 
-  Use CSS variables for dimensions instead of inline styles.
-  This resolves the Microsoft Edge Tools warning about inline styles.
-  The variables are set via style attribute in the component.
-*/
 .scene-dimensions {
-  width: var(--scene-width, 800px); /* Default fallback width if variable not set */
-  height: var(--scene-height, 600px); /* Default fallback height if variable not set */
+  width: var(--scene-width, 800px);
+  height: var(--scene-height, 600px);
+}
+
+.perspective-container {
+  perspective: 1000px;
 }
 
 .perspective-transform-container {
+  position: relative;
   width: 100%;
   height: 100%;
-  position: relative;
   transform-style: preserve-3d;
 }
 
-/* For animated icons (e.g., stars, sun, moon, etc.) */
-.animated-icon {
+/* Environment layers */
+.environment-layer {
   position: absolute;
-  z-index: 10;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+  inset: 0;
+  overflow: hidden;
 }
 
-/* For abstract animated shapes (circle, triangle, rectangle) */
-.animated-shape {
-  position: absolute;
-  filter: blur(8px);
-  /* border-radius and clip-path will be set dynamically */
-  z-index: 5;
+/* Layer depths */
+.depth-background { z-index: 0; }
+.depth-far { z-index: 10; }
+.depth-mid { z-index: 20; }
+.depth-near { z-index: 30; }
+.depth-foreground { z-index: 40; }
+
+/* Animation states */
+.animation-paused * {
+  animation-play-state: paused !important;
+}
+
+/* Theme variations */
+.theme-light {
+  --scene-background: rgba(240, 240, 245, 0.9);
+  --scene-text: #1a1a2e;
+  --scene-accent: #4361ee;
+}
+
+.theme-dark {
+  --scene-background: rgba(10, 10, 18, 0.9);
+  --scene-text: #f0f0f5;
+  --scene-accent: #4cc9f0;
+}
+
+/* Scene type variations */
+.scene-nature {
+  --scene-primary: #2d6a4f;
+  --scene-secondary: #40916c;
+  --scene-tertiary: #74c69d;
+}
+
+.scene-space {
+  --scene-primary: #03071e;
+  --scene-secondary: #370617;
+  --scene-tertiary: #6a040f;
+}
+
+.scene-abstract {
+  --scene-primary: #7209b7;
+  --scene-secondary: #560bad;
+  --scene-tertiary: #480ca8;
+}
+
+.scene-underwater {
+  --scene-primary: #03045e;
+  --scene-secondary: #0077b6;
+  --scene-tertiary: #00b4d8;
 }

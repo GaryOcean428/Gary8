@@ -118,14 +118,13 @@ export function AnimationScene({
         Dynamic width/height required, cannot move to CSS (Edge Tools warning acknowledged).
         This is an animation scene container that tracks mouse movement for visual effects,
         not a traditional interactive control requiring keyboard navigation.
+        
+        Using CSS variables to handle dimensions - these are handled in AnimationScene.css
       */}
       <section
-        {/* Using CSS variables to handle dimensions - these are handled in AnimationScene.css */}
-        style={{ 
-          '--scene-width': `${width}px`,
-          '--scene-height': `${height}px`
-        } as React.CSSProperties}
-        className={`animation-scene-container perspective-container overflow-hidden relative rounded-xl scene-dimensions ${className}`}
+        data-width={width}
+        data-height={height}
+        className={`animation-scene-container perspective-container overflow-hidden relative rounded-xl ${className}`}
         onMouseMove={handleMouseMove}
         aria-label={`${sceneType} themed animation scene with parallax effects that respond to mouse movement`}
         tabIndex={-1}
@@ -182,10 +181,10 @@ export function AnimationScene({
 
           {/* Foreground decorative elements */}
           <ForegroundElements
-            type={sceneType} // Added missing prop
-            theme={theme} // Added missing prop
-            width={width} // Added missing prop
-            height={height} // Added missing prop
+            type={sceneType}
+            theme={theme}
+            width={width}
+            height={height}
             isPlaying={isPlaying}
           />
         </motion.div>
@@ -193,5 +192,3 @@ export function AnimationScene({
     </>
   );
 }
-
-// ForegroundElements, AnimatedIcon, and getRandomColor functions have been moved to separate files.

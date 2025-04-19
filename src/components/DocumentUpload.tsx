@@ -181,8 +181,7 @@ export function DocumentUpload({
                     <div className="mt-1 h-1 w-full bg-muted rounded-full overflow-hidden">
                       {/* Apply CSS class and keep dynamic width */}
                       <div 
-                        className="upload-progress-bar" // Apply CSS class
-                        style={{ width: `${uploadProgress[_file.name]}%` }} 
+                        className={`progress-bar width-${uploadProgress[_file.name]}`}
                       />
                     </div>
                   )}

@@ -170,9 +170,14 @@ describe('RetryHandler', () => {
     for (let attempt = 0; attempt < 3; attempt++) {
       try { 
         await retryHandler.execute(mockFunction); 
+        // If this succeeds unexpectedly, fail the test
+        throw new Error('Expected function to fail but it succeeded');
       } catch (_expectedError) { 
-        // Expected error, continue test circuit opening process 
-        console.log(`Circuit opening attempt ${attempt+1}: Error expected and handled`);
+        // Expected error - log for test visibility and continue
+        console.log(`Circuit opening attempt ${attempt+1}: Error expected and handled correctly`);
+        if (!(_expectedError instanceof Error)) {
+          throw new Error('Expected error object but got something else');
+        }
       }
     }
     

@@ -72,8 +72,7 @@ export function LoggingSidebar() {
     <div 
       className={`fixed top-0 right-0 h-screen bg-gray-900 border-l border-gray-700 transition-all duration-300 flex flex-col ${
         isVisible ? 'translate-x-0' : 'translate-x-full'
-      } z-20`} 
-      style={{ width: isVisible ? width : 0 }}
+      } sidebar-width ${isVisible ? 'visible' : 'hidden'} z-20`}
     >
       {/* Toggle Button */}
       <button
@@ -101,6 +100,7 @@ export function LoggingSidebar() {
                   ? 'text-blue-400 hover:text-blue-300'
                   : 'text-gray-400 hover:text-gray-300'
               }`}
+              aria-label="Toggle filters"
             >
               <Filter size={20} />
             </button>
