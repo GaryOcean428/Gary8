@@ -19,6 +19,8 @@ export interface CanvasMode {
   mode: 'design' | 'sandbox' | 'tools' | 'agents' | 'mcp';
 }
 
+type MutableFabricObject = fabric.Object & Record<string, unknown>;
+
 export function useCanvas(_canvasRef: React.RefObject<HTMLCanvasElement | null>) {
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const [selectedTool, setSelectedTool] = useState<string>('select');
@@ -189,8 +191,8 @@ export function useCanvas(_canvasRef: React.RefObject<HTMLCanvasElement | null>)
   const handlePropertyChange = (_property: string, _value: unknown) => {
     if (!canvas || !selectedObject) return;
 
-    // Use type assertion to handle the property setting
-    (selectedObject as any)[_property] = _value;
+    // Use type assertion with typed helper to handle the property setting
+    (selectedObject as MutableFabricObject)[_property] = _value;
     canvas.renderAll();
   };
 

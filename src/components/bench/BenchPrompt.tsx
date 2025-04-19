@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Wand2 } from 'lucide-react';
 
-interface CanvasPromptProps {
-  onSubmit: (prompt: string) => Promise<void>;
-  isGenerating: boolean;
+interface BenchPromptProps {
+  readonly onSubmit: (prompt: string) => Promise<void>;
+  readonly isGenerating: boolean;
 }
 
-export function CanvasPrompt({ onSubmit, isGenerating }: CanvasPromptProps) {
+export function BenchPrompt({ onSubmit, isGenerating }: BenchPromptProps) {
   const [prompt, setPrompt] = useState('');
 
   const handleSubmit = async (_e: React.FormEvent) => {
@@ -25,7 +25,7 @@ export function CanvasPrompt({ onSubmit, isGenerating }: CanvasPromptProps) {
             type="text"
             value={prompt}
             onChange={(_e) => setPrompt(_e.target.value)}
-            placeholder="Describe the interface you want to create..."
+            placeholder="Describe what you want to create in the workbench..."
             className="w-full bg-white rounded-lg pl-4 pr-12 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
             disabled={isGenerating}
           />

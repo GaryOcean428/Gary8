@@ -24,11 +24,11 @@ export class VectorMemory {
       
       this.memories.push({
         id: crypto.randomUUID(),
-        _content,
-        _type,
+        content: _content,
+        type: _type,
         timestamp: Date.now(),
         embedding,
-        _metadata
+        metadata: _metadata
       });
 
       // Keep only recent memories to prevent bloat

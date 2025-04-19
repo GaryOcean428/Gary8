@@ -60,9 +60,9 @@ describe('RetryHandler', () => {
   });
   
   it('should not retry when offline', async () => {
-    // Mock network as offline
-    const { getNetworkStatus } = require('../../core/supabase/supabase-client');
-    getNetworkStatus.mockReturnValue(false);
+    // Mock network as offline by updating the mocked getNetworkStatus
+    const supabaseModule = await import('../../core/supabase/supabase-client');
+    supabaseModule.getNetworkStatus.mockReturnValue(false);
     
     const mockFn = vi.fn().mockResolvedValue('success');
     

@@ -155,7 +155,7 @@ interface MemoryEntry {
    - [x] Modernize SearchRouter to satisfy routing tests and updated AI models
    - [x] Modernize ModelRouter to use latest model lineup and pass calibration tests
    - [x] Refactor APIClient to use OpenAI Responses API and Agents SDK; fix config store usage
-   - [ ] Update RetryHandler to correctly handle offline detection and circuit-breaker behavior
+   - [x] Update RetryHandler to correctly handle offline detection and circuit-breaker behavior
 
 4. **Integration**
    - Additional API providers

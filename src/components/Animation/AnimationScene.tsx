@@ -120,7 +120,7 @@ export function AnimationScene({
         not a traditional interactive control requiring keyboard navigation.
       */}
       <section
-        // Using CSS variables to handle dimensions - these are properly handled in AnimationScene.css
+        {/* Using CSS variables to handle dimensions - these are handled in AnimationScene.css */}
         style={{ 
           '--scene-width': `${width}px`,
           '--scene-height': `${height}px`
@@ -128,8 +128,7 @@ export function AnimationScene({
         className={`animation-scene-container perspective-container overflow-hidden relative rounded-xl scene-dimensions ${className}`}
         onMouseMove={handleMouseMove}
         aria-label={`${sceneType} themed animation scene with parallax effects that respond to mouse movement`}
-        // Removed redundant role="region" as <section> already has this role implicitly
-        tabIndex={-1} // Not keyboard focusable, purely mouse interactive
+        tabIndex={-1}
       >
         {/* Main scene container with perspective effect */}
         <motion.div
@@ -137,7 +136,7 @@ export function AnimationScene({
           className="perspective-transform-container" // Use CSS class
           style={{
             rotateX,
-            rotateY // Removed trailing comma (TS Error fix)
+            rotateY,
             // transformStyle is now in CSS
           }}
           initial={{ opacity: 0, scale: 0.9 }}

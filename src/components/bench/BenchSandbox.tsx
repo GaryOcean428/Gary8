@@ -1,24 +1,43 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FileCode, Play, Download, Copy, Check, X, Terminal, AlertTriangle, RefreshCw } from 'lucide-react';
+import { FileCode, Play, Download, Copy, X, Terminal, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { useToast } from '../../shared/hooks/useToast';
 
-interface CanvasSandboxProps {
-  initialCode?: string;
-  language?: string;
-  onExecute?: (result: string) => void;
-  height?: string;
-  readOnly?: boolean;
+// Custom check icon component to avoid import issues
+const CheckIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width="24" 
+    height="24" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className="lucide lucide-check"
+    {...props}
+  >
+    <polyline points="20 6 9 17 4 12"></polyline>
+  </svg>
+);
+
+interface BenchSandboxProps {
+  readonly initialCode?: string;
+  readonly language?: string;
+  readonly onExecute?: (result: string) => void;
+  readonly height?: string;
+  readonly readOnly?: boolean;
 }
 
-export function CanvasSandbox({
+export function BenchSandbox({
   initialCode = '',
   language = 'javascript',
   onExecute,
   height = '400px',
   readOnly = false
-}: CanvasSandboxProps) {
+}: BenchSandboxProps) {
   const [code, setCode] = useState(initialCode || getDefaultCode(language));
   const [output, setOutput] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
@@ -118,7 +137,7 @@ export function CanvasSandbox({
   };
 
   return (
-    <div className="rounded-lg border border-border bg-card shadow-md overflow-hidden flex flex-col" style={{ height }}>
+    <div className={`rounded-lg border border-border bg-card shadow-md overflow-hidden flex flex-col h-${height}`}>
       {/* Toolbar */}
       <div className="bg-muted/50 p-2 border-b border-border flex items-center justify-between">
         <div className="flex items-center">
@@ -150,7 +169,7 @@ export function CanvasSandbox({
                   variant={isError ? "destructive" : "success"} 
                   className="ml-2 text-[10px] h-4"
                 >
-                  {isError ? <X className="h-2 w-2" /> : <Check className="h-2 w-2" />}
+                  {isError ? <X className="h-2 w-2" /> : <CheckIcon className="h-2 w-2" />}
                 </Badge>
               )}
             </Button>
@@ -212,7 +231,7 @@ export function CanvasSandbox({
           <Button
             variant="outline"
             size="sm"
-            leftIcon={isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            leftIcon={isCopied ? <CheckIcon className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             onClick={handleCopyCode}
           >
             {isCopied ? 'Copied' : 'Copy'}
@@ -242,7 +261,7 @@ export function CanvasSandbox({
         ref={sandboxRef}
         title="Code Execution Sandbox"
         sandbox="allow-scripts"
-        style={{ display: 'none' }}
+        className="hidden"
       />
     </div>
   );
@@ -271,7 +290,7 @@ print(greet("world"))
       return `<!DOCTYPE html>
 <html>
 <head>
-  <title>Canvas Sandbox</title>
+  <title>Workbench Sandbox</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -280,7 +299,7 @@ print(greet("world"))
   </style>
 </head>
 <body>
-  <h1>Hello, Canvas!</h1>
+  <h1>Hello, Workbench!</h1>
   <p>Edit this HTML to create your own content.</p>
 </body>
 </html>
