@@ -89,18 +89,18 @@ export function LightingEffects({
       
       {/* Volumetric light beams */}
       <div className="absolute inset-0 z-5 overflow-hidden">
-        {Array.from({ length: 3 }).map((_, i) => (
+        {Array.from({ length: 3 }).map((_, _i) => (
           <motion.div
-            key={`light-beam-${i}`}
+            key={`light-beam-${_i}`}
             className="absolute"
             style={{
-              left: `${i * 30 + 10}%`,
+              left: `${_i * 30 + 10}%`,
               top: 0,
               bottom: 0,
               width: '20px',
               background: `linear-gradient(to bottom, transparent, ${highlightColor}, transparent)`,
               opacity: 0.15,
-              transform: `skewX(${45 * (i % 2 === 0 ? 1 : -1)}deg)`,
+              transform: `skewX(${45 * (_i % 2 === 0 ? 1 : -1)}deg)`,
               filter: 'blur(8px)',
             }}
             animate={isPlaying ? {
@@ -108,10 +108,10 @@ export function LightingEffects({
               opacity: [0.1, 0.2, 0.1],
             } : {}}
             transition={{
-              duration: 15 + i * 2,
+              duration: 15 + _i * 2,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: i * 2,
+              delay: _i * 2,
             }}
           />
         ))}

@@ -25,12 +25,12 @@ export class ContentManager {
 
   /**
    * Append new content to the stream
-   * @param content New content chunk
+   * @param _content New content chunk
    */
-  appendContent(content: string): void {
+  appendContent(_content: string): void {
     if (this.pauseStatus) return;
     
-    this.buffer.append(content);
+    this.buffer.append(_content);
     
     const now = Date.now();
     if (now - this.lastUpdateTime >= this.updateFrequencyMs) {
@@ -45,10 +45,10 @@ export class ContentManager {
 
   /**
    * Set model information
-   * @param model Model name/info
+   * @param _model Model name/info
    */
-  setModelInfo(model: string): void {
-    this.modelInfo = model;
+  setModelInfo(_model: string): void {
+    this.modelInfo = _model;
   }
 
   /**

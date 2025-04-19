@@ -25,13 +25,13 @@ export function UserProfileSettings() {
     }
   }, [profile]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleChange = (_e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = _e.target;
+    setFormData(_prev => ({ ..._prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (_e: React.FormEvent) => {
+    _e.preventDefault();
     if (!formData) return;
     
     setIsSaving(true);

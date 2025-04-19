@@ -21,18 +21,18 @@ export class AIDesigner {
     return AIDesigner.instance;
   }
 
-  async generateDesign(prompt: string, canvas: fabric.Canvas): Promise<void> {
-    thoughtLogger.log('plan', 'Generating design from prompt', { prompt });
+  async generateDesign(_prompt: string, _canvas: fabric.Canvas): Promise<void> {
+    thoughtLogger.log('plan', 'Generating design from prompt', { _prompt });
 
     try {
       // Route to appropriate model for design generation
-      const routerConfig = await this.modelRouter.route(prompt, []);
+      const routerConfig = await this.modelRouter.route(_prompt, []);
 
       // Generate design specification
-      const designSpec = await this.generateDesignSpec(prompt, routerConfig);
+      const designSpec = await this.generateDesignSpec(_prompt, routerConfig);
 
       // Clear canvas
-      canvas.clear();
+      _canvas.clear();
 
       // Create layout containers
       for (const layout of designSpec.layout) {
@@ -47,7 +47,7 @@ export class AIDesigner {
           strokeDashArray: [5, 5],
           selectable: false
         });
-        canvas.add(container);
+        _canvas.add(container);
       }
 
       // Create components
@@ -138,10 +138,10 @@ export class AIDesigner {
           element.set(designSpec.styles[component.type]);
         }
 
-        canvas.add(element);
+        _canvas.add(element);
       }
 
-      canvas.renderAll();
+      _canvas.renderAll();
       thoughtLogger.log('success', 'Design generated successfully');
     } catch (error) {
       thoughtLogger.log('error', 'Failed to generate design', { error });
@@ -149,7 +149,7 @@ export class AIDesigner {
     }
   }
 
-  private async generateDesignSpec(prompt: string, config: any): Promise<DesignSpec> {
+  private async generateDesignSpec(_prompt: string, _config: unknown): Promise<DesignSpec> {
     // This would normally call an LLM to generate the design spec
     // For now, return a simple example spec
     return {
@@ -206,8 +206,8 @@ export class AIDesigner {
     };
   }
 
-  private getFontSize(variant: string): number {
-    switch (variant) {
+  private getFontSize(_variant: string): number {
+    switch (_variant) {
       case 'h1': return 40;
       case 'h2': return 32;
       case 'h3': return 28;

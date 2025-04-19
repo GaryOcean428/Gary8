@@ -52,12 +52,12 @@ export function useChatHistory() {
           chats.push({
             id: chat.id,
             title: chat.title,
-            messages: messageData.map(msg => ({
-              id: msg.id,
-              role: msg.role,
-              content: msg.content,
-              timestamp: new Date(msg.created_at).getTime(),
-              model: msg.model
+            messages: messageData.map(_msg => ({
+              id: _msg.id,
+              role: _msg.role,
+              content: _msg.content,
+              timestamp: new Date(_msg.created_at).getTime(),
+              model: _msg.model
             })),
             tags: chat.tags || [],
             timestamp: new Date(chat.created_at).getTime()
@@ -88,9 +88,9 @@ export function useChatHistory() {
 
   // Save a chat
   const saveChat = useCallback(async (
-    title: string,
-    messages: Message[],
-    tags?: string[]
+    _title: string,
+    _messages: Message[],
+    _tags?: string[]
   ): Promise<string> => {
     if (!user) {
       throw new Error('User not authenticated');
@@ -101,9 +101,9 @@ export function useChatHistory() {
       const { data: chatData, error: chatError } = await supabase
         .from('chats')
         .insert({
-          title,
+          _title,
           user_id: user.id,
-          tags,
+          _tags,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
@@ -116,13 +116,13 @@ export function useChatHistory() {
       const { error: messagesError } = await supabase
         .from('chat_messages')
         .insert(
-          messages.map(msg => ({
-            id: msg.id,
+          _messages.map(_msg => ({
+            id: _msg.id,
             chat_id: chatData.id,
-            role: msg.role,
-            content: msg.content,
-            model: msg.model,
-            created_at: new Date(msg.timestamp).toISOString()
+            role: _msg.role,
+            content: _msg.content,
+            model: _msg.model,
+            created_at: new Date(_msg.timestamp).toISOString()
           }))
         );
       
@@ -131,13 +131,13 @@ export function useChatHistory() {
       // Add to state
       const newChat: SavedChat = {
         id: chatData.id,
-        title,
-        messages,
-        tags,
+        _title,
+        _messages,
+        _tags,
         timestamp: Date.now()
       };
       
-      setSavedChats(prev => [newChat, ...prev]);
+      setSavedChats(_prev => [newChat, ..._prev]);
       
       addToast({
         type: 'success',
@@ -159,7 +159,7 @@ export function useChatHistory() {
   }, [user, addToast]);
 
   // Delete a chat
-  const deleteChat = useCallback(async (id: string): Promise<void> => {
+  const deleteChat = useCallback(async (_id: string): Promise<void> => {
     if (!user) {
       throw new Error('User not authenticated');
     }
@@ -169,7 +169,7 @@ export function useChatHistory() {
       const { data, error: fetchError } = await supabase
         .from('chats')
         .select('id')
-        .eq('id', id)
+        .eq('id', _id)
         .eq('user_id', user.id)
         .single();
       
@@ -179,12 +179,12 @@ export function useChatHistory() {
       const { error: deleteError } = await supabase
         .from('chats')
         .delete()
-        .eq('id', id);
+        .eq('id', _id);
       
       if (deleteError) throw deleteError;
       
       // Update state
-      setSavedChats(prev => prev.filter(chat => chat.id !== id));
+      setSavedChats(_prev => _prev.filter(_chat => _chat.id !== _id));
       
       addToast({
         type: 'success',

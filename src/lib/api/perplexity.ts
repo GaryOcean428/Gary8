@@ -17,7 +17,7 @@ export class PerplexityAPI {
     }
   }
 
-  async search(query: string): Promise<string> {
+  async search(_query: string): Promise<string> {
     if (!this.apiKey) {
       throw new AppError('Perplexity API key not configured', 'API_ERROR');
     }
@@ -31,7 +31,7 @@ export class PerplexityAPI {
         },
         body: JSON.stringify({
           model: config.services.perplexity.models.reasoningPro,
-          messages: [{ role: 'user', content: query }],
+          messages: [{ role: 'user', content: _query }],
           max_tokens: config.services.perplexity.maxTokens,
           temperature: config.services.perplexity.temperature
         })

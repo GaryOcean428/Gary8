@@ -4,29 +4,29 @@
 
 /**
  * Checks if content needs virtualization based on length
- * @param content Message content
- * @param threshold Threshold length (default: 10000 characters)
+ * @param _content Message content
+ * @param _threshold Threshold length (default: 10000 characters)
  */
-export function needsVirtualization(content: string, threshold = 10000): boolean {
-  return content.length > threshold;
+export function needsVirtualization(_content: string, _threshold = 10000): boolean {
+  return _content.length > _threshold;
 }
 
 /**
  * Intelligently splits content into blocks for virtualized rendering
- * @param content Message content
+ * @param _content Message content
  */
-export function splitContentBlocks(content: string): string[] {
+export function splitContentBlocks(_content: string): string[] {
   // Handle empty content
-  if (!content) return [];
+  if (!_content) return [];
   
   // Split by paragraphs for better readability
-  const blocks = content
+  const blocks = _content
     .split('\n\n')
-    .filter(block => block.trim().length > 0);
+    .filter(_block => _block.trim().length > 0);
     
   // Handle case where there are no proper paragraphs
   if (blocks.length === 0) {
-    return [content];
+    return [_content];
   }
   
   // Process code blocks specially to keep them intact
@@ -67,12 +67,12 @@ export function splitContentBlocks(content: string): string[] {
 /**
  * Gets block height estimate based on content characteristics
  */
-export function estimateBlockHeight(block: string): number {
+export function estimateBlockHeight(_block: string): number {
   // Base height for any block
   let height = 24;
   
   // Count lines - each newline adds to height
-  const lineCount = (block.match(/\n/g) || []).length + 1;
+  const lineCount = (_block.match(/\n/g) || []).length + 1;
   
   // Increase height for multi-line blocks
   if (lineCount > 1) {
@@ -80,18 +80,18 @@ export function estimateBlockHeight(block: string): number {
   }
   
   // Extra height for code blocks
-  if (block.includes('```')) {
+  if (_block.includes('```')) {
     height += 40;
   }
   
   // Extra height for complex content like tables
-  if (block.includes('|') && block.includes('-') && block.includes('\n')) {
+  if (_block.includes('|') && _block.includes('-') && _block.includes('\n')) {
     height += 80;
   }
   
   // Increase height based on text length (approx chars per line)
   const charsPerLine = 60;
-  const textLines = Math.ceil(block.length / charsPerLine);
+  const textLines = Math.ceil(_block.length / charsPerLine);
   if (textLines > lineCount) {
     height += (textLines - lineCount) * 20;
   }
@@ -103,19 +103,19 @@ export function estimateBlockHeight(block: string): number {
  * Determines if content is actively streaming based on timestamps and changes
  */
 export function isActivelyStreaming(
-  content: string,
-  prevContent: string,
-  lastUpdateTime: number,
-  maxIdleTime = 1000 // ms
+  _content: string,
+  _prevContent: string,
+  _lastUpdateTime: number,
+  _maxIdleTime = 1000 // ms
 ): boolean {
   // Content is definitely still changing
-  if (content !== prevContent) {
+  if (_content !== _prevContent) {
     return true;
   }
   
   // Content hasn't changed, but we haven't been idle long
   const now = Date.now();
-  if (now - lastUpdateTime < maxIdleTime) {
+  if (now - _lastUpdateTime < _maxIdleTime) {
     return true;
   }
   

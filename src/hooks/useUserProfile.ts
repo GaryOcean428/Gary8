@@ -10,7 +10,7 @@ export interface UserProfile {
   avatar_url: string | null;
   role: 'user' | 'admin' | 'dev';
   is_dev_user: boolean;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   profile_complete: boolean;
   bio: string | null;
   created_at: string;
@@ -67,13 +67,13 @@ export function useUserProfile() {
     loadUserProfile();
   }, [user, addToast]);
 
-  const updateProfile = async (updates: Partial<Omit<UserProfile, 'id' | 'created_at' | 'updated_at'>>) => {
+  const updateProfile = async (_updates: Partial<Omit<UserProfile, 'id' | 'created_at' | 'updated_at'>>) => {
     if (!user) return null;
 
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .update(updates)
+        .update(_updates)
         .eq('id', user.id)
         .select()
         .single();

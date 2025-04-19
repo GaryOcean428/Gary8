@@ -1,61 +1,61 @@
 import { dbInitializer } from './db-init';
 
-export async function dbGet(storeName: string, key: string | number): Promise<any> {
+export async function dbGet(_storeName: string, _key: string | number): Promise<unknown> {
   const db = await dbInitializer.getDatabase();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(storeName, 'readonly');
-    const store = transaction.objectStore(storeName);
-    const request = store.get(key);
+  return new Promise((_resolve, _reject) => {
+    const transaction = db.transaction(_storeName, 'readonly');
+    const store = transaction.objectStore(_storeName);
+    const request = store.get(_key);
 
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    request.onsuccess = () => _resolve(request.result);
+    request.onerror = () => _reject(request.error);
   });
 }
 
-export async function dbPut(storeName: string, value: any): Promise<any> {
+export async function dbPut(_storeName: string, _value: unknown): Promise<unknown> {
   const db = await dbInitializer.getDatabase();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(storeName, 'readwrite');
-    const store = transaction.objectStore(storeName);
-    const request = store.put(value);
+  return new Promise((_resolve, _reject) => {
+    const transaction = db.transaction(_storeName, 'readwrite');
+    const store = transaction.objectStore(_storeName);
+    const request = store.put(_value);
 
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    request.onsuccess = () => _resolve(request.result);
+    request.onerror = () => _reject(request.error);
   });
 }
 
-export async function dbGetAll(storeName: string): Promise<any[]> {
+export async function dbGetAll(_storeName: string): Promise<any[]> {
   const db = await dbInitializer.getDatabase();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(storeName, 'readonly');
-    const store = transaction.objectStore(storeName);
+  return new Promise((_resolve, _reject) => {
+    const transaction = db.transaction(_storeName, 'readonly');
+    const store = transaction.objectStore(_storeName);
     const request = store.getAll();
 
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    request.onsuccess = () => _resolve(request.result);
+    request.onerror = () => _reject(request.error);
   });
 }
 
-export async function dbDelete(storeName: string, key: string | number): Promise<void> {
+export async function dbDelete(_storeName: string, _key: string | number): Promise<void> {
   const db = await dbInitializer.getDatabase();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(storeName, 'readwrite');
-    const store = transaction.objectStore(storeName);
-    const request = store.delete(key);
+  return new Promise((_resolve, _reject) => {
+    const transaction = db.transaction(_storeName, 'readwrite');
+    const store = transaction.objectStore(_storeName);
+    const request = store.delete(_key);
 
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
+    request.onsuccess = () => _resolve();
+    request.onerror = () => _reject(request.error);
   });
 }
 
-export async function dbClear(storeName: string): Promise<void> {
+export async function dbClear(_storeName: string): Promise<void> {
   const db = await dbInitializer.getDatabase();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(storeName, 'readwrite');
-    const store = transaction.objectStore(storeName);
+  return new Promise((_resolve, _reject) => {
+    const transaction = db.transaction(_storeName, 'readwrite');
+    const store = transaction.objectStore(_storeName);
     const request = store.clear();
 
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
+    request.onsuccess = () => _resolve();
+    request.onerror = () => _reject(request.error);
   });
 }

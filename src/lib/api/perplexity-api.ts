@@ -22,9 +22,9 @@ export class PerplexityAPI extends BaseAPI {
   }
 
   async chat(
-    messages: Message[],
-    onProgress?: (content: string) => void,
-    options: {
+    _messages: Message[],
+    _onProgress?: (content: string) => void,
+    _options: {
       model?: string;
       temperature?: number;
       maxTokens?: number;
@@ -35,7 +35,7 @@ export class PerplexityAPI extends BaseAPI {
     }
 
     try {
-      const model = options.model || perplexityModels.sonarPro;
+      const model = _options.model || perplexityModels.sonarPro;
 
       const response = await fetch('https://api.perplexity.ai/chat/completions', {
         method: 'POST',
@@ -45,10 +45,10 @@ export class PerplexityAPI extends BaseAPI {
         },
         body: JSON.stringify({
           model: model,
-          messages: messages.map(({ role, content }) => ({ role, content })),
-          temperature: options.temperature || this.config.services.perplexity.temperature,
-          max_tokens: options.maxTokens || this.config.services.perplexity.maxTokens,
-          stream: Boolean(onProgress)
+          messages: _messages.map(({ role, content }) => ({ role, content })),
+          temperature: _options.temperature || this.config.services.perplexity.temperature,
+          max_tokens: _options.maxTokens || this.config.services.perplexity.maxTokens,
+          stream: Boolean(_onProgress)
         })
       });
 
@@ -60,8 +60,8 @@ export class PerplexityAPI extends BaseAPI {
         );
       }
 
-      if (onProgress && response.body) {
-        return this.handleStreamingResponse(response.body, onProgress);
+      if (_onProgress && response.body) {
+        return this.handleStreamingResponse(response.body, _onProgress);
       }
 
       const data = await response.json();
@@ -77,10 +77,10 @@ export class PerplexityAPI extends BaseAPI {
   }
 
   private async handleStreamingResponse(
-    body: ReadableStream<Uint8Array>,
-    onProgress: (content: string) => void
+    _body: ReadableStream<Uint8Array>,
+    _onProgress: (content: string) => void
   ): Promise<string> {
-    const reader = body.getReader();
+    const reader = _body.getReader();
     const decoder = new TextDecoder();
     let fullContent = '';
 
@@ -102,7 +102,7 @@ export class PerplexityAPI extends BaseAPI {
               const content = parsed.choices[0]?.delta?.content;
               if (content) {
                 fullContent += content;
-                onProgress(content);
+                _onProgress(content);
               }
             } catch (e) {
               thoughtLogger.log('error', 'Failed to parse streaming response', { error: e });

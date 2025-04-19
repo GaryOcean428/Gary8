@@ -9,8 +9,8 @@ interface CanvasPromptProps {
 export function CanvasPrompt({ onSubmit, isGenerating }: CanvasPromptProps) {
   const [prompt, setPrompt] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (_e: React.FormEvent) => {
+    _e.preventDefault();
     if (!prompt.trim() || isGenerating) return;
 
     await onSubmit(prompt.trim());
@@ -24,13 +24,14 @@ export function CanvasPrompt({ onSubmit, isGenerating }: CanvasPromptProps) {
           <input
             type="text"
             value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
+            onChange={(_e) => setPrompt(_e.target.value)}
             placeholder="Describe the interface you want to create..."
             className="w-full bg-white rounded-lg pl-4 pr-12 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
             disabled={isGenerating}
           />
           <button
             type="submit"
+            aria-label="Generate AI interface"
             disabled={!prompt.trim() || isGenerating}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-blue-600 hover:text-blue-700 disabled:opacity-50 disabled:hover:text-blue-600"
           >

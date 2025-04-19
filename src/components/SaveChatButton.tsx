@@ -20,7 +20,7 @@ export function SaveChatButton({ messages, onSave }: SaveChatButtonProps) {
     
     setIsSaving(true);
     try {
-      const tagArray = tags.split(',').map(tag => tag.trim()).filter(Boolean);
+      const tagArray = tags.split(',').map(_tag => _tag.trim()).filter(Boolean);
       await saveChat(title, messages, tagArray);
       setIsModalOpen(false);
       onSave?.();
@@ -60,7 +60,7 @@ export function SaveChatButton({ messages, onSave }: SaveChatButtonProps) {
                 <input
                   type="text"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={(_e) => setTitle(_e.target.value)}
                   className="w-full bg-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter a title for this chat"
                 />
@@ -71,7 +71,7 @@ export function SaveChatButton({ messages, onSave }: SaveChatButtonProps) {
                 <input
                   type="text"
                   value={tags}
-                  onChange={(e) => setTags(e.target.value)}
+                  onChange={(_e) => setTags(_e.target.value)}
                   className="w-full bg-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter tags, separated by commas"
                 />

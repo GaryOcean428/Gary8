@@ -36,9 +36,9 @@ export function MemorySettings() {
             <span className="text-sm">Enable vector memory</span>
             <Toggle
               enabled={localSettings.vectorMemoryEnabled}
-              onChange={(enabled) => setLocalSettings(prev => ({
-                ...prev,
-                vectorMemoryEnabled: enabled
+              onChange={(_enabled) => setLocalSettings(_prev => ({
+                ..._prev,
+                vectorMemoryEnabled: _enabled
               }))}
             />
           </div>
@@ -51,9 +51,9 @@ export function MemorySettings() {
           </label>
           <select
             value={localSettings.memoryLimit}
-            onChange={(e) => setLocalSettings(prev => ({
-              ...prev,
-              memoryLimit: parseInt(e.target.value)
+            onChange={(_e) => setLocalSettings(_prev => ({
+              ..._prev,
+              memoryLimit: parseInt(_e.target.value)
             }))}
             className="w-full bg-gray-700 rounded px-3 py-2"
           >
@@ -71,9 +71,9 @@ export function MemorySettings() {
           </label>
           <select
             value={localSettings.contextWindow}
-            onChange={(e) => setLocalSettings(prev => ({
-              ...prev,
-              contextWindow: parseInt(e.target.value)
+            onChange={(_e) => setLocalSettings(_prev => ({
+              ..._prev,
+              contextWindow: parseInt(_e.target.value)
             }))}
             className="w-full bg-gray-700 rounded px-3 py-2"
           >

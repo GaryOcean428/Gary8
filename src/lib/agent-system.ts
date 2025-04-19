@@ -61,13 +61,13 @@ export class AgentSystem {
   }
 
   async processMessage(
-    content: string,
-    onProgress?: (content: string) => void,
-    onStateChange?: (state: ProcessingState) => void
+    _content: string,
+    _onProgress?: (content: string) => void,
+    _onStateChange?: (state: ProcessingState) => void
   ): Promise<void> {
     if (this.isProcessing || this.isPaused) return;
 
-    performanceMonitor.startMeasure('process_message', { contentLength: content.length });
+    performanceMonitor.startMeasure('process_message', { contentLength: _content.length });
     this.isProcessing = true;
     thoughtLogger.log('plan', 'Processing new message');
 
@@ -77,25 +77,25 @@ export class AgentSystem {
       const message: Message = {
         id: crypto.randomUUID(),
         role: 'user',
-        content,
+        _content,
         timestamp: Date.now()
       };
 
       // Get context from memory
-      await this.updateState('retrieving', onStateChange);
+      await this.updateState('retrieving', _onStateChange);
       performanceMonitor.startMeasure('context_retrieval');
       const context = await this.chatContext.getRecentContext();
-      const memoryResults = await this.vectorMemory.recall(content);
+      const memoryResults = await this.vectorMemory.recall(_content);
       performanceMonitor.endMeasure('context_retrieval');
 
       // Search if needed
       let searchContext = '';
-      if (this.searchService.needsSearch(content)) {
-        await this.updateState('searching', onStateChange);
+      if (this.searchService.needsSearch(_content)) {
+        await this.updateState('searching', _onStateChange);
         performanceMonitor.startMeasure('web_search');
         try {
-          searchContext = await this.searchService.search(content);
-          await this.updateState('synthesizing', onStateChange);
+          searchContext = await this.searchService.search(_content);
+          await this.updateState('synthesizing', _onStateChange);
         } catch (error) {
           thoughtLogger.log('critique', `Search failed: ${error}`);
         }
@@ -103,7 +103,7 @@ export class AgentSystem {
       }
 
       // Process message
-      await this.updateState('thinking', onStateChange);
+      await this.updateState('thinking', _onStateChange);
       const systemMessage = this.buildSystemMessage(context, memoryResults, searchContext);
 
       // Use retry handler for API calls
@@ -111,9 +111,9 @@ export class AgentSystem {
       const response = await this.retryHandler.execute(async () => {
         return this.apiClient.chat(
           [systemMessage, message],
-          content => {
-            if (!this.isPaused && onProgress) {
-              onProgress(content);
+          _content => {
+            if (!this.isPaused && _onProgress) {
+              _onProgress(_content);
             }
           }
         );
@@ -145,18 +145,18 @@ export class AgentSystem {
       throw new Error(handled.message);
     } finally {
       this.isProcessing = false;
-      onStateChange?.(undefined);
+      _onStateChange?.(undefined);
       performanceMonitor.endMeasure('process_message');
     }
   }
 
   private buildSystemMessage(
-    context: string,
-    memoryResults: Array<{ content: string }>,
-    searchContext: string
+    _context: string,
+    _memoryResults: Array<{ content: string }>,
+    _searchContext: string
   ): Message {
-    const memoryContext = memoryResults
-      .map(mem => `Previous relevant information: ${mem.content}`)
+    const memoryContext = _memoryResults
+      .map(_mem => `Previous relevant information: ${_mem.content}`)
       .join('\n');
 
     return {
@@ -171,25 +171,25 @@ export class AgentSystem {
         '- If uncertain, ask for clarification',
         '- For medical queries, provide general educational information with clear disclaimers',
         '- Never provide specific medical advice or diagnoses',
-        context ? `Recent context:\n${context}` : '',
+        _context ? `Recent context:\n${_context}` : '',
         memoryContext ? `Memory context:\n${memoryContext}` : '',
-        searchContext ? `Search context:\n${searchContext}` : ''
+        _searchContext ? `Search context:\n${_searchContext}` : ''
       ].filter(Boolean).join('\n\n'),
       timestamp: Date.now()
     };
   }
 
   private async updateState(
-    state: ProcessingState,
-    onStateChange?: (state: ProcessingState) => void
+    _state: ProcessingState,
+    _onStateChange?: (state: ProcessingState) => void
   ): Promise<void> {
-    this.currentState = state;
-    onStateChange?.(state);
-    await new Promise(resolve => setTimeout(resolve, 50));
+    this.currentState = _state;
+    _onStateChange?.(_state);
+    await new Promise(_resolve => setTimeout(_resolve, 50));
   }
 
-  setPaused(paused: boolean): void {
-    this.isPaused = paused;
+  setPaused(_paused: boolean): void {
+    this.isPaused = _paused;
   }
 
   getMessages(): Message[] {

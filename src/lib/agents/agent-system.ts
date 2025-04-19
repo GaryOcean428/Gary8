@@ -68,9 +68,9 @@ export class AgentSystem {
   }
 
   async processMessage(
-    content: string,
-    onProgress?: (content: string) => void,
-    onStateChange?: (state: string) => void
+    _content: string,
+    _onProgress?: (content: string) => void,
+    _onStateChange?: (state: string) => void
   ): Promise<void> {
     if (this.isProcessing || this.isPaused) return;
 
@@ -81,12 +81,12 @@ export class AgentSystem {
       const message: Message = {
         id: crypto.randomUUID(),
         role: 'user',
-        content,
+        _content,
         timestamp: Date.now()
       };
 
       // Get and enhance context
-      await this.updateState('retrieving', onStateChange);
+      await this.updateState('retrieving', _onStateChange);
       const context = await this.contextManager.getContext(message);
       const enhancedContext = this.contextEnhancer.enhanceContext(message);
 
@@ -97,28 +97,28 @@ export class AgentSystem {
       let lastProgress = '';
       const progressInterval = setInterval(() => {
         const plan = this.collaborationManager.getSession(session.id);
-        if (plan && onProgress && plan.messages.length > 0) {
+        if (plan && _onProgress && plan.messages.length > 0) {
           const latestMessage = plan.messages[plan.messages.length - 1];
           if (latestMessage.content !== lastProgress) {
-            onProgress(latestMessage.content);
+            _onProgress(latestMessage.content);
             lastProgress = latestMessage.content;
           }
         }
       }, 100);
 
       // Wait for session completion
-      await new Promise<void>((resolve, reject) => {
+      await new Promise<void>((_resolve, _reject) => {
         const cleanup = () => {
           clearInterval(progressInterval);
           this.collaborationManager.removeAllListeners(session.id);
         };
 
-        this.collaborationManager.once(session.id, (event: any) => {
+        this.collaborationManager.once(session.id, (_event: unknown) => {
           cleanup();
-          if (event.type === 'completed') {
-            resolve();
+          if (_event.type === 'completed') {
+            _resolve();
           } else {
-            reject(new Error(event.error));
+            _reject(new Error(_event.error));
           }
         });
       });
@@ -138,20 +138,20 @@ export class AgentSystem {
       throw new Error(handled.message);
     } finally {
       this.isProcessing = false;
-      onStateChange?.(undefined);
+      _onStateChange?.(undefined);
     }
   }
 
   private async updateState(
-    state: string,
-    onStateChange?: (state: string) => void
+    _state: string,
+    _onStateChange?: (state: string) => void
   ): Promise<void> {
-    onStateChange?.(state);
-    await new Promise(resolve => setTimeout(resolve, 100));
+    _onStateChange?.(_state);
+    await new Promise(_resolve => setTimeout(_resolve, 100));
   }
 
-  setPaused(paused: boolean): void {
-    this.isPaused = paused;
+  setPaused(_paused: boolean): void {
+    this.isPaused = _paused;
   }
 
   getAgents(): any[] {

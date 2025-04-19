@@ -25,13 +25,13 @@ export class CollaborationManager extends EventEmitter {
     this.memoryAggregator = MemoryAggregator.getInstance();
   }
 
-  async startCollaboration(message: Message): Promise<CollaborationSession> {
+  async startCollaboration(_message: Message): Promise<CollaborationSession> {
     const sessionId = crypto.randomUUID();
     thoughtLogger.log('plan', 'Starting collaboration session', { sessionId });
 
     try {
       // Create task plan
-      const plan = await this.taskPlanner.planTask(message);
+      const plan = await this.taskPlanner.planTask(_message);
       
       // Initialize collaboration session
       const session: CollaborationSession = {
@@ -39,10 +39,10 @@ export class CollaborationManager extends EventEmitter {
         taskPlanId: plan.id,
         participants: new Set(
           plan.steps
-            .map(step => step.assignedAgent)
-            .filter((agent): agent is string => Boolean(agent))
+            .map(_step => _step.assignedAgent)
+            .filter((_agent): _agent is string => Boolean(_agent))
         ),
-        messages: [message],
+        messages: [_message],
         status: 'active',
         startTime: Date.now()
       };
@@ -54,10 +54,10 @@ export class CollaborationManager extends EventEmitter {
       
       // Aggregate results
       const results = plan.steps
-        .filter(step => step.status === 'completed')
-        .map(step => ({
-          agentId: step.assignedAgent!,
-          content: step.result,
+        .filter(_step => _step.status === 'completed')
+        .map(_step => ({
+          agentId: _step.assignedAgent!,
+          content: _step.result,
           confidence: 0.9
         }));
 
@@ -80,42 +80,42 @@ export class CollaborationManager extends EventEmitter {
   }
 
   async sendMessage(
-    sessionId: string,
-    message: Omit<Message, 'id' | 'timestamp'>
+    _sessionId: string,
+    _message: Omit<Message, 'id' | 'timestamp'>
   ): Promise<void> {
-    const session = this.sessions.get(sessionId);
+    const session = this.sessions.get(_sessionId);
     if (!session) {
-      throw new Error(`Session ${sessionId} not found`);
+      throw new Error(`Session ${_sessionId} not found`);
     }
 
     const fullMessage: Message = {
-      ...message,
+      ..._message,
       id: crypto.randomUUID(),
       timestamp: Date.now()
     };
 
     session.messages.push(fullMessage);
-    this.emit('message', { sessionId, message: fullMessage });
+    this.emit('message', { _sessionId, message: fullMessage });
   }
 
-  getSession(sessionId: string): CollaborationSession | undefined {
-    return this.sessions.get(sessionId);
+  getSession(_sessionId: string): CollaborationSession | undefined {
+    return this.sessions.get(_sessionId);
   }
 
   getActiveSessions(): CollaborationSession[] {
     return Array.from(this.sessions.values()).filter(
-      session => session.status === 'active'
+      _session => _session.status === 'active'
     );
   }
 
-  async endSession(sessionId: string): Promise<void> {
-    const session = this.sessions.get(sessionId);
+  async endSession(_sessionId: string): Promise<void> {
+    const session = this.sessions.get(_sessionId);
     if (!session) {
-      throw new Error(`Session ${sessionId} not found`);
+      throw new Error(`Session ${_sessionId} not found`);
     }
 
     session.status = 'completed';
     session.endTime = Date.now();
-    this.emit('session-ended', { sessionId });
+    this.emit('session-ended', { _sessionId });
   }
 }

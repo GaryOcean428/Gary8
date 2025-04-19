@@ -18,8 +18,8 @@ export class AnthropicAdapter implements AIProviderAdapter {
     }
   }
 
-  setApiKey(apiKey: string): void {
-    this.apiKey = apiKey;
+  setApiKey(_apiKey: string): void {
+    this.apiKey = _apiKey;
   }
   
   getAvailableModels(): string[] {
@@ -80,9 +80,9 @@ export class AnthropicAdapter implements AIProviderAdapter {
   }
 
   async chat(
-    messages: Message[],
-    onProgress?: (content: string) => void,
-    options?: ChatOptions
+    _messages: Message[],
+    _onProgress?: (content: string) => void,
+    _options?: ChatOptions
   ): Promise<string> {
     if (!this.apiKey) {
       throw new AppError('Anthropic API key not configured', 'API_ERROR');
@@ -90,11 +90,11 @@ export class AnthropicAdapter implements AIProviderAdapter {
 
     return await this.retryHandler.execute(async () => {
       const body = {
-        model: options?.model || 'claude-3.5-haiku-latest',
-        max_tokens: options?.maxTokens || 4096,
-        messages: messages.map(({ role, content }) => ({ role, content })),
-        temperature: options?.temperature,
-        stream: Boolean(onProgress)
+        model: _options?.model || 'claude-3.5-haiku-latest',
+        max_tokens: _options?.maxTokens || 4096,
+        messages: _messages.map(({ role, content }) => ({ role, content })),
+        temperature: _options?.temperature,
+        stream: Boolean(_onProgress)
       };
 
       const response = await fetch(`${this.baseUrl}/messages`, {
@@ -119,8 +119,8 @@ export class AnthropicAdapter implements AIProviderAdapter {
       }
       
       // Handle streaming
-      if (onProgress && response.body) {
-        return await this.handleStreamingResponse(response.body, onProgress);
+      if (_onProgress && response.body) {
+        return await this.handleStreamingResponse(response.body, _onProgress);
       }
       
       // Parse normal response
@@ -130,10 +130,10 @@ export class AnthropicAdapter implements AIProviderAdapter {
   }
   
   private async handleStreamingResponse(
-    body: ReadableStream<Uint8Array>,
-    onProgress: (content: string) => void
+    _body: ReadableStream<Uint8Array>,
+    _onProgress: (content: string) => void
   ): Promise<string> {
-    const reader = body.getReader();
+    const reader = _body.getReader();
     const decoder = new TextDecoder();
     let fullContent = '';
     
@@ -155,7 +155,7 @@ export class AnthropicAdapter implements AIProviderAdapter {
               if (parsed.type === 'content_block_delta' && parsed.delta.text) {
                 const content = parsed.delta.text;
                 fullContent += content;
-                onProgress(content);
+                _onProgress(content);
               } else if (parsed.type === 'message_stop') {
                 // End of message
               }
@@ -173,6 +173,6 @@ export class AnthropicAdapter implements AIProviderAdapter {
   }
 }
 
-export function createAnthropicAdapter(apiKey?: string): AIProviderAdapter {
-  return new AnthropicAdapter(apiKey);
+export function createAnthropicAdapter(_apiKey?: string): AIProviderAdapter {
+  return new AnthropicAdapter(_apiKey);
 }

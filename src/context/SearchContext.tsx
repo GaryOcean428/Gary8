@@ -11,7 +11,7 @@ interface SearchContextType {
   results: SearchResult[];
   isStreaming: boolean;
   streamingPhase: StreamingPhase;
-  search: (query: string, filters?: any, sort?: string) => Promise<void>;
+  search: (query: string, filters?: unknown, sort?: string) => Promise<void>;
   clearResults: () => void;
   isCached: boolean;
   error: Error | null;
@@ -35,8 +35,8 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
   
   const { settings } = useSettings();
 
-  const search = useCallback(async (query: string, filters = {}, sort = 'relevance') => {
-    if (!query.trim()) {
+  const search = useCallback(async (_query: string, _filters = {}, _sort = 'relevance') => {
+    if (!_query.trim()) {
       setResults([]);
       return;
     }
@@ -50,9 +50,9 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     const controller = new AbortController();
     setCurrentAbortController(controller);
     
-    setLastQuery(query);
-    setLastFilters(filters);
-    setLastSort(sort);
+    setLastQuery(_query);
+    setLastFilters(_filters);
+    setLastSort(_sort);
     setIsStreaming(true);
     setIsCached(false);
     setError(null);
@@ -65,14 +65,14 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
       }
       
       // Check cache first
-      const cacheKey = `search:${query}:${JSON.stringify(filters)}:${sort}`;
+      const cacheKey = `search:${_query}:${JSON.stringify(_filters)}:${_sort}`;
       const cached = sessionStorage.getItem(cacheKey);
       
       if (cached) {
         // Short delay to show the cache is being used
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(_resolve => setTimeout(_resolve, 300));
         setStreamingPhase('processing');
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(_resolve => setTimeout(_resolve, 200));
         
         setResults(JSON.parse(cached));
         setIsCached(true);
@@ -83,18 +83,18 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
       
       // Simulate search phases
       setStreamingPhase('searching');
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(_resolve => setTimeout(_resolve, 800));
       
       setStreamingPhase('processing');
-      await new Promise(resolve => setTimeout(resolve, 600));
+      await new Promise(_resolve => setTimeout(_resolve, 600));
       
       setStreamingPhase('analyzing');
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(_resolve => setTimeout(_resolve, 500));
       
       setStreamingPhase('generating');
       
       // Do the actual search
-      const searchResults = await searchService.search(query, filters, sort);
+      const searchResults = await searchService.search(_query, _filters, _sort);
       
       // Cache the results if the search was successful
       try {
@@ -106,7 +106,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
       // Update state with results
       setResults(searchResults);
       thoughtLogger.log('success', 'Search completed successfully', { 
-        query, 
+        _query, 
         resultCount: searchResults.length 
       });
     } catch (error) {

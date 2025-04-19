@@ -94,9 +94,9 @@ export function ApiStatusDisplay() {
     
     // Re-check API status when API keys change
     const unsubscribe = useConfigStore.subscribe(
-      state => state.apiKeys,
+      _state => _state.apiKeys,
       () => checkApiStatus(),
-      { equalityFn: (a, b) => JSON.stringify(a) === JSON.stringify(b) }
+      { equalityFn: (_a, _b) => JSON.stringify(_a) === JSON.stringify(_b) }
     );
     
     // Periodic check for status changes
@@ -116,8 +116,8 @@ export function ApiStatusDisplay() {
   }, []);
 
   // Display status icon based on API connection state
-  const getStatusIcon = (status: 'checking' | 'connected' | 'disconnected') => {
-    switch (status) {
+  const getStatusIcon = (_status: 'checking' | 'connected' | 'disconnected') => {
+    switch (_status) {
       case 'checking':
         return <Loader size={16} className="text-primary animate-spin" />;
       case 'connected':
@@ -195,15 +195,15 @@ export function ApiStatusDisplay() {
         <div className="mt-3">
           <p className="text-xs text-muted-foreground mb-1">Connected Providers:</p>
           <div className="flex flex-wrap gap-1.5">
-            {connectedProviders.map(provider => (
+            {connectedProviders.map(_provider => (
               <motion.span 
-                key={provider}
+                key={_provider}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-success/10 text-success border border-success/20"
               >
                 <CheckCircle size={12} className="mr-1" />
-                {provider.charAt(0).toUpperCase() + provider.slice(1)}
+                {_provider.charAt(0).toUpperCase() + _provider.slice(1)}
               </motion.span>
             ))}
           </div>

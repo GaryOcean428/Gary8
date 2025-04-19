@@ -16,10 +16,10 @@ export function WorkflowSettings() {
     });
   };
 
-  const handleParallelTasksChange = (value: number) => {
-    setLocalSettings(prev => ({
-      ...prev,
-      parallelTasks: value
+  const handleParallelTasksChange = (_value: number) => {
+    setLocalSettings(_prev => ({
+      ..._prev,
+      parallelTasks: _value
     }));
   };
 
@@ -40,9 +40,9 @@ export function WorkflowSettings() {
             <span className="text-sm">Enable agent collaboration</span>
             <Toggle
               enabled={localSettings.collaborationEnabled}
-              onChange={(enabled) => setLocalSettings(prev => ({
-                ...prev,
-                collaborationEnabled: enabled
+              onChange={(_enabled) => setLocalSettings(_prev => ({
+                ..._prev,
+                collaborationEnabled: _enabled
               }))}
             />
           </div>
@@ -57,9 +57,9 @@ export function WorkflowSettings() {
             <span className="text-sm">Enable task planning</span>
             <Toggle
               enabled={localSettings.taskPlanningEnabled}
-              onChange={(enabled) => setLocalSettings(prev => ({
-                ...prev,
-                taskPlanningEnabled: enabled
+              onChange={(_enabled) => setLocalSettings(_prev => ({
+                ..._prev,
+                taskPlanningEnabled: _enabled
               }))}
             />
           </div>
@@ -73,7 +73,7 @@ export function WorkflowSettings() {
           <div className="relative">
             <select
               value={localSettings.parallelTasks}
-              onChange={(e) => handleParallelTasksChange(parseInt(e.target.value))}
+              onChange={(_e) => handleParallelTasksChange(parseInt(_e.target.value))}
               className="w-full bg-gray-700 rounded px-3 py-2"
             >
               <option value={1}>Sequential (1 task)</option>
@@ -108,9 +108,9 @@ export function WorkflowSettings() {
               <span className="text-sm">Log task planning</span>
               <Toggle
                 enabled={localSettings.logTaskPlanning}
-                onChange={(enabled) => setLocalSettings(prev => ({
-                  ...prev,
-                  logTaskPlanning: enabled
+                onChange={(_enabled) => setLocalSettings(_prev => ({
+                  ..._prev,
+                  logTaskPlanning: _enabled
                 }))}
               />
             </div>
@@ -118,9 +118,9 @@ export function WorkflowSettings() {
               <span className="text-sm">Log agent communication</span>
               <Toggle
                 enabled={localSettings.logAgentComm}
-                onChange={(enabled) => setLocalSettings(prev => ({
-                  ...prev,
-                  logAgentComm: enabled
+                onChange={(_enabled) => setLocalSettings(_prev => ({
+                  ..._prev,
+                  logAgentComm: _enabled
                 }))}
               />
             </div>
@@ -128,9 +128,9 @@ export function WorkflowSettings() {
               <span className="text-sm">Log agent state changes</span>
               <Toggle
                 enabled={localSettings.logAgentState || false}
-                onChange={(enabled) => setLocalSettings(prev => ({
-                  ...prev,
-                  logAgentState: enabled
+                onChange={(_enabled) => setLocalSettings(_prev => ({
+                  ..._prev,
+                  logAgentState: _enabled
                 }))}
               />
             </div>
@@ -138,9 +138,9 @@ export function WorkflowSettings() {
               <span className="text-sm">Log memory operations</span>
               <Toggle
                 enabled={localSettings.logMemoryOps || false}
-                onChange={(enabled) => setLocalSettings(prev => ({
-                  ...prev,
-                  logMemoryOps: enabled
+                onChange={(_enabled) => setLocalSettings(_prev => ({
+                  ..._prev,
+                  logMemoryOps: _enabled
                 }))}
               />
             </div>

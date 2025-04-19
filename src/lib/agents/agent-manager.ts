@@ -3,21 +3,21 @@
 export class AgentManager {
   // Previous properties remain the same...
 
-  async processMessage(message: Message): Promise<Message> {
-    thoughtLogger.log('plan', 'Starting message processing', { messageId: message.id });
+  async processMessage(_message: Message): Promise<Message> {
+    thoughtLogger.log('plan', 'Starting message processing', { messageId: _message.id });
 
     try {
       // Route to appropriate model/agent based on message content
-      const routerConfig = await this.router.route(message.content, []);
+      const routerConfig = await this.router.route(_message.content, []);
       thoughtLogger.log('decision', `Selected model: ${routerConfig.model}`, {
         confidence: routerConfig.confidence,
         strategy: routerConfig.responseStrategy
       });
 
       // For data gathering and analysis tasks
-      if (message.content.toLowerCase().includes('find') || 
-          message.content.toLowerCase().includes('search') ||
-          message.content.toLowerCase().includes('gather')) {
+      if (_message.content.toLowerCase().includes('find') || 
+          _message.content.toLowerCase().includes('search') ||
+          _message.content.toLowerCase().includes('gather')) {
         
         thoughtLogger.log('plan', 'Initiating multi-agent data gathering collaboration');
 
@@ -28,7 +28,7 @@ export class AgentManager {
         }
 
         const searchResponse = await searchSpecialist.processMessage({
-          ...message,
+          ..._message,
           type: 'search'
         });
 
@@ -61,8 +61,8 @@ export class AgentManager {
         });
 
         // 4. If export is requested, delegate to CSV agent
-        if (message.content.toLowerCase().includes('table') || 
-            message.content.toLowerCase().includes('export')) {
+        if (_message.content.toLowerCase().includes('table') || 
+            _message.content.toLowerCase().includes('export')) {
           
           thoughtLogger.log('plan', 'Data export requested, delegating to CSV agent');
           
@@ -112,7 +112,7 @@ export class AgentManager {
       }
 
       // Handle other types of requests...
-      return await this.primaryAgent.processMessage(message);
+      return await this.primaryAgent.processMessage(_message);
 
     } catch (error) {
       thoughtLogger.log('error', `Message processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);

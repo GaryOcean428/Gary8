@@ -33,16 +33,16 @@ export class TaskPlanner {
     this.router = new ModelRouter();
   }
 
-  async createPlan(task: string): Promise<TaskPlan> {
+  async createPlan(_task: string): Promise<TaskPlan> {
     const planId = crypto.randomUUID();
     thoughtLogger.log('plan', 'Creating task plan', { planId });
 
     try {
       // Route to planning model
-      const routerConfig = await this.router.route(task, []);
+      const routerConfig = await this.router.route(_task, []);
 
       // Generate task steps based on complexity and requirements
-      const steps = await this.generateTaskSteps(task, routerConfig);
+      const steps = await this.generateTaskSteps(_task, routerConfig);
 
       // Create and store task plan
       const plan: TaskPlan = {
@@ -66,9 +66,9 @@ export class TaskPlanner {
     }
   }
 
-  private async generateTaskSteps(task: string, config: any): Promise<TaskStep[]> {
+  private async generateTaskSteps(_task: string, _config: unknown): Promise<TaskStep[]> {
     const steps: TaskStep[] = [];
-    const taskLower = task.toLowerCase();
+    const taskLower = _task.toLowerCase();
 
     // Information gathering step
     if (this.requiresResearch(taskLower)) {
@@ -89,7 +89,7 @@ export class TaskPlanner {
         type: 'analyze',
         description: 'Analyze gathered information and identify key insights',
         requiredCapabilities: ['data-analysis', 'content-generation'],
-        dependencies: steps.map(s => s.id),
+        dependencies: steps.map(_s => _s.id),
         status: 'pending'
       });
     }
@@ -101,7 +101,7 @@ export class TaskPlanner {
         type: 'code',
         description: 'Generate required code implementation',
         requiredCapabilities: ['code-execution', 'tool-usage'],
-        dependencies: steps.map(s => s.id),
+        dependencies: steps.map(_s => _s.id),
         status: 'pending'
       });
     }
@@ -113,7 +113,7 @@ export class TaskPlanner {
         type: 'write',
         description: 'Create content based on analysis',
         requiredCapabilities: ['content-generation', 'self-reflection'],
-        dependencies: steps.map(s => s.id),
+        dependencies: steps.map(_s => _s.id),
         status: 'pending'
       });
     }
@@ -124,7 +124,7 @@ export class TaskPlanner {
       type: 'review',
       description: 'Review and validate generated content/code',
       requiredCapabilities: ['error-handling', 'self-reflection'],
-      dependencies: steps.map(s => s.id),
+      dependencies: steps.map(_s => _s.id),
       status: 'pending'
     });
 
@@ -134,41 +134,41 @@ export class TaskPlanner {
       type: 'execute',
       description: 'Execute final actions and compile results',
       requiredCapabilities: ['tool-usage', 'agent-communication'],
-      dependencies: steps.map(s => s.id),
+      dependencies: steps.map(_s => _s.id),
       status: 'pending'
     });
 
     return steps;
   }
 
-  private requiresResearch(task: string): boolean {
-    return /\b(search|find|gather|research|information about|learn about)\b/i.test(task);
+  private requiresResearch(_task: string): boolean {
+    return /\b(search|find|gather|research|information about|learn about)\b/i.test(_task);
   }
 
-  private requiresAnalysis(task: string): boolean {
-    return /\b(analyze|compare|evaluate|assess|understand)\b/i.test(task);
+  private requiresAnalysis(_task: string): boolean {
+    return /\b(analyze|compare|evaluate|assess|understand)\b/i.test(_task);
   }
 
-  private requiresCode(task: string): boolean {
-    return /\b(code|program|implement|function|class|algorithm)\b/i.test(task);
+  private requiresCode(_task: string): boolean {
+    return /\b(code|program|implement|function|class|algorithm)\b/i.test(_task);
   }
 
-  private requiresWriting(task: string): boolean {
-    return /\b(write|create|generate|compose|draft)\b/i.test(task);
+  private requiresWriting(_task: string): boolean {
+    return /\b(write|create|generate|compose|draft)\b/i.test(_task);
   }
 
-  async executePlan(plan: TaskPlan): Promise<void> {
-    plan.status = 'executing';
-    thoughtLogger.log('execution', 'Executing task plan', { planId: plan.id });
+  async executePlan(_plan: TaskPlan): Promise<void> {
+    _plan.status = 'executing';
+    thoughtLogger.log('execution', 'Executing task plan', { planId: _plan.id });
 
     try {
       // Execute steps in dependency order
       const completed = new Set<string>();
       
-      while (completed.size < plan.steps.length) {
-        const readySteps = plan.steps.filter(step => 
-          step.status === 'pending' &&
-          step.dependencies.every(depId => completed.has(depId))
+      while (completed.size < _plan.steps.length) {
+        const readySteps = _plan.steps.filter(_step => 
+          _step.status === 'pending' &&
+          _step.dependencies.every(_depId => completed.has(_depId))
         );
 
         if (readySteps.length === 0) {
@@ -176,36 +176,36 @@ export class TaskPlanner {
         }
 
         // Execute ready steps in parallel
-        await Promise.all(readySteps.map(async step => {
+        await Promise.all(readySteps.map(async _step => {
           try {
-            step.status = 'active';
+            _step.status = 'active';
             // Step execution handled by assigned agent
-            completed.add(step.id);
-            step.status = 'completed';
+            completed.add(_step.id);
+            _step.status = 'completed';
           } catch (error) {
-            step.status = 'failed';
+            _step.status = 'failed';
             throw error;
           }
         }));
       }
 
-      plan.status = 'completed';
-      plan.endTime = Date.now();
+      _plan.status = 'completed';
+      _plan.endTime = Date.now();
 
       thoughtLogger.log('success', 'Task plan executed successfully', {
-        planId: plan.id,
-        duration: plan.endTime - plan.startTime
+        planId: _plan.id,
+        duration: _plan.endTime - _plan.startTime
       });
     } catch (error) {
-      plan.status = 'failed';
-      plan.endTime = Date.now();
-      thoughtLogger.log('error', 'Task plan execution failed', { planId: plan.id, error });
+      _plan.status = 'failed';
+      _plan.endTime = Date.now();
+      thoughtLogger.log('error', 'Task plan execution failed', { planId: _plan.id, error });
       throw error;
     }
   }
 
-  getPlan(planId: string): TaskPlan | undefined {
-    return this.activePlans.get(planId);
+  getPlan(_planId: string): TaskPlan | undefined {
+    return this.activePlans.get(_planId);
   }
 
   getActivePlans(): TaskPlan[] {

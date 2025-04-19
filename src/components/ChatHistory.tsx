@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { History, Search, Download, Tag, Clock, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useChat } from '../hooks/useChat';
-import { SavedChat } from '../types';
-import { AutoTagger } from '../lib/auto-tagger';
+import type { SavedChat, Message } from '../types';
 import { downloadAsDocx } from '../utils/export';
 
 export function ChatHistory() {
@@ -11,34 +10,33 @@ export function ChatHistory() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const { savedChats, loadChat, deleteChat } = useChat();
-  // const autoTagger = AutoTagger.getInstance(); // Removed unused variable
 
-  const filteredChats = savedChats?.filter((chat: SavedChat) => { // Add type for chat
-    const matchesSearch = chat.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      chat.messages.some((msg: Message) => msg.content.toLowerCase().includes(searchTerm.toLowerCase())); // Add type for msg
-    const matchesTags = selectedTags.length === 0 || 
-      selectedTags.every((tag: string) => chat.tags?.includes(tag)); // Add type for tag
+  const filteredChats = savedChats?.filter((_chat: SavedChat) => {
+    const matchesSearch = _chat.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      _chat.messages.some((_msg: Message) => _msg.content.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesTags = selectedTags.length === 0 ||
+      selectedTags.every((_tag: string) => _chat.tags?.includes(_tag));
     return matchesSearch && matchesTags;
   }) || [];
 
   const allTags = Array.from(new Set(
-    savedChats?.flatMap(chat => chat.tags || []) || []
+    savedChats?.flatMap(_chat => _chat.tags || []) || []
   ));
 
-  const handleChatSelect = async (chatId: string) => {
-    await loadChat(chatId);
+  const handleChatSelect = async (_chatId: string) => {
+    await loadChat(_chatId);
     setIsOpen(false);
   };
 
-  const handleExport = async (chat: SavedChat) => {
-    await downloadAsDocx(chat);
+  const handleExport = async (_chat: SavedChat) => {
+    await downloadAsDocx(_chat);
   };
 
-  const toggleTag = (tag: string) => { // Type for tag already provided
-    setSelectedTags((prev: string[]) => // Add type for prev
-      prev.includes(tag) 
-        ? prev.filter((t: string) => t !== tag) // Add type for t
-        : [...prev, tag]
+  const toggleTag = (_tag: string) => {
+    setSelectedTags((_prev: string[]) =>
+      _prev.includes(_tag)
+        ? _prev.filter((_t: string) => _t !== _tag)
+        : [..._prev, _tag]
     );
   };
 
@@ -60,27 +58,27 @@ export function ChatHistory() {
                 <input
                   type="text"
                   value={searchTerm}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)} // Add type for e
+                  onChange={(_e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(_e.target.value)}
                   placeholder="Search conversations..."
                   className="w-full bg-gray-700 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width={18} height={18} />
               </div>
 
               {allTags.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {allTags.map(tag => (
+                  {allTags.map(_tag => (
                     <button
-                      key={tag}
-                      onClick={() => toggleTag(tag)}
+                      key={_tag}
+                      onClick={() => toggleTag(_tag)}
                       className={`inline-flex items-center px-2 py-1 rounded-full text-xs transition-colors ${
-                        selectedTags.includes(tag)
+                        selectedTags.includes(_tag)
                           ? 'bg-blue-600 text-white'
                           : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                       }`}
                     >
                       <Tag className="w-3 h-3 mr-1" />
-                      {tag}
+                      {_tag}
                     </button>
                   ))}
                 </div>
@@ -93,29 +91,29 @@ export function ChatHistory() {
                   No chats found
                 </div>
               ) : (
-                filteredChats.map(chat => (
-                  <div key={chat.id} className="bg-gray-700 rounded-lg p-3 hover:bg-gray-600 transition-colors">
+                filteredChats.map(_chat => (
+                  <div key={_chat.id} className="bg-gray-700 rounded-lg p-3 hover:bg-gray-600 transition-colors">
                     <div className="flex items-start justify-between">
                       <button
-                        onClick={() => handleChatSelect(chat.id)}
+                        onClick={() => handleChatSelect(_chat.id)}
                         className="flex-1 text-left"
                       >
-                        <h3 className="font-medium">{chat.title}</h3>
+                        <h3 className="font-medium">{_chat.title}</h3>
                         <div className="text-sm text-gray-400 flex items-center mt-1">
                           <Clock className="w-3 h-3 mr-1" />
-                          {formatDistanceToNow(chat.timestamp)} ago
+                          {formatDistanceToNow(_chat.timestamp)} ago
                         </div>
                       </button>
                       <div className="flex items-center space-x-2">
                         <button
-                          onClick={() => handleExport(chat)}
+                          onClick={() => handleExport(_chat)}
                           className="p-1 text-gray-400 hover:text-gray-300 transition-colors"
                           title="Export as DOCX"
                         >
                           <Download className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => deleteChat(chat.id)}
+                          onClick={() => deleteChat(_chat.id)}
                           className="p-1 text-gray-400 hover:text-red-400 transition-colors"
                           title="Delete chat"
                         >
@@ -123,14 +121,14 @@ export function ChatHistory() {
                         </button>
                       </div>
                     </div>
-                    {chat.tags && chat.tags.length > 0 && (
+                    {_chat.tags && _chat.tags.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
-                        {chat.tags.map(tag => (
+                        {_chat.tags.map(_tag => (
                           <span
-                            key={tag}
+                            key={_tag}
                             className="px-2 py-0.5 rounded-full bg-gray-600 text-xs text-gray-300"
                           >
-                            {tag}
+                            {_tag}
                           </span>
                         ))}
                       </div>

@@ -13,10 +13,10 @@ export function useCompetitorAnalysis() {
   const [insights, setInsights] = useState<AnalysisInsight[]>([]);
   const [metrics, setMetrics] = useState<Record<string, number>>({});
 
-  const analyze = async (params: AnalysisParams) => {
+  const analyze = async (_params: AnalysisParams) => {
     setIsLoading(true);
     try {
-      const result = await toolRegistry.executeTool('analyze-competitors', params);
+      const result = await toolRegistry.executeTool('analyze-competitors', _params);
 
       if (result.success && result.result) {
         setReport(result.result.report);

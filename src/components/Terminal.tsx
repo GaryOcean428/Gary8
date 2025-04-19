@@ -36,8 +36,8 @@ export default function Terminal({
     }
   }, [input]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (_e: React.FormEvent) => {
+    _e.preventDefault();
     if (!input.trim() || isProcessing) return;
 
     try {
@@ -54,41 +54,41 @@ export default function Terminal({
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit(e);
+  const handleKeyDown = (_e: React.KeyboardEvent) => {
+    if (_e.key === 'Enter' && !_e.shiftKey) {
+      _e.preventDefault();
+      handleSubmit(_e);
     }
   };
 
-  const handleEnhance = (enhancement: string) => {
-    setActiveEnhancement(enhancement);
+  const handleEnhance = (_enhancement: string) => {
+    setActiveEnhancement(_enhancement);
     setShowEnhancer(false);
   };
 
   return (
     <div className="flex-1 flex flex-col bg-gray-900">
       <div className="flex-1 overflow-auto p-4 space-y-4">
-        {messages.map((message) => (
+        {messages.map((_message) => (
           <div
-            key={message.id}
+            key={_message.id}
             className={`message-container ${
-              message.role === 'user' ? 'user-container' : 'ai-container'
+              _message.role === 'user' ? 'user-container' : 'ai-container'
             }`}
           >
             <div className={`message ${
-              message.role === 'user' ? 'message-user' : 'message-ai'
+              _message.role === 'user' ? 'message-user' : 'message-ai'
             } p-4`}>
               <div className="flex items-start">
                 <span className="font-mono text-sm text-gray-400 mr-2">
-                  {message.role === 'user' ? '>' : '#'}
+                  {_message.role === 'user' ? '>' : '#'}
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="prose prose-invert max-w-none">
-                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                    <ReactMarkdown>{_message.content}</ReactMarkdown>
                   </div>
-                  {message.role === 'assistant' && message.model && (
-                    <div className="text-xs text-gray-500 mt-2">{message.model}</div>
+                  {_message.role === 'assistant' && _message.model && (
+                    <div className="text-xs text-gray-500 mt-2">{_message.model}</div>
                   )}
                 </div>
               </div>
@@ -120,13 +120,13 @@ export default function Terminal({
             <textarea
               ref={inputRef}
               value={input}
-              onChange={e => setInput(e.target.value)}
+              onChange={_e => setInput(_e.target.value)}
               onKeyDown={handleKeyDown}
               className="w-full bg-gray-800 text-gray-100 rounded-lg p-3 pr-12 resize-none min-h-[48px] max-h-[200px] focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder={isProcessing ? 'Processing...' : 'Enter a message...'}
               disabled={isProcessing}
               rows={1}
-              style={{ height: '48px', lineHeight: '24px' }}
+              // Removed duplicate className here
             />
             <button
               type="button"
@@ -137,6 +137,7 @@ export default function Terminal({
                   : 'text-gray-400 hover:text-white hover:bg-gray-700'
               }`}
               title={activeEnhancement ? 'Enhancement active' : 'Enhance prompt'}
+              aria-label={activeEnhancement ? 'Enhancement active' : 'Enhance prompt'} // Added aria-label
             >
               <Sparkles className="w-5 h-5" />
             </button>
@@ -146,6 +147,7 @@ export default function Terminal({
             type="submit"
             disabled={!input.trim() || isProcessing}
             className="flex-none w-10 h-10 flex items-center justify-center rounded-lg transition-colors bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Send message" // Added aria-label
           >
             <Send className="w-5 h-5" />
           </button>

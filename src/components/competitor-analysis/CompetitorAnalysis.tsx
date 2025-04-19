@@ -19,8 +19,8 @@ export function CompetitorAnalysis() {
 
   const [activeTab, setActiveTab] = useState<'dashboard' | 'report' | 'matrix' | 'insights'>('dashboard');
 
-  const handleAnalysis = async (params: AnalysisParams) => {
-    await analyze(params);
+  const handleAnalysis = async (_params: AnalysisParams) => {
+    await analyze(_params);
   };
 
   const renderContent = () => {
@@ -57,17 +57,17 @@ export function CompetitorAnalysis() {
               { id: 'report', label: 'Detailed Report' },
               { id: 'matrix', label: 'Comparison Matrix' },
               { id: 'insights', label: 'Strategic Insights' }
-            ].map(tab => (
+            ].map(_tab => (
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                key={_tab.id}
+                onClick={() => setActiveTab(_tab.id as typeof activeTab)}
                 className={`flex-1 min-w-[120px] px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === tab.id
+                  activeTab === _tab.id
                     ? 'bg-blue-600 text-white'
                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                 }`}
               >
-                {tab.label}
+                {_tab.label}
               </button>
             ))}
           </div>

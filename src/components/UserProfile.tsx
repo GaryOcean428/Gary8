@@ -35,9 +35,9 @@ export function UserProfileComponent() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleChange = (_e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = _e.target;
+    setFormData(_prev => ({ ..._prev, [name]: value }));
   };
 
   if (isLoading) {

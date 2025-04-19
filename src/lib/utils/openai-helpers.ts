@@ -7,36 +7,36 @@ import { thoughtLogger } from '../logging/thought-logger';
 /**
  * Convert messages to chat completion format
  */
-export function messagesToChatCompletionFormat(messages: Array<{ role: string; content: string }>): any {
-  return messages.map(({ role, content }) => ({ role, content }));
+export function messagesToChatCompletionFormat(_messages: Array<{ role: string; content: string }>): any {
+  return _messages.map(({ role, content }) => ({ role, content }));
 }
 
 /**
  * Convert messages to the Responses API input format
  */
-export function messagesToResponsesInputFormat(messages: Array<{ role: string; content: string }>): any {
+export function messagesToResponsesInputFormat(_messages: Array<{ role: string; content: string }>): any {
   // If there's only one message, return it directly
-  if (messages.length === 1) {
-    return { role: messages[0].role, content: messages[0].content };
+  if (_messages.length === 1) {
+    return { role: _messages[0].role, content: _messages[0].content };
   }
   
   // For multiple messages, return the array
-  return messages.map(({ role, content }) => ({ role, content }));
+  return _messages.map(({ role, content }) => ({ role, content }));
 }
 
 /**
  * Extract content text from a Responses API response
  */
-export function extractResponsesContent(response: any): string {
+export function extractResponsesContent(_response: unknown): string {
   try {
     // First, try the convenience helper
-    if ('output_text' in response) {
-      return response.output_text;
+    if ('output_text' in _response) {
+      return _response.output_text;
     }
     
     // If not available, manually extract from output array
-    if (response.output) {
-      for (const item of response.output) {
+    if (_response.output) {
+      for (const item of _response.output) {
         if (item.type === 'message' && item.role === 'assistant' && item.content) {
           for (const content of item.content) {
             if (content.type === 'output_text' || content.type === 'text') {
@@ -49,7 +49,7 @@ export function extractResponsesContent(response: any): string {
     
     // Fallback to logging the response and returning empty
     thoughtLogger.log('error', 'Failed to extract content from Responses API response', {
-      responseStructure: JSON.stringify(response)
+      responseStructure: JSON.stringify(_response)
     });
     
     return '';
@@ -62,10 +62,10 @@ export function extractResponsesContent(response: any): string {
 /**
  * Convert Chat Completions function calling to Responses API tool calling format
  */
-export function convertFunctionsToTools(functions: any[]): Record<string, any> {
-  const tools: Record<string, any> = {};
+export function convertFunctionsToTools(_functions: any[]): Record<string, unknown> {
+  const tools: Record<string, unknown> = {};
   
-  for (const fn of functions) {
+  for (const fn of _functions) {
     tools[fn.name] = {
       description: fn.description,
       parameters: fn.parameters
@@ -78,10 +78,10 @@ export function convertFunctionsToTools(functions: any[]): Record<string, any> {
 /**
  * Parse function call from response text
  */
-export function parseFunctionCall(responseText: string): { name: string; arguments: any } | null {
+export function parseFunctionCall(_responseText: string): { name: string; arguments: unknown } | null {
   try {
     // Look for JSON in code blocks
-    const functionCallMatch = responseText.match(/```(?:json)?\s*({[\s\S]*?})\s*```/);
+    const functionCallMatch = _responseText.match(/```(?:json)?\s*({[\s\S]*?})\s*```/);
     if (functionCallMatch && functionCallMatch[1]) {
       const parsed = JSON.parse(functionCallMatch[1]);
       if (parsed.function || parsed.name) {
@@ -94,7 +94,7 @@ export function parseFunctionCall(responseText: string): { name: string; argumen
     
     // Try parsing the whole response as JSON
     try {
-      const parsed = JSON.parse(responseText);
+      const parsed = JSON.parse(_responseText);
       if (parsed.function_call || parsed.function) {
         const functionCall = parsed.function_call || parsed;
         return {
@@ -110,7 +110,7 @@ export function parseFunctionCall(responseText: string): { name: string; argumen
     
     return null;
   } catch (error) {
-    thoughtLogger.log('error', 'Failed to parse function call', { error, responseText });
+    thoughtLogger.log('error', 'Failed to parse function call', { error, _responseText });
     return null;
   }
 }
@@ -118,7 +118,7 @@ export function parseFunctionCall(responseText: string): { name: string; argumen
 /**
  * Check if a model is compatible with the Responses API
  */
-export function isResponsesCompatibleModel(model: string): boolean {
+export function isResponsesCompatibleModel(_model: string): boolean {
   const compatibleModels = [
     'gpt-4o',
     'gpt-4o-mini',
@@ -128,7 +128,7 @@ export function isResponsesCompatibleModel(model: string): boolean {
     'chatgpt-4o-latest'
   ];
   
-  return compatibleModels.some(compatibleModel => 
-    model.includes(compatibleModel)
+  return compatibleModels.some(_compatibleModel => 
+    _model.includes(_compatibleModel)
   );
 }

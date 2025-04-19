@@ -4,7 +4,7 @@ interface LogEntry {
   timestamp: number;
   level: LogLevel;
   message: string;
-  details?: any;
+  details?: unknown;
 }
 
 export class Logger {
@@ -21,28 +21,28 @@ export class Logger {
     return Logger.instance;
   }
 
-  debug(message: string, details?: any) {
-    this.log('debug', message, details);
+  debug(_message: string, _details?: unknown) {
+    this.log('debug', _message, _details);
   }
 
-  info(message: string, details?: any) {
-    this.log('info', message, details);
+  info(_message: string, _details?: unknown) {
+    this.log('info', _message, _details);
   }
 
-  warn(message: string, details?: any) {
-    this.log('warn', message, details);
+  warn(_message: string, _details?: unknown) {
+    this.log('warn', _message, _details);
   }
 
-  error(message: string, details?: any) {
-    this.log('error', message, details);
+  error(_message: string, _details?: unknown) {
+    this.log('error', _message, _details);
   }
 
-  private log(level: LogLevel, message: string, details?: any) {
+  private log(_level: LogLevel, _message: string, _details?: unknown) {
     const entry: LogEntry = {
       timestamp: Date.now(),
-      level,
-      message,
-      details
+      _level,
+      _message,
+      _details
     };
 
     this.logs.push(entry);
@@ -52,7 +52,7 @@ export class Logger {
     }
 
     // Also log to console for development
-    console[level](message, details || '');
+    console[_level](_message, _details || '');
   }
 
   getLogs(): LogEntry[] {

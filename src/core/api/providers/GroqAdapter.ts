@@ -23,8 +23,8 @@ export class GroqAdapter implements AIProviderAdapter {
     }
   }
 
-  setApiKey(apiKey: string): void {
-    this.apiKey = apiKey;
+  setApiKey(_apiKey: string): void {
+    this.apiKey = _apiKey;
   }
   
   async getAvailableModels(): Promise<string[]> {
@@ -45,7 +45,7 @@ export class GroqAdapter implements AIProviderAdapter {
       }
       
       const data = await response.json();
-      return data.data?.map((model: any) => model.id) || this.getDefaultModels();
+      return data.data?.map((_model: unknown) => _model.id) || this.getDefaultModels();
     } catch (error) {
       return this.getDefaultModels();
     }
@@ -103,9 +103,9 @@ export class GroqAdapter implements AIProviderAdapter {
   }
 
   async chat(
-    messages: Message[],
-    onProgress?: (content: string) => void,
-    options?: ChatOptions
+    _messages: Message[],
+    _onProgress?: (content: string) => void,
+    _options?: ChatOptions
   ): Promise<string> {
     if (!this.apiKey) {
       throw new AppError('Groq API key not configured', 'API_ERROR');
@@ -113,14 +113,14 @@ export class GroqAdapter implements AIProviderAdapter {
 
     return await this.retryHandler.execute(async () => {
       const requestBody = {
-        model: options?.model || 'llama-3.3-70b-versatile',
-        messages: messages.map(({ role, content }) => ({ role, content })),
-        temperature: options?.temperature ?? 0.7,
-        max_tokens: options?.maxTokens ?? 8192,
-        top_p: options?.topP ?? 1,
-        frequency_penalty: options?.frequencyPenalty ?? 0,
-        presence_penalty: options?.presencePenalty ?? 0,
-        stream: Boolean(onProgress)
+        model: _options?.model || 'llama-3.3-70b-versatile',
+        messages: _messages.map(({ role, content }) => ({ role, content })),
+        temperature: _options?.temperature ?? 0.7,
+        max_tokens: _options?.maxTokens ?? 8192,
+        top_p: _options?.topP ?? 1,
+        frequency_penalty: _options?.frequencyPenalty ?? 0,
+        presence_penalty: _options?.presencePenalty ?? 0,
+        stream: Boolean(_onProgress)
       };
 
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
@@ -144,8 +144,8 @@ export class GroqAdapter implements AIProviderAdapter {
       }
       
       // Handle streaming
-      if (onProgress && response.body) {
-        return await this.handleStreamingResponse(response.body, onProgress);
+      if (_onProgress && response.body) {
+        return await this.handleStreamingResponse(response.body, _onProgress);
       }
       
       // Parse normal response
@@ -155,10 +155,10 @@ export class GroqAdapter implements AIProviderAdapter {
   }
   
   private async handleStreamingResponse(
-    body: ReadableStream<Uint8Array>,
-    onProgress: (content: string) => void
+    _body: ReadableStream<Uint8Array>,
+    _onProgress: (content: string) => void
   ): Promise<string> {
-    const reader = body.getReader();
+    const reader = _body.getReader();
     const decoder = new TextDecoder();
     let fullContent = '';
     
@@ -181,7 +181,7 @@ export class GroqAdapter implements AIProviderAdapter {
               
               if (content) {
                 fullContent += content;
-                onProgress(content);
+                _onProgress(content);
               }
             } catch (e) {
               thoughtLogger.log('error', 'Failed to parse streaming response', { error: e });
@@ -196,7 +196,7 @@ export class GroqAdapter implements AIProviderAdapter {
     }
   }
   
-  getModelInfo(modelId: string): {
+  getModelInfo(_modelId: string): {
     name: string;
     contextWindow: number;
     description: string;
@@ -228,10 +228,10 @@ export class GroqAdapter implements AIProviderAdapter {
       }
     };
     
-    return modelMap[modelId] || null;
+    return modelMap[_modelId] || null;
   }
 }
 
-export function createGroqAdapter(apiKey?: string): AIProviderAdapter {
-  return new GroqAdapter(apiKey);
+export function createGroqAdapter(_apiKey?: string): AIProviderAdapter {
+  return new GroqAdapter(_apiKey);
 }

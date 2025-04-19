@@ -5,15 +5,15 @@ export class MessageQueue {
   private processing = false;
   private handlers: Map<string, (message: AgentMessage) => Promise<void>> = new Map();
 
-  async enqueue(message: AgentMessage): Promise<void> {
-    this.queue.push(message);
+  async enqueue(_message: AgentMessage): Promise<void> {
+    this.queue.push(_message);
     if (!this.processing) {
       await this.processQueue();
     }
   }
 
-  registerHandler(type: string, handler: (message: AgentMessage) => Promise<void>): void {
-    this.handlers.set(type, handler);
+  registerHandler(_type: string, _handler: (message: AgentMessage) => Promise<void>): void {
+    this.handlers.set(_type, _handler);
   }
 
   private async processQueue(): Promise<void> {

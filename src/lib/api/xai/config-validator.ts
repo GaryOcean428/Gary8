@@ -7,17 +7,17 @@ import type { XAIConfig } from './types';
 export class ConfigValidator {
   /**
    * Validates API key format and presence
-   * @param apiKey API key to validate
+   * @param _apiKey API key to validate
    * @returns Validated API key
    * @throws {Error} If API key is invalid or missing
    */
-  static validateApiKey(apiKey: string | undefined): string {
-    if (!apiKey) {
+  static validateApiKey(_apiKey: string | undefined): string {
+    if (!_apiKey) {
       thoughtLogger.log('warning', 'X.AI API key not found in environment variables');
       return ''; // Return empty string instead of throwing
     }
 
-    const trimmedKey = apiKey.trim();
+    const trimmedKey = _apiKey.trim();
     if (trimmedKey.length < 10) {  // Reduced threshold for validation
       thoughtLogger.log('warning', 'X.AI API key looks invalid (too short)');
       return trimmedKey; // Still return it even if it looks invalid
@@ -28,12 +28,12 @@ export class ConfigValidator {
 
   /**
    * Validates complete API configuration
-   * @param config Configuration object to validate
+   * @param _config Configuration object to validate
    * @throws {Error} If configuration is invalid
    */
-  static validateConfig(config: Partial<XAIConfig>): void {
+  static validateConfig(_config: Partial<XAIConfig>): void {
     const requiredFields = ['baseUrl', 'apiVersion', 'models'] as const;
-    const missingFields = requiredFields.filter(field => !config[field]);
+    const missingFields = requiredFields.filter(_field => !_config[_field]);
 
     if (missingFields.length > 0) {
       thoughtLogger.log('warning', 'Missing configuration fields', { missingFields });
@@ -41,21 +41,21 @@ export class ConfigValidator {
     }
 
     // Validate rate limits if present
-    if (config.rateLimits) {
-      if (config.rateLimits.requestsPerMinute <= 0) {
-        config.rateLimits.requestsPerMinute = 60; // Default value
+    if (_config.rateLimits) {
+      if (_config.rateLimits.requestsPerMinute <= 0) {
+        _config.rateLimits.requestsPerMinute = 60; // Default value
       }
-      if (config.rateLimits.tokensPerMinute <= 0) {
-        config.rateLimits.tokensPerMinute = 100000; // Default value
+      if (_config.rateLimits.tokensPerMinute <= 0) {
+        _config.rateLimits.tokensPerMinute = 100000; // Default value
       }
     }
 
     // Check model configuration
-    if (!config.models || Object.keys(config.models).length === 0) {
+    if (!_config.models || Object.keys(_config.models).length === 0) {
       thoughtLogger.log('warning', 'Missing model configuration, using defaults');
       
-      if (config.models === undefined) {
-        (config as any).models = {
+      if (_config.models === undefined) {
+        (_config as any).models = {
           beta: 'grok-3-beta',
           fast: 'grok-3-fast-beta',
           mini: 'grok-3-mini-beta',
@@ -65,10 +65,10 @@ export class ConfigValidator {
     }
     
     // Set default model if not defined
-    if (!config.defaultModel && config.models) {
-      const models = Object.values(config.models);
+    if (!_config.defaultModel && _config.models) {
+      const models = Object.values(_config.models);
       if (models.length > 0) {
-        (config as any).defaultModel = models[0];
+        (_config as any).defaultModel = models[0];
       }
     }
   }

@@ -15,7 +15,7 @@ interface MCPTool {
   id: string;
   name: string;
   description: string;
-  parameters: any;
+  parameters: unknown;
 }
 
 interface MCPPrompt {
@@ -71,7 +71,7 @@ export class MCPClient extends EventEmitter {
       thoughtLogger.log('execution', `MCP Client(${this.agentId}): Connecting to server`);
       
       // Simulate connection latency
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(_resolve => setTimeout(_resolve, 300));
       
       // For demo purposes, we'll create a mock connection
       this.serverInfo = {
@@ -115,7 +115,7 @@ export class MCPClient extends EventEmitter {
         const delay = Math.pow(2, this.retryCount) * 500; // Exponential backoff
         thoughtLogger.log('execution', `MCP Client(${this.agentId}): Retrying in ${delay}ms (${this.retryCount + 1}/${this.maxRetries})`);
         
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise(_resolve => setTimeout(_resolve, delay));
         return this.connect();
       }
       
@@ -136,7 +136,7 @@ export class MCPClient extends EventEmitter {
       thoughtLogger.log('execution', `MCP Client(${this.agentId}): Disconnecting from server`);
       
       // Simulate disconnection
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(_resolve => setTimeout(_resolve, 100));
       
       this.isConnected = false;
       this.resources = [];
@@ -158,7 +158,7 @@ export class MCPClient extends EventEmitter {
       thoughtLogger.log('execution', `MCP Client(${this.agentId}): Discovering resources`);
       
       // Simulate resource discovery
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(_resolve => setTimeout(_resolve, 100));
       
       this.resources = [
         {
@@ -189,7 +189,7 @@ export class MCPClient extends EventEmitter {
       thoughtLogger.log('execution', `MCP Client(${this.agentId}): Discovering tools`);
       
       // Simulate tool discovery
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise(_resolve => setTimeout(_resolve, 150));
       
       this.tools = [
         {
@@ -269,7 +269,7 @@ export class MCPClient extends EventEmitter {
       thoughtLogger.log('execution', `MCP Client(${this.agentId}): Discovering prompts`);
       
       // Simulate prompt discovery
-      await new Promise(resolve => setTimeout(resolve, 80));
+      await new Promise(_resolve => setTimeout(_resolve, 80));
       
       this.prompts = [
         {
@@ -310,21 +310,21 @@ export class MCPClient extends EventEmitter {
     return [...this.prompts];
   }
 
-  async executeTool(toolId: string, parameters: any): Promise<any> {
+  async executeTool(_toolId: string, _parameters: unknown): Promise<unknown> {
     if (!this.isConnected) {
       throw new AppError('Cannot execute tool: Not connected to MCP server', 'MCP_ERROR');
     }
 
-    const tool = this.tools.find(t => t.id === toolId);
+    const tool = this.tools.find(_t => _t.id === _toolId);
     if (!tool) {
-      throw new AppError(`Tool not found: ${toolId}`, 'MCP_ERROR');
+      throw new AppError(`Tool not found: ${_toolId}`, 'MCP_ERROR');
     }
 
     try {
-      thoughtLogger.log('execution', `MCP Client(${this.agentId}): Executing tool ${tool.name}`, { parameters });
+      thoughtLogger.log('execution', `MCP Client(${this.agentId}): Executing tool ${tool.name}`, { _parameters });
       
       // Simulate tool execution
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(_resolve => setTimeout(_resolve, 500));
       
       // Mock responses for demo purposes
       let result;
@@ -333,8 +333,8 @@ export class MCPClient extends EventEmitter {
         case 'web-search':
           result = {
             results: [
-              { title: 'Example Result 1', url: 'https://example.com/1', snippet: 'This is an example search result about ' + parameters.query },
-              { title: 'Example Result 2', url: 'https://example.com/2', snippet: 'Another example search result relevant to ' + parameters.query }
+              { title: 'Example Result 1', url: 'https://example.com/1', snippet: 'This is an example search result about ' + _parameters.query },
+              { title: 'Example Result 2', url: 'https://example.com/2', snippet: 'Another example search result relevant to ' + _parameters.query }
             ],
             totalResults: 2
           };
@@ -342,7 +342,7 @@ export class MCPClient extends EventEmitter {
           
         case 'execute-code':
           result = {
-            output: 'Code executed successfully: ' + parameters.code.substring(0, 30) + '...',
+            output: 'Code executed successfully: ' + _parameters.code.substring(0, 30) + '...',
             execTime: '0.12s'
           };
           break;
@@ -376,26 +376,26 @@ export class MCPClient extends EventEmitter {
       throw new AppError(
         `Failed to execute tool ${tool.name}: ${error instanceof Error ? error.message : 'Unknown error'}`,
         'MCP_TOOL_EXECUTION_ERROR',
-        { toolId, parameters, originalError: error }
+        { _toolId, _parameters, originalError: error }
       );
     }
   }
 
-  async getResource(resourceId: string, params?: any): Promise<any> {
+  async getResource(_resourceId: string, _params?: unknown): Promise<unknown> {
     if (!this.isConnected) {
       throw new AppError('Cannot get resource: Not connected to MCP server', 'MCP_ERROR');
     }
 
-    const resource = this.resources.find(r => r.id === resourceId);
+    const resource = this.resources.find(_r => _r.id === _resourceId);
     if (!resource) {
-      throw new AppError(`Resource not found: ${resourceId}`, 'MCP_ERROR');
+      throw new AppError(`Resource not found: ${_resourceId}`, 'MCP_ERROR');
     }
 
     try {
-      thoughtLogger.log('execution', `MCP Client(${this.agentId}): Fetching resource ${resource.name}`, { params });
+      thoughtLogger.log('execution', `MCP Client(${this.agentId}): Fetching resource ${resource.name}`, { _params });
       
       // Simulate resource fetching
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(_resolve => setTimeout(_resolve, 300));
       
       // Mock responses for demo purposes
       let content;
@@ -431,7 +431,7 @@ export class MCPClient extends EventEmitter {
       throw new AppError(
         `Failed to fetch resource ${resource.name}: ${error instanceof Error ? error.message : 'Unknown error'}`,
         'MCP_RESOURCE_ERROR',
-        { resourceId, params, originalError: error }
+        { _resourceId, _params, originalError: error }
       );
     }
   }

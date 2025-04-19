@@ -10,17 +10,17 @@ export class DBStore {
     if (this.db) return;
 
     this.db = await openDB(this.dbName, this.version, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains('messages')) {
-          db.createObjectStore('messages', { keyPath: 'id' });
+      upgrade(_db) {
+        if (!_db.objectStoreNames.contains('messages')) {
+          _db.createObjectStore('messages', { keyPath: 'id' });
         }
       },
     });
   }
 
-  async addMessage(message: Message): Promise<void> {
+  async addMessage(_message: Message): Promise<void> {
     if (!this.db) await this.initialize();
-    await this.db!.add('messages', message);
+    await this.db!.add('messages', _message);
   }
 
   async getMessages(): Promise<Message[]> {

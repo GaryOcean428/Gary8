@@ -1,20 +1,20 @@
 import { SavedChat } from '../types';
 
-export async function downloadAsDocx(chat: SavedChat): Promise<void> {
+export async function downloadAsDocx(_chat: SavedChat): Promise<void> {
   try {
     // Create a formatted document string
-    let content = `# ${chat.title}\n\n`;
-    content += `Created: ${new Date(chat.timestamp).toLocaleString()}\n\n`;
+    let content = `# ${_chat.title}\n\n`;
+    content += `Created: ${new Date(_chat.timestamp).toLocaleString()}\n\n`;
     
-    if (chat.tags?.length) {
-      content += `Tags: ${chat.tags.join(', ')}\n\n`;
+    if (_chat.tags?.length) {
+      content += `Tags: ${_chat.tags.join(', ')}\n\n`;
     }
     
     content += '## Conversation\n\n';
     
-    chat.messages.forEach(message => {
-      const role = message.role.charAt(0).toUpperCase() + message.role.slice(1);
-      content += `### ${role}\n${message.content}\n\n`;
+    _chat.messages.forEach(_message => {
+      const role = _message.role.charAt(0).toUpperCase() + _message.role.slice(1);
+      content += `### ${role}\n${_message.content}\n\n`;
     });
 
     // Convert to blob and download
@@ -22,7 +22,7 @@ export async function downloadAsDocx(chat: SavedChat): Promise<void> {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${chat.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${new Date().toISOString().split('T')[0]}.docx`;
+    a.download = `${_chat.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${new Date().toISOString().split('T')[0]}.docx`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

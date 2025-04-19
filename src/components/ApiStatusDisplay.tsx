@@ -35,7 +35,7 @@ export function ApiStatusDisplay() {
       const edgeFunctionStatuses = await apiClient.getEdgeFunctionStatuses();
       console.log('Edge Function Statuses:', edgeFunctionStatuses);
       setEdgeFunctionDetails(edgeFunctionStatuses);
-      const anyFunctionWorking = Object.values(edgeFunctionStatuses).some(status => status);
+      const anyFunctionWorking = Object.values(edgeFunctionStatuses).some(_status => _status);
       setEdgeFunctionsStatus(anyFunctionWorking ? 'connected' : 'disconnected');
       return anyFunctionWorking;
     } catch (error) {
@@ -50,7 +50,7 @@ export function ApiStatusDisplay() {
     const apiKeys = configStore.getState().apiKeys as Record<string, string | undefined | null>;
     // Fix: Access key by index for type predicate
     const providersWithKeys = Object.entries(apiKeys)
-      .filter((entry): entry is [string, string] => typeof entry[1] === 'string' && entry[1].trim().length > 10) 
+      .filter((_entry): _entry is [string, string] => typeof _entry[1] === 'string' && _entry[1].trim().length > 10) 
       .map(([provider]) => provider);
 
     if (providersWithKeys.length === 0) {
@@ -66,21 +66,21 @@ export function ApiStatusDisplay() {
       for (const provider of providersWithKeys) {
         try {
           console.log(`Testing connection for provider: ${provider}`);
-          // Assume testConnection returns { success: boolean, message?: string, error?: string }
-          const result = await apiClient.testConnection(provider); 
-
+          // testConnection returns { success: boolean; message?: string; error?: string }
+          const raw = await apiClient.testConnection(provider);
+          const result = raw as { success: boolean; message?: string; error?: string };
           if (result.success) {
             connectedProvs.push(provider);
             console.log(`✅ Provider ${provider} connected successfully`);
           } else {
-            // Refined error message handling
-            const errorMessage = (result as any).message || (result as any).error || 'Unknown connection error';
+            const errorMessage = result.message || result.error || 'Unknown connection error';
             failedProvs[provider] = errorMessage;
             console.error(`❌ Provider ${provider} connection failed:`, errorMessage);
           }
-        } catch (providerError) {
-          failedProvs[provider] = providerError instanceof Error ?
-            providerError.message : 'Connection test failed';
+        } catch (providerError: unknown) {
+          failedProvs[provider] = providerError instanceof Error
+            ? providerError.message
+            : 'Connection test failed';
           console.error(`❌ Provider ${provider} test threw error:`, providerError);
         }
       }
@@ -166,11 +166,11 @@ export function ApiStatusDisplay() {
     // Assuming state type has apiKeys: Record<string, string | undefined | null>
     type ApiKeysState = { apiKeys: Record<string, string | undefined | null> }; 
     const unsubscribe = useConfigStore.subscribe(
-      (state: ApiKeysState) => state.apiKeys, // Add type to state
+      (_state: ApiKeysState) => _state.apiKeys, // Add type to state
       () => checkApiStatus(),
       { 
-        equalityFn: (a: Record<string, string | undefined | null> | undefined, b: Record<string, string | undefined | null> | undefined) => 
-          JSON.stringify(a) === JSON.stringify(b) // Add types to a, b
+        equalityFn: (_a: Record<string, string | undefined | null> | undefined, _b: Record<string, string | undefined | null> | undefined) => 
+          JSON.stringify(_a) === JSON.stringify(_b) // Add types to a, b
       }
     );
     
@@ -191,8 +191,8 @@ export function ApiStatusDisplay() {
   }, []); // Keep dependencies minimal for initial load and setup
 
   // Display status icon based on API connection state
-  const getStatusIcon = (status: StatusType) => { // Use StatusType
-    switch (status) {
+  const getStatusIcon = (_status: StatusType) => { // Use StatusType
+    switch (_status) {
       case 'checking':
         return <Loader size={16} className="text-primary animate-spin" />;
       case 'connected':
@@ -203,8 +203,8 @@ export function ApiStatusDisplay() {
   };
 
   // Helper to get status text and class (addresses nested ternary warnings)
-  const getStatusTextAndClass = (status: StatusType): { text: string; className: string } => {
-    switch (status) {
+  const getStatusTextAndClass = (_status: StatusType): { text: string; className: string } => {
+    switch (_status) {
       case 'checking':
         return { text: 'Checking...', className: 'text-muted-foreground' };
       case 'connected':
@@ -215,13 +215,13 @@ export function ApiStatusDisplay() {
   };
 
   // Helper to render status item (addresses nested ternary warnings)
-  const renderStatusItem = (label: string, status: StatusType) => {
-    const { text, className } = getStatusTextAndClass(status);
+  const renderStatusItem = (_label: string, _status: StatusType) => {
+    const { text, className } = getStatusTextAndClass(_status);
     return (
       <div className="flex items-center justify-between mb-3 p-2 rounded-md bg-muted/30">
-        <span className="text-sm">{label}</span>
+        <span className="text-sm">{_label}</span>
         <div className="flex items-center gap-1.5">
-          {getStatusIcon(status)}
+          {getStatusIcon(_status)}
           <span className={`text-xs ${className}`}>{text}</span>
         </div>
       </div>
@@ -300,9 +300,9 @@ export function ApiStatusDisplay() {
             <span className="text-sm font-medium">API Provider Details</span>
           </div>
           <div className="mt-2 space-y-1">
-            {connectedProviders.map((provider: string) => ( 
-              <div key={provider} className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">{provider.charAt(0).toUpperCase() + provider.slice(1)}</span>
+            {connectedProviders.map((_provider: string) => ( 
+              <div key={_provider} className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">{_provider.charAt(0).toUpperCase() + _provider.slice(1)}</span>
                 <div className="flex items-center gap-1">
                   <CheckCircle size={12} className="text-success" />
                   <span className="text-success">Connected</span>
@@ -310,9 +310,9 @@ export function ApiStatusDisplay() {
               </div>
             ))}
             
-            {Object.entries(failedProviders).map((entry) => {
+            {Object.entries(failedProviders).map((_entry) => {
               // Fix: Assert entry type here
-              const [provider, errorMsg] = entry as [string, string]; 
+              const [provider, errorMsg] = _entry as [string, string]; 
               return (
                 <div key={provider} className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">{provider.charAt(0).toUpperCase() + provider.slice(1)}</span>
@@ -350,15 +350,15 @@ export function ApiStatusDisplay() {
                   Edge Functions
                 </motion.span>
               )}
-              {connectedProviders.map((provider: string) => ( 
+              {connectedProviders.map((_provider: string) => ( 
                 <motion.span 
-                  key={provider}
+                  key={_provider}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-success/10 text-success border border-success/20"
                 >
                   <CheckCircle size={12} className="mr-1" />
-                  {provider.charAt(0).toUpperCase() + provider.slice(1)}
+                  {_provider.charAt(0).toUpperCase() + _provider.slice(1)}
                 </motion.span>
               ))}
             </div>

@@ -37,10 +37,10 @@ export class RetryHandler {
   
   /**
    * Execute a function with retry logic
-   * @param fn The function to execute
+   * @param _fn The function to execute
    * @returns Promise resolving to the function result
    */
-  async execute<T>(fn: () => Promise<T>): Promise<T> {
+  async execute<T>(_fn: () => Promise<T>): Promise<T> {
     if (this.isCircuitOpen()) {
       throw new Error('Circuit breaker is open, too many recent failures');
     }
@@ -54,7 +54,7 @@ export class RetryHandler {
           await this.delay(attempt);
         }
         
-        const result = await fn();
+        const result = await _fn();
         
         // Success - reset failure count
         if (attempt > 0) {
@@ -85,19 +85,19 @@ export class RetryHandler {
   
   /**
    * Calculates the delay for a retry attempt with exponential backoff
-   * @param attempt Current attempt number (1-based)
+   * @param _attempt Current attempt number (1-based)
    * @returns Promise that resolves after the calculated delay
    */
-  private async delay(attempt: number): Promise<void> {
+  private async delay(_attempt: number): Promise<void> {
     // Calculate exponential backoff
-    const expBackoff = this.initialDelay * Math.pow(this.backoffFactor, attempt - 1);
+    const expBackoff = this.initialDelay * Math.pow(this.backoffFactor, _attempt - 1);
     const maxBackoff = Math.min(expBackoff, this.maxDelay);
     
     // Add jitter to prevent thundering herd problem
     const jitter = Math.random() * this.jitterFactor * 2 - this.jitterFactor;
     const finalDelay = Math.floor(maxBackoff * (1 + jitter));
     
-    return new Promise(resolve => setTimeout(resolve, finalDelay));
+    return new Promise(_resolve => setTimeout(_resolve, finalDelay));
   }
   
   /**
@@ -142,13 +142,13 @@ export class RetryHandler {
   
   /**
    * Determines if an error should not be retried
-   * @param error The error to check
+   * @param _error The error to check
    * @returns True if the error should not be retried
    */
-  private shouldNotRetry(error: any): boolean {
+  private shouldNotRetry(_error: unknown): boolean {
     // Don't retry authorization errors, validation errors, etc.
-    const message = (error?.message || '').toLowerCase();
-    const code = error?.code || '';
+    const message = (_error?.message || '').toLowerCase();
+    const code = _error?.code || '';
     
     return (
       message.includes('unauthorized') ||

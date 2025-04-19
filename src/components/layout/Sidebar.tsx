@@ -31,14 +31,14 @@ export function Sidebar({ activePanel, onPanelChange }: SidebarProps) {
   ] as const;
 
   const allTags = Array.from(new Set(
-    savedChats?.flatMap(chat => chat.tags || []) || []
+    savedChats?.flatMap(_chat => _chat.tags || []) || []
   ));
 
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
+  const toggleTag = (_tag: string) => {
+    setSelectedTags(_prev => 
+      _prev.includes(_tag) 
+        ? _prev.filter(_t => _t !== _tag)
+        : [..._prev, _tag]
     );
   };
 
@@ -53,10 +53,10 @@ export function Sidebar({ activePanel, onPanelChange }: SidebarProps) {
               src="/gary.svg" 
               alt="Gary8 Logo" 
               className="w-10 h-10 object-contain"
-              onError={(e) => {
+              onError={(_e) => {
                 // Fallback to Brain icon if image fails to load
-                e.currentTarget.style.display = 'none';
-                const parent = e.currentTarget.parentElement;
+                _e.currentTarget.style.display = 'none';
+                const parent = _e.currentTarget.parentElement;
                 if (parent) {
                   const icon = document.createElement('div');
                   icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 0 19.5v-15A2.5 2.5 0 0 1 2.5 2h7z"/><path d="M14.5 2a2.5 2.5 0 0 0-2.5 2.5v15a2.5 2.5 0 0 0 2.5 2.5h7a2.5 2.5 0 0 0 2.5-2.5v-15a2.5 2.5 0 0 0-2.5-2.5h-7z"/><path d="M8 10v.01"/><path d="M16 10v.01"/><path d="M8 14v.01"/><path d="M16 14v.01"/><path d="M12 18v.01"/></svg>';
@@ -119,14 +119,14 @@ export function Sidebar({ activePanel, onPanelChange }: SidebarProps) {
               <div className="pt-2 space-y-1">
                 {selectedTags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-2">
-                    {selectedTags.map(tag => (
+                    {selectedTags.map(_tag => (
                       <button
-                        key={tag}
-                        onClick={() => toggleTag(tag)}
+                        key={_tag}
+                        onClick={() => toggleTag(_tag)}
                         className="badge badge-primary inline-flex items-center gap-1"
                       >
                         <Tag className="w-3 h-3" />
-                        {tag}
+                        {_tag}
                         <X className="w-3 h-3" />
                       </button>
                     ))}
@@ -137,7 +137,7 @@ export function Sidebar({ activePanel, onPanelChange }: SidebarProps) {
                   <input
                     type="text"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(_e) => setSearchTerm(_e.target.value)}
                     placeholder="Search chats..."
                     className="w-full bg-input rounded-lg pl-9 pr-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   />
@@ -147,55 +147,55 @@ export function Sidebar({ activePanel, onPanelChange }: SidebarProps) {
                 <div className="mt-1">
                   <div className="text-xs text-muted-foreground mb-1 px-2">Available Tags</div>
                   <div className="flex flex-wrap gap-1 mb-2">
-                    {allTags.map(tag => (
+                    {allTags.map(_tag => (
                       <button
-                        key={tag}
-                        onClick={() => toggleTag(tag)}
+                        key={_tag}
+                        onClick={() => toggleTag(_tag)}
                         className={`px-2 py-0.5 rounded-full text-xs ${
-                          selectedTags.includes(tag) ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                          selectedTags.includes(_tag) ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
                         }`}
                       >
                         <Tag className="w-3 h-3 mr-1" />
-                        {tag}
+                        {_tag}
                       </button>
                     ))}
                   </div>
                 </div>
                 
-                {savedChats?.filter(chat => {
+                {savedChats?.filter(_chat => {
                   // Filter by search term
-                  const matchesSearch = !searchTerm || chat.title.toLowerCase().includes(searchTerm.toLowerCase());
+                  const matchesSearch = !searchTerm || _chat.title.toLowerCase().includes(searchTerm.toLowerCase());
                   
                   // Filter by selected tags
                   const matchesTags = selectedTags.length === 0 || 
-                    (chat.tags && selectedTags.every(tag => chat.tags?.includes(tag)));
+                    (_chat.tags && selectedTags.every(_tag => _chat.tags?.includes(_tag)));
                     
                   return matchesSearch && matchesTags;
-                }).map(chat => (
+                }).map(_chat => (
                   <div
-                    key={chat.id}
+                    key={_chat.id}
                     className="group card-glass rounded-lg p-2 hover:card-elevated transition-all"
                   >
                     <div className="flex items-center justify-between">
                       <button
-                        onClick={() => loadChat(chat.id)}
+                        onClick={() => loadChat(_chat.id)}
                         className="flex-1 text-left"
                       >
-                        <h4 className="text-sm font-medium truncate">{chat.title}</h4>
+                        <h4 className="text-sm font-medium truncate">{_chat.title}</h4>
                         <p className="text-xs text-muted-foreground">
-                          {formatDistanceToNow(chat.timestamp)} ago
+                          {formatDistanceToNow(_chat.timestamp)} ago
                         </p>
                       </button>
                       <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
-                          onClick={() => downloadAsDocx(chat)}
+                          onClick={() => downloadAsDocx(_chat)}
                           className="p-1 text-muted-foreground hover:text-foreground transition-colors"
                           title="Export as DOCX"
                         >
                           <Download className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => deleteChat(chat.id)}
+                          onClick={() => deleteChat(_chat.id)}
                           className="p-1 text-muted-foreground hover:text-destructive transition-colors"
                           title="Delete chat"
                         >
@@ -204,19 +204,19 @@ export function Sidebar({ activePanel, onPanelChange }: SidebarProps) {
                       </div>
                     </div>
                     
-                    {chat.tags && chat.tags.length > 0 && (
+                    {_chat.tags && _chat.tags.length > 0 && (
                       <div className="mt-1 flex flex-wrap gap-1">
-                        {chat.tags.slice(0, 3).map(tag => (
+                        {_chat.tags.slice(0, 3).map(_tag => (
                           <span
-                            key={tag}
+                            key={_tag}
                             className="badge badge-outline text-[10px] py-0"
                           >
-                            {tag}
+                            {_tag}
                           </span>
                         ))}
-                        {chat.tags.length > 3 && (
+                        {_chat.tags.length > 3 && (
                           <span className="text-[10px] text-muted-foreground">
-                            +{chat.tags.length - 3} more
+                            +{_chat.tags.length - 3} more
                           </span>
                         )}
                       </div>

@@ -16,24 +16,24 @@ export function PerformanceSettings() {
     });
   };
 
-  const handleMaxTokensChange = (value: string) => {
-    setLocalSettings(prev => ({
-      ...prev,
-      maxTokens: parseInt(value)
+  const handleMaxTokensChange = (_value: string) => {
+    setLocalSettings(_prev => ({
+      ..._prev,
+      maxTokens: parseInt(_value)
     }));
   };
 
-  const handleTemperatureChange = (value: string) => {
-    setLocalSettings(prev => ({
-      ...prev,
-      temperature: parseFloat(value)
+  const handleTemperatureChange = (_value: string) => {
+    setLocalSettings(_prev => ({
+      ..._prev,
+      temperature: parseFloat(_value)
     }));
   };
 
-  const handleStreamingToggle = (enabled: boolean) => {
-    setLocalSettings(prev => ({
-      ...prev,
-      streaming: enabled
+  const handleStreamingToggle = (_enabled: boolean) => {
+    setLocalSettings(_prev => ({
+      ..._prev,
+      streaming: _enabled
     }));
   };
 
@@ -65,7 +65,7 @@ export function PerformanceSettings() {
             max="1"
             step="0.1"
             value={localSettings.temperature}
-            onChange={(e) => handleTemperatureChange(e.target.value)}
+            onChange={(_e) => handleTemperatureChange(_e.target.value)}
             className="w-full"
           />
           <div className="flex justify-between text-sm text-gray-400">
@@ -79,12 +79,12 @@ export function PerformanceSettings() {
           <label className="block font-medium mb-2">Max Tokens</label>
           <select
             value={localSettings.maxTokens}
-            onChange={(e) => handleMaxTokensChange(e.target.value)}
+            onChange={(_e) => handleMaxTokensChange(_e.target.value)}
             className="w-full bg-gray-700 rounded-lg px-3 py-2"
           >
-            {tokenOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
+            {tokenOptions.map(_option => (
+              <option key={_option.value} value={_option.value}>
+                {_option.label}
               </option>
             ))}
           </select>

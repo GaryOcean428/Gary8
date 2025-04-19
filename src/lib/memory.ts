@@ -31,13 +31,13 @@ export class Memory {
       'long-term': LongTermMemory;
       'user-info': UserInfo;
     }>('agent-memory', 1, {
-      upgrade(db) {
+      upgrade(_db) {
         // Create stores if they don't exist
-        if (!db.objectStoreNames.contains('long-term')) {
-          db.createObjectStore('long-term', { keyPath: 'id' });
+        if (!_db.objectStoreNames.contains('long-term')) {
+          _db.createObjectStore('long-term', { keyPath: 'id' });
         }
-        if (!db.objectStoreNames.contains('user-info')) {
-          db.createObjectStore('user-info', { keyPath: 'key' });
+        if (!_db.objectStoreNames.contains('user-info')) {
+          _db.createObjectStore('user-info', { keyPath: 'key' });
         }
       },
     });
@@ -45,18 +45,18 @@ export class Memory {
     this.dbInitialized = true;
   }
 
-  async store(message: Message, response: Message) {
+  async store(_message: Message, _response: Message) {
     // Add to short-term memory
-    this.shortTermMemory.push(message);
-    this.shortTermMemory.push(response);
+    this.shortTermMemory.push(_message);
+    this.shortTermMemory.push(_response);
 
     if (this.shortTermMemory.length > this.maxShortTermSize) {
       this.shortTermMemory.shift();
     }
 
     // Check for user information to store long-term
-    if (message.role === 'user') {
-      const content = message.content.toLowerCase();
+    if (_message.role === 'user') {
+      const content = _message.content.toLowerCase();
       if (content.includes('my name is') || content.includes('i am called')) {
         const name = this.extractName(content);
         if (name) {
@@ -66,7 +66,7 @@ export class Memory {
     }
   }
 
-  private extractName(content: string): string | null {
+  private extractName(_content: string): string | null {
     const namePatterns = [
       /my name is (\w+)/i,
       /i am called (\w+)/i,
@@ -75,7 +75,7 @@ export class Memory {
     ];
 
     for (const pattern of namePatterns) {
-      const match = content.match(pattern);
+      const match = _content.match(pattern);
       if (match && match[1]) {
         return match[1];
       }
@@ -83,7 +83,7 @@ export class Memory {
     return null;
   }
 
-  async storeUserInfo(key: string, value: string) {
+  async storeUserInfo(_key: string, _value: string) {
     await this.initDB();
     if (!this.db) return;
 
@@ -91,8 +91,8 @@ export class Memory {
       const tx = this.db.transaction('user-info', 'readwrite');
       const store = tx.objectStore('user-info');
       await store.put({
-        key,
-        value,
+        _key,
+        _value,
         timestamp: Date.now()
       });
       await tx.done;
@@ -101,12 +101,12 @@ export class Memory {
     }
   }
 
-  async getUserInfo(key: string): Promise<string | null> {
+  async getUserInfo(_key: string): Promise<string | null> {
     await this.initDB();
     if (!this.db) return null;
 
     try {
-      const info = await this.db.get('user-info', key);
+      const info = await this.db.get('user-info', _key);
       return info?.value || null;
     } catch (error) {
       console.error('Error getting user info:', error);
@@ -114,7 +114,7 @@ export class Memory {
     }
   }
 
-  async getRelevantMemories(content: string): Promise<string> {
+  async getRelevantMemories(_content: string): Promise<string> {
     await this.initDB();
     
     // Get user info
@@ -124,7 +124,7 @@ export class Memory {
     // Get recent messages for context
     const recentMessages = this.shortTermMemory
       .slice(-5)
-      .map(msg => `${msg.role}: ${msg.content}`)
+      .map(_msg => `${_msg.role}: ${_msg.content}`)
       .join('\n');
 
     // Combine all context
@@ -133,8 +133,8 @@ export class Memory {
       .join('\n\n');
   }
 
-  getRecentMessages(count = 10): Message[] {
-    return this.shortTermMemory.slice(-count);
+  getRecentMessages(_count = 10): Message[] {
+    return this.shortTermMemory.slice(-_count);
   }
 
   clearShortTermMemory() {

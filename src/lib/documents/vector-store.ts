@@ -17,10 +17,10 @@ export class VectorStore {
   private vectors: Map<string, VectorEntry> = new Map();
   private dimensions = 384;
 
-  async addDocument(content: string): Promise<string> {
+  async addDocument(_content: string): Promise<string> {
     try {
       const id = crypto.randomUUID();
-      const vector = await this.generateEmbedding(content);
+      const vector = await this.generateEmbedding(_content);
 
       this.vectors.set(id, {
         id,
@@ -37,18 +37,18 @@ export class VectorStore {
     }
   }
 
-  async search(query: string, minSimilarity = 0.7, limit = 10): Promise<SearchResult[]> {
+  async search(_query: string, _minSimilarity = 0.7, _limit = 10): Promise<SearchResult[]> {
     try {
-      const queryVector = await this.generateEmbedding(query);
+      const queryVector = await this.generateEmbedding(_query);
       
       const results = Array.from(this.vectors.values())
-        .map(entry => ({
-          id: entry.id,
-          score: this.cosineSimilarity(queryVector, entry.vector)
+        .map(_entry => ({
+          id: _entry.id,
+          score: this.cosineSimilarity(queryVector, _entry.vector)
         }))
-        .filter(result => result.score >= minSimilarity)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, limit);
+        .filter(_result => _result.score >= _minSimilarity)
+        .sort((_a, _b) => _b.score - _a.score)
+        .slice(0, _limit);
 
       return results;
     } catch (error) {
@@ -57,12 +57,12 @@ export class VectorStore {
     }
   }
 
-  private async generateEmbedding(text: string): Promise<number[]> {
+  private async generateEmbedding(_text: string): Promise<number[]> {
     // Initialize embedding vector
     const vector = new Array(this.dimensions).fill(0);
     
     // Normalize and tokenize text
-    const tokens = text.toLowerCase()
+    const tokens = _text.toLowerCase()
       .replace(/[^\w\s]/g, '')
       .split(/\s+/)
       .filter(Boolean);
@@ -80,30 +80,30 @@ export class VectorStore {
 
     // Normalize vector
     const magnitude = Math.sqrt(
-      vector.reduce((sum, val) => sum + val * val, 0)
+      vector.reduce((_sum, _val) => _sum + _val * _val, 0)
     );
 
-    return vector.map(val => val / magnitude);
+    return vector.map(_val => _val / magnitude);
   }
 
-  private hashString(str: string): number {
+  private hashString(_str: string): number {
     let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
+    for (let i = 0; i < _str.length; i++) {
+      const char = _str.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
       hash = hash & hash;
     }
     return hash;
   }
 
-  private cosineSimilarity(a: number[], b: number[]): number {
-    if (a.length !== b.length) {
+  private cosineSimilarity(_a: number[], _b: number[]): number {
+    if (_a.length !== _b.length) {
       throw new Error('Vector dimensions must match');
     }
 
-    const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
-    const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
-    const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
+    const dotProduct = _a.reduce((_sum, _val, _i) => _sum + _val * _b[_i], 0);
+    const magnitudeA = Math.sqrt(_a.reduce((_sum, _val) => _sum + _val * _val, 0));
+    const magnitudeB = Math.sqrt(_b.reduce((_sum, _val) => _sum + _val * _val, 0));
 
     return dotProduct / (magnitudeA * magnitudeB);
   }

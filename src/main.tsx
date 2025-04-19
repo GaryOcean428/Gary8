@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App';
 import { Animation } from './components/Animation';
 import './index.css';
+import './styles/theme.css'; // Import the new theme file
 import './lib/polyfills';
 
 const root = document.getElementById('root');

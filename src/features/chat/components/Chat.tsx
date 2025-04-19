@@ -59,19 +59,19 @@ export function Chat() {
     setAutoScroll(isScrolledToBottom);
   };
 
-  const handleModelChange = (model: string) => {
-    setFilters(prev => ({ ...prev, model }));
+  const handleModelChange = (_model: string) => {
+    setFilters(_prev => ({ ..._prev, _model }));
     setShowFilterMenu(false);
   };
 
-  const toggleFilter = (key: 'searchEnabled' | 'streamingEnabled') => {
-    setFilters(prev => ({ ...prev, [key]: !prev[key] }));
+  const toggleFilter = (_key: 'searchEnabled' | 'streamingEnabled') => {
+    setFilters(_prev => ({ ..._prev, [_key]: !_prev[_key] }));
   };
 
-  const updateProcessingPhase = (state?: string) => {
-    if (!state) return;
+  const updateProcessingPhase = (_state?: string) => {
+    if (!_state) return;
     
-    switch (state) {
+    switch (_state) {
       case 'searching':
         setProcessingPhase('searching');
         break;
@@ -88,8 +88,8 @@ export function Chat() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (_e: React.FormEvent) => {
+    _e.preventDefault();
     if (!input.trim() || isProcessing) return;
 
     performanceMonitor.startMeasure('message_processing', {
@@ -136,21 +136,21 @@ export function Chat() {
       
       await agentSystem.processMessage(
         userMessage.content,
-        (content) => {
+        (_content) => {
           if (!isPaused) {
-            currentContent += content;
+            currentContent += _content;
             chunkCount++;
             
-            addMessage(messages => {
-              const lastMessage = messages[messages.length - 1];
+            addMessage(_messages => {
+              const lastMessage = _messages[_messages.length - 1];
               if (lastMessage && lastMessage.role === 'assistant') {
-                return messages.map(msg => 
-                  msg.id === assistantMessage.id
-                    ? { ...msg, content: currentContent }
-                    : msg
+                return _messages.map(_msg => 
+                  _msg.id === assistantMessage.id
+                    ? { ..._msg, content: currentContent }
+                    : _msg
                 );
               }
-              return messages;
+              return _messages;
             });
           }
         },
@@ -221,18 +221,18 @@ export function Chat() {
                   "Analyze the trends in renewable energy adoption",
                   "Generate a React component for a dynamic form",
                   "How can I optimize my SQLite database queries?"
-                ].map((suggestion, i) => (
+                ].map((_suggestion, _i) => (
                   <button
-                    key={i}
+                    key={_i}
                     className="p-3 text-left rounded-lg bg-muted hover:bg-accent/20 transition-colors"
                     onClick={() => {
-                      setInput(suggestion);
+                      setInput(_suggestion);
                       if (textareaRef.current) {
                         textareaRef.current.focus();
                       }
                     }}
                   >
-                    {suggestion}
+                    {_suggestion}
                   </button>
                 ))}
               </div>
@@ -255,51 +255,51 @@ export function Chat() {
           </div>
         )}
 
-        {messages.map((message) => (
+        {messages.map((_message) => (
           <motion.div
-            key={message.id}
+            key={_message.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
             className={`flex ${
-              message.role === 'user' ? 'justify-end' : 'justify-start'
+              _message.role === 'user' ? 'justify-end' : 'justify-start'
             }`}
           >
             <div
               className={`max-w-[95%] sm:max-w-[80%] rounded-lg p-4 shadow-lg backdrop-blur-sm ${
-                message.role === 'user'
+                _message.role === 'user'
                   ? 'bg-secondary/90 text-secondary-foreground rounded-l-lg rounded-tr-lg card-elevated'
-                  : message.role === 'system'
+                  : _message.role === 'system'
                   ? 'bg-destructive/90 text-destructive-foreground rounded-lg card-elevated glow-destructive'
                   : 'bg-card/90 text-card-foreground rounded-r-lg rounded-tl-lg card-elevated'
               } ${
-                message.role === 'assistant' && message.content === '' && isProcessing
+                _message.role === 'assistant' && _message.content === '' && isProcessing
                   ? 'streaming-cursor streaming-cursor-' + processingPhase
                   : ''
               }`}
             >
-              {message.role === 'assistant' && message.content.length > 0 ? (
+              {_message.role === 'assistant' && _message.content.length > 0 ? (
                 <ProgressiveMessage
-                  content={message.content}
-                  isLoading={isProcessing && message.content === ''}
+                  content={_message.content}
+                  isLoading={isProcessing && _message.content === ''}
                   streamingPhase={processingPhase}
                   className="prose prose-invert max-w-none break-words"
                 />
               ) : (
                 <div className="prose prose-invert max-w-none break-words">
-                  <ReactMarkdown>{String(message.content || '')}</ReactMarkdown>
+                  <ReactMarkdown>{String(_message.content || '')}</ReactMarkdown>
                 </div>
               )}
-              {message.model && (
+              {_message.model && (
                 <div className="mt-2 text-xs text-muted-foreground flex gap-1 items-center">
-                  <span className="badge badge-primary">{message.model}</span>
-                  <span className="text-muted-foreground">{new Date(message.timestamp).toLocaleTimeString()}</span>
+                  <span className="badge badge-primary">{_message.model}</span>
+                  <span className="text-muted-foreground">{new Date(_message.timestamp).toLocaleTimeString()}</span>
                 </div>
               )}
             </div>
           </motion.div>
         ))}
-        {isProcessing && !messages.some(m => m.role === 'assistant' && m.content === '') && (
+        {isProcessing && !messages.some(_m => _m.role === 'assistant' && _m.content === '') && (
           <div className="flex justify-start">
             <div className="bg-card backdrop-blur-sm rounded-lg p-3 shadow-lg">
               <LoadingIndicator state={processingPhase} />
@@ -345,17 +345,17 @@ export function Chat() {
                       <div>
                         <label className="text-sm text-muted-foreground">Model Selection</label>
                         <div className="grid grid-cols-2 gap-1 mt-1">
-                          {['auto', 'grok', 'claude', 'openai', 'groq'].map(model => (
+                          {['auto', 'grok', 'claude', 'openai', 'groq'].map(_model => (
                             <button
-                              key={model}
-                              onClick={() => handleModelChange(model)}
+                              key={_model}
+                              onClick={() => handleModelChange(_model)}
                               className={`px-2 py-1 text-xs rounded-full ${
-                                filters.model === model
+                                filters.model === _model
                                   ? 'bg-primary text-primary-foreground'
                                   : 'bg-muted hover:bg-muted/80'
                               }`}
                             >
-                              {model.charAt(0).toUpperCase() + model.slice(1)}
+                              {_model.charAt(0).toUpperCase() + _model.slice(1)}
                             </button>
                           ))}
                         </div>
@@ -435,11 +435,11 @@ export function Chat() {
             <textarea
               ref={textareaRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit(e);
+              onChange={(_e) => setInput(_e.target.value)}
+              onKeyDown={(_e) => {
+                if (_e.key === 'Enter' && !_e.shiftKey) {
+                  _e.preventDefault();
+                  handleSubmit(_e);
                 }
               }}
               placeholder={isProcessing ? 'Processing...' : 'Send a message...'}

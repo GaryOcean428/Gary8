@@ -39,8 +39,8 @@ export class OllamaAPI extends BaseAPI {
       }
 
       const data = await response.json();
-      const hasModel = data.models?.some((model: any) => 
-        model.name === this.config.services.ollama.models.granite
+      const hasModel = data.models?.some((_model: unknown) => 
+        _model.name === this.config.services.ollama.models.granite
       );
 
       if (!hasModel) {
@@ -68,10 +68,10 @@ export class OllamaAPI extends BaseAPI {
     }
   }
 
-  private handleConnectionError(message: string): void {
+  private handleConnectionError(_message: string): void {
     this.isInitialized = false;
-    this.connectionError = message;
-    thoughtLogger.log('warning', message);
+    this.connectionError = _message;
+    thoughtLogger.log('warning', _message);
 
     // Retry connection every 30 seconds
     if (!this.retryTimeout) {
@@ -82,7 +82,7 @@ export class OllamaAPI extends BaseAPI {
     }
   }
 
-  async chat(messages: Message[], onProgress?: (content: string) => void): Promise<string> {
+  async chat(_messages: Message[], _onProgress?: (content: string) => void): Promise<string> {
     if (!this.isInitialized) {
       if (this.connectionError) {
         throw new AppError(this.connectionError, 'OLLAMA_ERROR');
@@ -99,8 +99,8 @@ export class OllamaAPI extends BaseAPI {
         },
         body: JSON.stringify({
           model: this.config.services.ollama.models.granite,
-          messages: messages.map(({ role, content }) => ({ role, content })),
-          stream: Boolean(onProgress),
+          messages: _messages.map(({ role, content }) => ({ role, content })),
+          stream: Boolean(_onProgress),
           options: {
             temperature: this.config.services.ollama.temperature,
             num_predict: this.config.services.ollama.maxTokens
@@ -116,8 +116,8 @@ export class OllamaAPI extends BaseAPI {
         );
       }
 
-      if (onProgress && response.body) {
-        return this.handleStreamingResponse(response.body, onProgress);
+      if (_onProgress && response.body) {
+        return this.handleStreamingResponse(response.body, _onProgress);
       }
 
       const data = await response.json();
@@ -139,10 +139,10 @@ export class OllamaAPI extends BaseAPI {
   }
 
   private async handleStreamingResponse(
-    body: ReadableStream<Uint8Array>,
-    onProgress: (content: string) => void
+    _body: ReadableStream<Uint8Array>,
+    _onProgress: (content: string) => void
   ): Promise<string> {
-    const reader = body.getReader();
+    const reader = _body.getReader();
     const decoder = new TextDecoder();
     let fullContent = '';
 
@@ -161,7 +161,7 @@ export class OllamaAPI extends BaseAPI {
             const parsed = JSON.parse(line);
             if (parsed.message?.content) {
               fullContent += parsed.message.content;
-              onProgress(parsed.message.content);
+              _onProgress(parsed.message.content);
             }
           } catch (e) {
             thoughtLogger.log('error', 'Failed to parse streaming response', { error: e });

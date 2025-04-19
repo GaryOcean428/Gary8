@@ -16,37 +16,37 @@ export function AnalysisParameters({ onAnalyze, isLoading }: AnalysisParametersP
   });
 
   const addCompetitor = () => {
-    setParams(prev => ({
-      ...prev,
-      competitors: [...prev.competitors, '']
+    setParams(_prev => ({
+      ..._prev,
+      competitors: [..._prev.competitors, '']
     }));
   };
 
-  const removeCompetitor = (index: number) => {
-    setParams(prev => ({
-      ...prev,
-      competitors: prev.competitors.filter((_, i) => i !== index)
+  const removeCompetitor = (_index: number) => {
+    setParams(_prev => ({
+      ..._prev,
+      competitors: _prev.competitors.filter((_, _i) => _i !== _index)
     }));
   };
 
-  const updateCompetitor = (index: number, value: string) => {
-    setParams(prev => ({
-      ...prev,
-      competitors: prev.competitors.map((c, i) => i === index ? value : c)
+  const updateCompetitor = (_index: number, _value: string) => {
+    setParams(_prev => ({
+      ..._prev,
+      competitors: _prev.competitors.map((_c, _i) => _i === _index ? _value : _c)
     }));
   };
 
-  const updateCriterionWeight = (id: string, weight: number) => {
-    setParams(prev => ({
-      ...prev,
-      criteria: prev.criteria.map(c => 
-        c.id === id ? { ...c, weight } : c
+  const updateCriterionWeight = (_id: string, _weight: number) => {
+    setParams(_prev => ({
+      ..._prev,
+      criteria: _prev.criteria.map(_c => 
+        _c.id === _id ? { ..._c, _weight } : _c
       )
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (_e: React.FormEvent) => {
+    _e.preventDefault();
     onAnalyze(params);
   };
 
@@ -58,7 +58,7 @@ export function AnalysisParameters({ onAnalyze, isLoading }: AnalysisParametersP
           <input
             type="text"
             value={params.industry}
-            onChange={(e) => setParams(prev => ({ ...prev, industry: e.target.value }))}
+            onChange={(_e) => setParams(_prev => ({ ..._prev, industry: _e.target.value }))}
             placeholder="e.g., Software Development, Healthcare"
             className="input"
           />
@@ -68,7 +68,7 @@ export function AnalysisParameters({ onAnalyze, isLoading }: AnalysisParametersP
           <input
             type="text"
             value={params.region}
-            onChange={(e) => setParams(prev => ({ ...prev, region: e.target.value }))}
+            onChange={(_e) => setParams(_prev => ({ ..._prev, region: _e.target.value }))}
             placeholder="e.g., North America, Global"
             className="input"
           />
@@ -87,19 +87,19 @@ export function AnalysisParameters({ onAnalyze, isLoading }: AnalysisParametersP
           </button>
         </div>
         <div className="space-y-2">
-          {params.competitors.map((competitor, index) => (
-            <div key={index} className="flex items-center space-x-2">
+          {params.competitors.map((_competitor, _index) => (
+            <div key={_index} className="flex items-center space-x-2">
               <input
                 type="text"
-                value={competitor}
-                onChange={(e) => updateCompetitor(index, e.target.value)}
+                value={_competitor}
+                onChange={(_e) => updateCompetitor(_index, _e.target.value)}
                 placeholder="Competitor name or URL"
                 className="input"
               />
               {params.competitors.length > 1 && (
                 <button
                   type="button"
-                  onClick={() => removeCompetitor(index)}
+                  onClick={() => removeCompetitor(_index)}
                   className="p-2 text-red-400 hover:text-red-300"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -121,18 +121,18 @@ export function AnalysisParameters({ onAnalyze, isLoading }: AnalysisParametersP
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {params.criteria.map(criterion => (
-            <div key={criterion.id} className="flex items-center space-x-4">
-              <span className="text-sm flex-1">{criterion.label}</span>
+          {params.criteria.map(_criterion => (
+            <div key={_criterion.id} className="flex items-center space-x-4">
+              <span className="text-sm flex-1">{_criterion.label}</span>
               <input
                 type="range"
                 min="1"
                 max="5"
-                value={criterion.weight}
-                onChange={(e) => updateCriterionWeight(criterion.id, parseInt(e.target.value))}
+                value={_criterion.weight}
+                onChange={(_e) => updateCriterionWeight(_criterion.id, parseInt(_e.target.value))}
                 className="w-24"
               />
-              <span className="text-sm w-4">{criterion.weight}</span>
+              <span className="text-sm w-4">{_criterion.weight}</span>
             </div>
           ))}
         </div>

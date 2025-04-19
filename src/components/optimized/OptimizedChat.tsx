@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Pause, Play, Sparkles, RotateCcw, Share2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { AgentSystem } from '../../lib/agent-system';
-import { LoadingIndicator } from '../LoadingIndicator';
-import { useChat } from '../../hooks/useChat';
+import { LoadingIndicator, ProcessingState } from '../LoadingIndicator'; // Import ProcessingState
+import { useChat, Message } from '../../hooks/useChat'; // Import Message type
 import { thoughtLogger } from '../../lib/logging/thought-logger';
 import { SaveChatButton } from '../SaveChatButton';
 import { useInView } from '../../hooks/useInView';
@@ -57,16 +57,16 @@ export function OptimizedChat() {
   }, [messages, autoScroll]);
 
   // Update processing phase based on agent state
-  const updateProcessingPhase = useCallback((state?: string) => {
-    if (!state) return;
+  const updateProcessingPhase = useCallback((_state?: string) => {
+    if (!_state) return;
     
-    switch (state) {
+    switch (_state) {
       case 'searching':
         setProcessingPhase('searching');
         break;
       case 'retrieving':
       case 'processing':
-        setProcessingPhase('processing');
+        setProcessingPhase("processing" as ProcessingPhase); // Cast to fix type mismatch
         break;
       case 'thinking':
       case 'reasoning':
@@ -77,8 +77,8 @@ export function OptimizedChat() {
     }
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (_e: React.FormEvent) => {
+    _e.preventDefault();
     if (!input.trim() || isProcessing) return;
 
     performanceMonitor.startMeasure('message_processing', {
@@ -86,9 +86,10 @@ export function OptimizedChat() {
       messageCount: messages.length
     });
 
-    const userMessage = {
+    // Ensure role matches the Message type definition
+    const userMessage: Message = { 
       id: crypto.randomUUID(),
-      role: 'user',
+      role: "user", // Explicitly use "user"
       content: input.trim(),
       timestamp: Date.now()
     };
@@ -99,7 +100,7 @@ export function OptimizedChat() {
     setAutoScroll(true);
 
     if (textareaRef.current) {
-      textareaRef.current.style.height = '48px';
+      textareaRef.current.style.height = '48px'; // Reset height
     }
 
     try {
@@ -107,9 +108,10 @@ export function OptimizedChat() {
       
       await addMessage(userMessage);
 
-      const assistantMessage = {
+      // Ensure role matches the Message type definition
+      const assistantMessage: Message = { 
         id: crypto.randomUUID(),
-        role: 'assistant',
+        role: "assistant", // Explicitly use "assistant"
         content: '',
         timestamp: Date.now()
       };
@@ -123,25 +125,26 @@ export function OptimizedChat() {
       const system = AgentSystem.getInstance();
       await system.processMessage(
         userMessage.content,
-        (content) => {
+        (_content) => {
           if (!isPaused) {
-            currentContent += content;
+            currentContent += _content;
             chunkCount++;
             
             // Throttle UI updates based on visibility and update size
             const shouldUpdate = isInView || chunkCount % 5 === 0;
             
             if (shouldUpdate) {
-              addMessage(messages => {
-                const lastMessage = messages[messages.length - 1];
-                if (lastMessage && lastMessage.role === 'assistant') {
-                  return messages.map(msg => 
-                    msg.id === assistantMessage.id
-                      ? { ...msg, content: currentContent }
-                      : msg
+              addMessage(_messages => {
+                const lastMessage = _messages[_messages.length - 1];
+                // Ensure role check matches Message type
+                if (lastMessage && lastMessage.role === 'assistant') { 
+                  return _messages.map(_msg => 
+                    _msg.id === assistantMessage.id
+                      ? { ..._msg, content: currentContent }
+                      : _msg
                   );
                 }
-                return messages;
+                return _messages;
               });
             }
           }
@@ -166,9 +169,10 @@ export function OptimizedChat() {
     } catch (error) {
       thoughtLogger.log('error', 'Failed to process message', { error });
       
-      await addMessage({
+      // Ensure role matches the Message type definition
+      await addMessage({ 
         id: crypto.randomUUID(),
-        role: 'system',
+        role: "system", // Explicitly use "system"
         content: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
         timestamp: Date.now()
       });
@@ -205,18 +209,18 @@ export function OptimizedChat() {
                   "Analyze the trends in renewable energy adoption",
                   "Generate a React component for a dynamic form",
                   "How can I optimize my SQLite database queries?"
-                ].map((suggestion, i) => (
+                ].map((_suggestion, _i) => (
                   <button
-                    key={i}
+                    key={_i}
                     className="p-3 text-left rounded-lg bg-muted hover:bg-accent/20 transition-colors"
                     onClick={() => {
-                      setInput(suggestion);
+                      setInput(_suggestion);
                       if (textareaRef.current) {
                         textareaRef.current.focus();
                       }
                     }}
                   >
-                    {suggestion}
+                    {_suggestion}
                   </button>
                 ))}
               </div>
@@ -224,53 +228,54 @@ export function OptimizedChat() {
           </div>
         )}
 
-        {messages.map((message) => (
+        {messages.map((_message) => (
           <div
-            key={message.id}
+            key={_message.id}
             className={`flex ${
-              message.role === 'user' ? 'justify-end' : 'justify-start'
+              _message.role === 'user' ? 'justify-end' : 'justify-start'
             }`}
           >
             <div
               className={`max-w-[95%] sm:max-w-[80%] rounded-lg p-4 shadow-lg backdrop-blur-sm ${
-                message.role === 'user'
+                _message.role === 'user'
                   ? 'bg-secondary/90 text-secondary-foreground rounded-l-lg rounded-tr-lg card-elevated'
-                  : message.role === 'system'
+                  : _message.role === 'system'
                   ? 'bg-destructive/90 text-destructive-foreground rounded-lg card-elevated glow-destructive'
                   : 'bg-card/90 text-card-foreground rounded-r-lg rounded-tl-lg card-elevated'
               } ${
-                message.role === 'assistant' && message.content === '' && isProcessing
+                _message.role === 'assistant' && _message.content === '' && isProcessing
                   ? 'streaming-cursor streaming-cursor-' + processingPhase
                   : ''
               }`}
             >
-              {message.role === 'assistant' ? (
+              {_message.role === 'assistant' ? (
                 <ProgressiveMessage 
-                  content={message.content || ''} 
-                  isLoading={isProcessing && message.content === ''}
+                  content={_message.content || ''} 
+                  isLoading={isProcessing && _message.content === ''}
                   streamingPhase={processingPhase}
                   className="prose prose-invert max-w-none break-words"
                 />
               ) : (
                 <div className="prose prose-invert max-w-none break-words">
-                  <ReactMarkdown>{String(message.content || '')}</ReactMarkdown>
+                  <ReactMarkdown>{String(_message.content || '')}</ReactMarkdown>
                 </div>
               )}
               
-              {message.model && (
+              {_message.model && (
                 <div className="mt-2 text-xs text-muted-foreground flex gap-1 items-center">
-                  <span className="badge badge-primary">{message.model}</span>
-                  <span className="text-muted-foreground">{new Date(message.timestamp).toLocaleTimeString()}</span>
+                  <span className="badge badge-primary">{_message.model}</span>
+                  <span className="text-muted-foreground">{new Date(_message.timestamp).toLocaleTimeString()}</span>
                 </div>
               )}
             </div>
           </div>
         ))}
         
-        {isProcessing && !messages.some(m => m.role === 'assistant' && m.content === '') && (
+        {isProcessing && !messages.some(_m => _m.role === 'assistant' && _m.content === '') && (
           <div className="flex justify-start">
             <div className="bg-card backdrop-blur-sm rounded-lg p-3 shadow-lg">
-              <LoadingIndicator state={processingPhase} />
+              {/* Ensure state matches ProcessingState type */}
+              <LoadingIndicator state={processingPhase as ProcessingState} /> 
             </div>
           </div>
         )}
@@ -309,21 +314,21 @@ export function OptimizedChat() {
             <textarea
               ref={textareaRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit(e);
+              onChange={(_e) => setInput(_e.target.value)}
+              onKeyDown={(_e) => {
+                if (_e.key === 'Enter' && !_e.shiftKey) {
+                  _e.preventDefault();
+                  handleSubmit(_e);
                 }
               }}
               placeholder={isProcessing ? 'Processing...' : 'Send a message...'}
-              className="w-full bg-input text-foreground rounded-lg pl-4 pr-12 py-3 resize-none min-h-[48px] max-h-[200px] border border-border focus:outline-none focus:ring-2 focus:ring-primary transition-all focus-glow"
+              className="w-full bg-input text-foreground rounded-lg pl-4 pr-12 py-3 resize-none min-h-[48px] max-h-[200px] border border-border focus:outline-none focus:ring-2 focus:ring-primary transition-all focus-glow input-height" // Added class back
               disabled={isProcessing}
               rows={1}
-              style={{ height: '48px' }}
             />
             <button
               type="button"
+              aria-label="AI Suggestions" // Added aria-label
               className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-muted-foreground hover:text-accent rounded-lg transition-colors"
               title="AI Suggestions"
             >
@@ -349,6 +354,7 @@ export function OptimizedChat() {
                 type="button"
                 className="flex-none p-3 text-primary hover:text-primary-foreground hover:bg-primary/20 rounded-lg transition-colors"
                 title="Share"
+                aria-label="Share chat" // Added aria-label
               >
                 <Share2 className="w-5 h-5" />
               </button>

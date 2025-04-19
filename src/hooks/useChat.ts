@@ -21,59 +21,59 @@ export function useChat() {
   const autoTagger = AutoTagger.getInstance();
 
   // Create a content manager for a message
-  const getContentManager = useCallback((messageId: string) => {
-    if (!contentManagers.has(messageId)) {
-      const updateContent = (content: string) => {
-        setMessages(prev => 
-          prev.map(msg => 
-            msg.id === messageId ? { ...msg, content } : msg
+  const getContentManager = useCallback((_messageId: string) => {
+    if (!contentManagers.has(_messageId)) {
+      const updateContent = (_content: string) => {
+        setMessages(_prev => 
+          _prev.map(_msg => 
+            _msg.id === _messageId ? { ..._msg, _content } : _msg
           )
         );
       };
       
       const contentManager = new ContentManager(updateContent);
-      setContentManagers(prev => {
-        const updated = new Map(prev);
-        updated.set(messageId, contentManager);
+      setContentManagers(_prev => {
+        const updated = new Map(_prev);
+        updated.set(_messageId, contentManager);
         return updated;
       });
       
       return contentManager;
     }
     
-    return contentManagers.get(messageId)!;
+    return contentManagers.get(_messageId)!;
   }, [contentManagers]);
 
-  const addMessage = useCallback((messageOrUpdater: Message | ((prev: Message[]) => Message[])) => {
+  const addMessage = useCallback((_messageOrUpdater: Message | ((prev: Message[]) => Message[])) => {
     performanceMonitor.startMeasure('addMessage');
-    setMessages(prev => {
-      if (typeof messageOrUpdater === 'function') {
-        return messageOrUpdater(prev);
+    setMessages(_prev => {
+      if (typeof _messageOrUpdater === 'function') {
+        return _messageOrUpdater(_prev);
       }
       
       // If it's a new assistant message, initialize its content manager
-      if (messageOrUpdater.role === 'assistant') {
-        getContentManager(messageOrUpdater.id);
+      if (_messageOrUpdater.role === 'assistant') {
+        getContentManager(_messageOrUpdater.id);
       }
       
-      return [...prev, messageOrUpdater];
+      return [..._prev, _messageOrUpdater];
     });
     performanceMonitor.endMeasure('addMessage');
     
     return Promise.resolve();
   }, [getContentManager]);
 
-  const saveChat = useCallback(async (title: string) => {
+  const saveChat = useCallback(async (_title: string) => {
     performanceMonitor.startMeasure('saveChat');
     const newChat = {
       id: crypto.randomUUID(),
-      title,
+      _title,
       messages,
       timestamp: Date.now(),
       tags: autoTagger.generateTags(messages)
     };
 
-    setSavedChats(prev => [...prev, newChat]);
+    setSavedChats(_prev => [..._prev, newChat]);
     setCurrentChatId(newChat.id);
     
     addToast({
@@ -86,12 +86,12 @@ export function useChat() {
     return newChat.id;
   }, [messages, setSavedChats, addToast, autoTagger]);
 
-  const loadChat = useCallback(async (chatId: string) => {
+  const loadChat = useCallback(async (_chatId: string) => {
     performanceMonitor.startMeasure('loadChat');
-    const chat = savedChats.find(c => c.id === chatId);
+    const chat = savedChats.find(_c => _c.id === _chatId);
     if (chat) {
       setMessages(chat.messages);
-      setCurrentChatId(chatId);
+      setCurrentChatId(_chatId);
       
       // Clear existing content managers
       setContentManagers(new Map());
@@ -105,9 +105,9 @@ export function useChat() {
     performanceMonitor.endMeasure('loadChat');
   }, [savedChats, addToast]);
 
-  const deleteChat = useCallback(async (chatId: string) => {
-    setSavedChats(prev => prev.filter(chat => chat.id !== chatId));
-    if (currentChatId === chatId) {
+  const deleteChat = useCallback(async (_chatId: string) => {
+    setSavedChats(_prev => _prev.filter(_chat => _chat.id !== _chatId));
+    if (currentChatId === _chatId) {
       setMessages([]);
       setCurrentChatId(null);
     }
@@ -126,28 +126,28 @@ export function useChat() {
   }, []);
   
   // Update message content through content manager
-  const updateMessageContent = useCallback((messageId: string, content: string) => {
-    const manager = getContentManager(messageId);
-    manager.appendContent(content);
+  const updateMessageContent = useCallback((_messageId: string, _content: string) => {
+    const manager = getContentManager(_messageId);
+    manager.appendContent(_content);
   }, [getContentManager]);
   
   // Set message pause status
-  const setMessagePaused = useCallback((messageId: string, paused: boolean) => {
-    const manager = contentManagers.get(messageId);
+  const setMessagePaused = useCallback((_messageId: string, _paused: boolean) => {
+    const manager = contentManagers.get(_messageId);
     if (manager) {
-      paused ? manager.pause() : manager.resume();
+      _paused ? manager.pause() : manager.resume();
     }
   }, [contentManagers]);
 
   // Clean up old content managers when messages change
   useEffect(() => {
-    const activeMessageIds = new Set(messages.map(msg => msg.id));
+    const activeMessageIds = new Set(messages.map(_msg => _msg.id));
     
     // Remove content managers for deleted messages
-    setContentManagers(prev => {
-      if (prev.size === 0) return prev;
+    setContentManagers(_prev => {
+      if (_prev.size === 0) return _prev;
       
-      const updated = new Map(prev);
+      const updated = new Map(_prev);
       let changed = false;
       
       for (const [id] of updated) {
@@ -157,7 +157,7 @@ export function useChat() {
         }
       }
       
-      return changed ? updated : prev;
+      return changed ? updated : _prev;
     });
   }, [messages]);
 

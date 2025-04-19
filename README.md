@@ -40,7 +40,7 @@ For Supabase Edge Functions, you'll also need to set the environment variables i
 
 ### Supported Models
 
-- **OpenAI Models**: GPT-4o, GPT-4o-mini, o1, o1-mini, o3-mini
+- **OpenAI Models**: GPT-4o, GPT-4o-mini, o1, o1-mini, o3-mini (plus newer if available)
 - **Anthropic Models**: Claude 3.7 Sonnet, Claude 3.5 Sonnet, Claude 3.5 Haiku
 - **Groq Models**: Llama 3.3 70b, Llama3 8B, Llama 3.2 Vision models
 - **X.AI (Grok) Models**: Grok-3, Grok-3 Fast, Grok-3 Mini
@@ -48,6 +48,17 @@ For Supabase Edge Functions, you'll also need to set the environment variables i
 - **Google Models**: Gemini 2.5 Pro, Gemini 2.0 Flash Lite
 
 ## Development
+
+### Developer Scripts
+
+- `yarn dev`         Start the development server (Vite).
+- `yarn lint`        Run ESLint and auto-fix issues.
+- `yarn typecheck`   Run the TypeScript compiler in no‑emit mode.
+ - `yarn test`        Execute the full test suite (Vitest).
+ - `yarn prefix-unused`  Prefix unused function parameters with `_` (bulk cleanup).
+ - `yarn refine-any`     Replace explicit `any` with `unknown` in type positions.
+
+Continuous Integration runs `lint`, `typecheck`, and `test` on every push and pull request per `.github/workflows/ci.yml`.
 
 ```bash
 # Install dependencies

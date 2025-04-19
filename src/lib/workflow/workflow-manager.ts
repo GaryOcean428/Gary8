@@ -7,7 +7,7 @@ interface WorkflowStep {
   id: string;
   type: 'search' | 'process' | 'analyze' | 'export';
   status: 'pending' | 'active' | 'completed' | 'failed';
-  result?: any;
+  result?: unknown;
 }
 
 interface Workflow {
@@ -28,11 +28,11 @@ export class WorkflowManager {
     this.realTimeProcessor = new RealTimeProcessor();
   }
 
-  async processWorkflow(message: Message): Promise<Message> {
+  async processWorkflow(_message: Message): Promise<Message> {
     const workflowId = crypto.randomUUID();
     const workflow: Workflow = {
       id: workflowId,
-      steps: this.createWorkflowSteps(message),
+      steps: this.createWorkflowSteps(_message),
       status: 'active',
       startTime: Date.now()
     };
@@ -50,7 +50,7 @@ export class WorkflowManager {
         });
 
         try {
-          step.result = await this.executeWorkflowStep(step, message);
+          step.result = await this.executeWorkflowStep(step, _message);
           step.status = 'completed';
         } catch (error) {
           step.status = 'failed';
@@ -82,9 +82,9 @@ export class WorkflowManager {
     }
   }
 
-  private createWorkflowSteps(message: Message): WorkflowStep[] {
+  private createWorkflowSteps(_message: Message): WorkflowStep[] {
     const steps: WorkflowStep[] = [];
-    const content = message.content.toLowerCase();
+    const content = _message.content.toLowerCase();
 
     if (content.includes('search') || content.includes('find')) {
       steps.push({
@@ -119,57 +119,57 @@ export class WorkflowManager {
   }
 
   private async executeWorkflowStep(
-    step: WorkflowStep,
-    message: Message
-  ): Promise<any> {
-    switch (step.type) {
+    _step: WorkflowStep,
+    _message: Message
+  ): Promise<unknown> {
+    switch (_step.type) {
       case 'search':
         return await this.swarmCoordinator.processTask({
-          ...message,
-          content: `Search: ${message.content}`
+          ..._message,
+          content: `Search: ${_message.content}`
         });
 
       case 'process':
         return await this.realTimeProcessor.processInRealTime(
-          message,
-          content => thoughtLogger.log('observation', content),
-          thought => thoughtLogger.log('reasoning', thought)
+          _message,
+          _content => thoughtLogger.log('observation', _content),
+          _thought => thoughtLogger.log('reasoning', _thought)
         );
 
       case 'analyze':
         return await this.swarmCoordinator.processTask({
-          ...message,
-          content: `Analyze: ${message.content}`
+          ..._message,
+          content: `Analyze: ${_message.content}`
         });
 
       case 'export':
         return await this.swarmCoordinator.processTask({
-          ...message,
-          content: `Export: ${message.content}`
+          ..._message,
+          content: `Export: ${_message.content}`
         });
 
       default:
-        throw new Error(`Unknown workflow step type: ${step.type}`);
+        throw new Error(`Unknown workflow step type: ${_step.type}`);
     }
   }
 
-  private aggregateWorkflowResults(workflow: Workflow): string {
+  private aggregateWorkflowResults(_workflow: Workflow): string {
     // Combine results from all completed steps
-    const results = workflow.steps
-      .filter(step => step.status === 'completed')
-      .map(step => step.result);
+    const results = _workflow.steps
+      .filter(_step => _step.status === 'completed')
+      .map(_step => _step.result);
 
     // Format and return combined results
     return results.join('\n\n');
   }
 
-  getWorkflow(workflowId: string): Workflow | undefined {
-    return this.workflows.get(workflowId);
+  getWorkflow(_workflowId: string): Workflow | undefined {
+    return this.workflows.get(_workflowId);
   }
 
   getActiveWorkflows(): Workflow[] {
     return Array.from(this.workflows.values()).filter(
-      workflow => workflow.status === 'active'
+      _workflow => _workflow.status === 'active'
     );
   }
 }

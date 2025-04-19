@@ -8,7 +8,7 @@ export interface ChatOptions {
   frequencyPenalty?: number;
   presencePenalty?: number;
   streaming?: boolean;
-  tools?: Record<string, any>;
+  tools?: Record<string, unknown>;
 }
 
 export interface AIProviderAdapter {

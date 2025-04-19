@@ -71,8 +71,8 @@ export function ProgressiveMessage({
   }, [content, isStreaming]);
 
   // Update visible content with usable thresholds for better UX
-  const updateVisibleContent = useCallback((fullContent: string) => {
-    const paragraphs = fullContent.split('\n\n');
+  const updateVisibleContent = useCallback((_fullContent: string) => {
+    const paragraphs = _fullContent.split('\n\n');
     
     // Show all completed paragraphs and potentially the current one if it looks complete
     let usableContent = '';
@@ -100,11 +100,11 @@ export function ProgressiveMessage({
       }
     } else if (paragraphs.length === 1) {
       // Only one paragraph - use the entire content
-      usableContent = fullContent;
+      usableContent = _fullContent;
       newCompletedParagraph = false;
     }
     
-    setVisibleContent(usableContent || fullContent);
+    setVisibleContent(usableContent || _fullContent);
     setCompletedParagraph(newCompletedParagraph);
   }, []);
   

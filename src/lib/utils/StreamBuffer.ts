@@ -19,20 +19,20 @@ export class StreamBuffer {
 
   /**
    * Appends content to the buffer
-   * @param content Content to append
+   * @param _content Content to append
    */
-  append(content: string): void {
+  append(_content: string): void {
     // Update metrics
-    this.totalLength += content.length;
+    this.totalLength += _content.length;
     this.lastUpdate = Date.now();
     
     // Instead of one growing string, manage array of fixed-size chunks
     const lastChunk = this.chunks[this.chunks.length - 1];
     
     if (!lastChunk || lastChunk.length >= this.maxChunkSize) {
-      this.chunks.push(content);
+      this.chunks.push(_content);
     } else {
-      this.chunks[this.chunks.length - 1] += content;
+      this.chunks[this.chunks.length - 1] += _content;
     }
   }
   
@@ -47,14 +47,14 @@ export class StreamBuffer {
   /**
    * Gets a specific range of content
    * Optimizes for showing only visible portions in virtualized displays
-   * @param start Start position
-   * @param end End position
+   * @param _start Start position
+   * @param _end End position
    * @returns The content in the specified range
    */
-  getRange(start: number, end: number): string {
-    if (start < 0) start = 0;
-    if (end > this.totalLength) end = this.totalLength;
-    if (start >= end) return '';
+  getRange(_start: number, _end: number): string {
+    if (_start < 0) _start = 0;
+    if (_end > this.totalLength) _end = this.totalLength;
+    if (_start >= _end) return '';
     
     let result = '';
     let position = 0;
@@ -65,14 +65,14 @@ export class StreamBuffer {
       const chunkEnd = position + chunk.length;
       
       // Check if this chunk overlaps with requested range
-      if (chunkEnd > start && chunkStart < end) {
-        const overlapStart = Math.max(start - chunkStart, 0);
-        const overlapEnd = Math.min(end - chunkStart, chunk.length);
+      if (chunkEnd > _start && chunkStart < _end) {
+        const overlapStart = Math.max(_start - chunkStart, 0);
+        const overlapEnd = Math.min(_end - chunkStart, chunk.length);
         result += chunk.substring(overlapStart, overlapEnd);
       }
       
       position += chunk.length;
-      if (position >= end) break;
+      if (position >= _end) break;
     }
     
     return result;

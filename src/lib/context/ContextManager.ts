@@ -25,20 +25,20 @@ export class ContextManager {
     return ContextManager.instance;
   }
 
-  async getContext(message: Message): Promise<string> {
+  async getContext(_message: Message): Promise<string> {
     thoughtLogger.log('execution', 'Retrieving context for message');
 
     try {
       // Get relevant memories
-      const memories = await this.vectorMemory.recall(message.content);
+      const memories = await this.vectorMemory.recall(_message.content);
       
       // Get recent conversation context
-      const recentContext = this.getRecentContext(message);
+      const recentContext = this.getRecentContext(_message);
 
       // Combine and format context
       const context = [
-        ...memories.map(m => `[Memory] ${m.content}`),
-        ...recentContext.map(m => `[Recent] ${m.role}: ${m.content}`)
+        ...memories.map(_m => `[Memory] ${_m.content}`),
+        ...recentContext.map(_m => `[Recent] ${_m.role}: ${_m.content}`)
       ].join('\n\n');
 
       thoughtLogger.log('success', 'Context retrieved successfully', {
@@ -53,19 +53,19 @@ export class ContextManager {
     }
   }
 
-  async updateContext(windowId: string, message: Message, metadata?: Record<string, unknown>): Promise<void> {
-    const window = this.contextWindows.get(windowId) || {
+  async updateContext(_windowId: string, _message: Message, _metadata?: Record<string, unknown>): Promise<void> {
+    const window = this.contextWindows.get(_windowId) || {
       messages: [],
       metadata: {},
       timestamp: Date.now()
     };
 
     // Add message to window
-    window.messages.push(message);
+    window.messages.push(_message);
     
     // Update metadata
-    if (metadata) {
-      window.metadata = { ...window.metadata, ...metadata };
+    if (_metadata) {
+      window.metadata = { ...window.metadata, ..._metadata };
     }
 
     // Trim window if needed
@@ -73,19 +73,19 @@ export class ContextManager {
       window.messages = window.messages.slice(-this.maxWindowSize);
     }
 
-    this.contextWindows.set(windowId, window);
+    this.contextWindows.set(_windowId, window);
 
     // Store in vector memory for long-term recall
-    await this.vectorMemory.store(message.content, 'message');
+    await this.vectorMemory.store(_message.content, 'message');
   }
 
-  private getRecentContext(message: Message): Message[] {
+  private getRecentContext(_message: Message): Message[] {
     // Find most relevant context window
     let relevantWindow: ContextWindow | undefined;
     let highestSimilarity = -1;
 
     for (const window of this.contextWindows.values()) {
-      const similarity = this.calculateContextSimilarity(message, window);
+      const similarity = this.calculateContextSimilarity(_message, window);
       if (similarity > highestSimilarity) {
         highestSimilarity = similarity;
         relevantWindow = window;
@@ -95,26 +95,26 @@ export class ContextManager {
     return relevantWindow?.messages || [];
   }
 
-  private calculateContextSimilarity(message: Message, window: ContextWindow): number {
+  private calculateContextSimilarity(_message: Message, _window: ContextWindow): number {
     // Simple keyword-based similarity for demonstration
     // In production, use proper embedding similarity
-    const messageWords = new Set(message.content.toLowerCase().split(/\s+/));
+    const messageWords = new Set(_message.content.toLowerCase().split(/\s+/));
     const windowWords = new Set(
-      window.messages
-        .map(m => m.content.toLowerCase())
+      _window.messages
+        .map(_m => _m.content.toLowerCase())
         .join(' ')
         .split(/\s+/)
     );
 
     const intersection = new Set(
-      Array.from(messageWords).filter(word => windowWords.has(word))
+      Array.from(messageWords).filter(_word => windowWords.has(_word))
     );
 
     return intersection.size / Math.max(messageWords.size, windowWords.size);
   }
 
-  clearContext(windowId: string): void {
-    this.contextWindows.delete(windowId);
+  clearContext(_windowId: string): void {
+    this.contextWindows.delete(_windowId);
   }
 
   getContextWindowCount(): number {

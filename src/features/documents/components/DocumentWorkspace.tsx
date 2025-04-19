@@ -1,15 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
+import type { Document } from '../types';
 import { DocumentList } from './DocumentList';
 import { DocumentUpload } from './DocumentUpload';
 import { DocumentManager } from '../services/DocumentManager';
 import { useAuth } from '../../../core/auth/AuthProvider';
-import { Search, Grid, List, Plus, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Grid, List, Plus, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useLocalStorage } from '../../../shared/hooks/useLocalStorage';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { SearchOptions } from '../types';
 
 export function DocumentWorkspace() {
-  const [documents, setDocuments] = React.useState<any[]>([]);
+  const [documents, setDocuments] = React.useState<Document[]>([]);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
   const [viewMode, setViewMode] = useLocalStorage<'grid' | 'list'>('docViewMode', 'grid');
@@ -23,15 +24,8 @@ export function DocumentWorkspace() {
   const documentManager = DocumentManager.getInstance();
   const { user } = useAuth();
 
-  // Load documents when user or search params change
-  useEffect(() => {
-    if (user) {
-      loadDocuments();
-    }
-  }, [user, searchQuery, selectedTags]);
-
   // Load documents from database
-  const loadDocuments = async () => {
+  const loadDocuments = useCallback(async () => {
     if (!user) return;
 
     setIsLoading(true);
@@ -44,14 +38,19 @@ export function DocumentWorkspace() {
       };
 
       const results = await documentManager.searchDocuments(searchOptions);
-      setDocuments(results.map(r => r.document));
+      setDocuments(results.map(_r => _r.document));
     } catch (error) {
       console.error('Failed to load documents:', error);
       setError(error instanceof Error ? error.message : 'Document search failed');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, searchQuery, selectedTags, documentManager]);
+
+  // Load documents when search parameters change or on mount
+  useEffect(() => {
+    loadDocuments();
+  }, [loadDocuments]);
 
   const handleUploadComplete = async () => {
     setUploadStatus({
@@ -67,10 +66,10 @@ export function DocumentWorkspace() {
     await loadDocuments();
   };
 
-  const handleUploadError = (error: Error) => {
+  const handleUploadError = (_error: Error) => {
     setUploadStatus({
       success: false,
-      message: `Upload failed: ${error.message}`
+      message: `Upload failed: ${_error.message}`
     });
 
     setTimeout(() => {

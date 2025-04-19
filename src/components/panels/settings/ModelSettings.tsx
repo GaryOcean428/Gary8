@@ -14,21 +14,21 @@ export function ModelSettings() {
     presencePenalty: settings.models.presencePenalty || 0
   });
 
-  const handleParamChange = (param: string, value: number) => {
-    setModelParams(prev => ({ ...prev, [param]: value }));
+  const handleParamChange = (_param: string, _value: number) => {
+    setModelParams(_prev => ({ ..._prev, [_param]: _value }));
     updateSettings({
       models: {
         ...settings.models,
-        [param]: value
+        [_param]: _value
       }
     });
   };
 
-  const handleModelChange = (model: string) => {
+  const handleModelChange = (_model: string) => {
     updateSettings({
       models: {
         ...settings.models,
-        defaultModel: model
+        defaultModel: _model
       }
     });
   };
@@ -242,8 +242,8 @@ export function ModelSettings() {
   ];
 
   // Function to determine badge color based on tier
-  const getTierBadgeClass = (tier: string): string => {
-    switch(tier) {
+  const getTierBadgeClass = (_tier: string): string => {
+    switch(_tier) {
       case 'Free': return 'bg-success/10 text-success border border-success/20';
       case 'Pro': return 'bg-secondary/10 text-secondary border border-secondary/20';
       case 'Premium': return 'bg-primary/10 text-primary border border-primary/20';
@@ -251,10 +251,10 @@ export function ModelSettings() {
     }
   };
 
-  const handleModelToggle = (modelId: string) => {
-    const enabledModels = settings.models.enabledModels.includes(modelId)
-      ? settings.models.enabledModels.filter(m => m !== modelId)
-      : [...settings.models.enabledModels, modelId];
+  const handleModelToggle = (_modelId: string) => {
+    const enabledModels = settings.models.enabledModels.includes(_modelId)
+      ? settings.models.enabledModels.filter(_m => _m !== _modelId)
+      : [...settings.models.enabledModels, _modelId];
     updateSettings({ models: { ...settings.models, enabledModels } });
   };
 
@@ -272,13 +272,13 @@ export function ModelSettings() {
               <label className="block text-sm font-medium mb-2">Default Model</label>
               <select
                 value={settings.models.defaultModel}
-                onChange={(e) => handleModelChange(e.target.value)}
+                onChange={(_e) => handleModelChange(_e.target.value)}
                 className="w-full bg-input rounded-lg px-3 py-2 text-foreground"
               >
-                {modelConfigs.map(provider => (
-                  <optgroup key={provider.provider} label={provider.provider}>
-                    {provider.models.map(model => (
-                      <option key={model.id} value={model.id}>{model.name}</option>
+                {modelConfigs.map(_provider => (
+                  <optgroup key={_provider.provider} label={_provider.provider}>
+                    {_provider.models.map(_model => (
+                      <option key={_model.id} value={_model.id}>{_model.name}</option>
                     ))}
                   </optgroup>
                 ))}
@@ -297,7 +297,7 @@ export function ModelSettings() {
                       max="1"
                       step="0.1"
                       value={modelParams.temperature}
-                      onChange={(e) => handleParamChange('temperature', parseFloat(e.target.value))}
+                      onChange={(_e) => handleParamChange('temperature', parseFloat(_e.target.value))}
                       className="flex-1"
                     />
                     <input
@@ -306,7 +306,7 @@ export function ModelSettings() {
                       max="1"
                       step="0.1"
                       value={modelParams.temperature}
-                      onChange={(e) => handleParamChange('temperature', parseFloat(e.target.value))}
+                      onChange={(_e) => handleParamChange('temperature', parseFloat(_e.target.value))}
                       className="w-20 bg-input rounded px-2 py-1 text-sm"
                     />
                   </div>
@@ -319,7 +319,7 @@ export function ModelSettings() {
                     min="1"
                     max="200000"
                     value={modelParams.maxTokens}
-                    onChange={(e) => handleParamChange('maxTokens', parseInt(e.target.value))}
+                    onChange={(_e) => handleParamChange('maxTokens', parseInt(_e.target.value))}
                     className="w-full bg-input rounded px-3 py-1"
                   />
                 </div>
@@ -333,7 +333,7 @@ export function ModelSettings() {
                       max="1"
                       step="0.1"
                       value={modelParams.topP}
-                      onChange={(e) => handleParamChange('topP', parseFloat(e.target.value))}
+                      onChange={(_e) => handleParamChange('topP', parseFloat(_e.target.value))}
                       className="flex-1"
                     />
                     <input
@@ -342,7 +342,7 @@ export function ModelSettings() {
                       max="1"
                       step="0.1"
                       value={modelParams.topP}
-                      onChange={(e) => handleParamChange('topP', parseFloat(e.target.value))}
+                      onChange={(_e) => handleParamChange('topP', parseFloat(_e.target.value))}
                       className="w-20 bg-input rounded px-2 py-1 text-sm"
                     />
                   </div>
@@ -357,7 +357,7 @@ export function ModelSettings() {
                       max="2"
                       step="0.1"
                       value={modelParams.frequencyPenalty}
-                      onChange={(e) => handleParamChange('frequencyPenalty', parseFloat(e.target.value))}
+                      onChange={(_e) => handleParamChange('frequencyPenalty', parseFloat(_e.target.value))}
                       className="flex-1"
                     />
                     <input
@@ -366,7 +366,7 @@ export function ModelSettings() {
                       max="2"
                       step="0.1"
                       value={modelParams.frequencyPenalty}
-                      onChange={(e) => handleParamChange('frequencyPenalty', parseFloat(e.target.value))}
+                      onChange={(_e) => handleParamChange('frequencyPenalty', parseFloat(_e.target.value))}
                       className="w-20 bg-input rounded px-2 py-1 text-sm"
                     />
                   </div>
@@ -375,35 +375,35 @@ export function ModelSettings() {
 
               <label className="block text-sm font-medium mb-2">Models by Tier</label>
               <div className="space-y-6">
-                {['Free', 'Pro', 'Premium'].map(tier => (
-                  <div key={tier} className="space-y-3">
+                {['Free', 'Pro', 'Premium'].map(_tier => (
+                  <div key={_tier} className="space-y-3">
                     <h4 className="text-sm font-medium flex items-center space-x-2">
-                      <span>{tier} Tier Models</span>
-                      <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${getTierBadgeClass(tier)}`}>
-                        {tier === 'Free' ? 'All Users' : tier === 'Pro' ? 'Pro & Premium Plans' : 'Premium Plan Only'}
+                      <span>{_tier} Tier Models</span>
+                      <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${getTierBadgeClass(_tier)}`}>
+                        {_tier === 'Free' ? 'All Users' : _tier === 'Pro' ? 'Pro & Premium Plans' : 'Premium Plan Only'}
                       </span>
                     </h4>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                      {modelConfigs.flatMap(provider => 
-                        provider.models
-                          .filter(model => model.tier.includes(tier))
-                          .map(model => (
-                            <div key={model.id} className="card p-3 hover:card-elevated transition-all">
+                      {modelConfigs.flatMap(_provider => 
+                        _provider.models
+                          .filter(_model => _model.tier.includes(_tier))
+                          .map(_model => (
+                            <div key={_model.id} className="card p-3 hover:card-elevated transition-all">
                               <div className="flex items-start">
                                 <input
                                   type="checkbox"
-                                  id={`model-${model.id}`}
-                                  checked={settings.models.enabledModels.includes(model.id)}
-                                  onChange={() => handleModelToggle(model.id)}
+                                  id={`model-${_model.id}`}
+                                  checked={settings.models.enabledModels.includes(_model.id)}
+                                  onChange={() => handleModelToggle(_model.id)}
                                   className="mt-1 rounded bg-input border-border text-primary focus:ring-primary"
                                 />
                                 <div className="ml-3 flex-1">
-                                  <label htmlFor={`model-${model.id}`} className="font-medium block cursor-pointer">{model.name}</label>
-                                  <p className="text-sm text-muted-foreground">{model.description}</p>
+                                  <label htmlFor={`model-${_model.id}`} className="font-medium block cursor-pointer">{_model.name}</label>
+                                  <p className="text-sm text-muted-foreground">{_model.description}</p>
                                   <div className="mt-1 flex gap-2 items-center">
-                                    <span className="text-xs text-muted-foreground">Provider: {provider.provider}</span>
+                                    <span className="text-xs text-muted-foreground">Provider: {_provider.provider}</span>
                                     <span className="text-xs bg-muted/50 px-1.5 py-0.5 rounded">
-                                      Context: {model.context}
+                                      Context: {_model.context}
                                     </span>
                                   </div>
                                 </div>

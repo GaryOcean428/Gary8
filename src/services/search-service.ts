@@ -7,32 +7,32 @@ import { perplexityModels } from '../lib/config/perplexity-models';
 export class SearchService {
   private moaAggregator: MoASearchAggregator;
   private configStore = useConfigStore;
-  private cache = new Map<string, { data: any, timestamp: number }>();
+  private cache = new Map<string, { data: unknown, timestamp: number }>();
   private cacheTTL = 30 * 60 * 1000; // 30 minutes
 
   constructor() { 
     this.moaAggregator = new MoASearchAggregator();
   }
 
-  needsSearch(query: string): boolean {
+  needsSearch(_query: string): boolean {
     const searchKeywords = [
       'what', 'who', 'where', 'when', 'why', 'how',
       'search', 'find', 'look up', 'tell me about',
       'latest', 'news', 'current', 'recent'
     ];
-    return searchKeywords.some(keyword => 
-      query.toLowerCase().includes(keyword.toLowerCase())
+    return searchKeywords.some(_keyword => 
+      _query.toLowerCase().includes(_keyword.toLowerCase())
     );
   }
 
-  async search(query: string, filters = {}, sort = 'relevance'): Promise<any[]> {
+  async search(_query: string, _filters = {}, _sort = 'relevance'): Promise<any[]> {
     const apiKeys = this.configStore.getState().apiKeys;
-    const cacheKey = `${query}:${JSON.stringify(filters)}:${sort}`;
+    const cacheKey = `${_query}:${JSON.stringify(_filters)}:${_sort}`;
     
     // Check cache
     const cached = this.cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < this.cacheTTL) {
-      thoughtLogger.log('success', 'Using cached search results', { query });
+      thoughtLogger.log('success', 'Using cached search results', { _query });
       return cached.data;
     }
     
@@ -44,7 +44,7 @@ export class SearchService {
       // Try providers in order of availability
       if (apiKeys.perplexity) {
         try {
-          answer = await this.searchWithPerplexity(query);
+          answer = await this.searchWithPerplexity(_query);
           providers.push('Perplexity');
         } catch (error) {
           thoughtLogger.log('error', 'Perplexity search failed, trying next provider', { error });
@@ -53,7 +53,7 @@ export class SearchService {
 
       if (!answer && apiKeys.openai) {
         try {
-          answer = await this.searchWithOpenAI(query);
+          answer = await this.searchWithOpenAI(_query);
           providers.push('OpenAI');
         } catch (error) {
           thoughtLogger.log('error', 'OpenAI search failed, trying next provider', { error });
@@ -62,7 +62,7 @@ export class SearchService {
 
       if (!answer && apiKeys.anthropic) {
         try {
-          answer = await this.searchWithAnthropic(query);
+          answer = await this.searchWithAnthropic(_query);
           providers.push('Anthropic');
         } catch (error) {
           thoughtLogger.log('error', 'Anthropic search failed, trying next provider', { error });
@@ -71,7 +71,7 @@ export class SearchService {
 
       if (!answer && apiKeys.xai) {
         try {
-          answer = await this.searchWithXai(query);
+          answer = await this.searchWithXai(_query);
           providers.push('X.AI');
         } catch (error) {
           thoughtLogger.log('error', 'X.AI search failed, trying next provider', { error });
@@ -80,7 +80,7 @@ export class SearchService {
 
       if (!answer && apiKeys.groq) {
         try {
-          answer = await this.searchWithGroq(query);
+          answer = await this.searchWithGroq(_query);
           providers.push('Groq');
         } catch (error) {
           thoughtLogger.log('error', 'Groq search failed', { error });
@@ -93,7 +93,7 @@ export class SearchService {
       }
 
       // Generate fake source results for demonstration
-      const sources = this.generateSampleSources(query, sort);
+      const sources = this.generateSampleSources(_query, _sort);
       
       // Combine answer and sources
       const results = [
@@ -116,7 +116,7 @@ export class SearchService {
     }
   }
 
-  private async searchWithPerplexity(query: string): Promise<string> {
+  private async searchWithPerplexity(_query: string): Promise<string> {
     const apiKeys = this.configStore.getState().apiKeys;
     
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
@@ -134,7 +134,7 @@ export class SearchService {
           },
           { 
             role: 'user', 
-            content: query 
+            content: _query 
           }
         ],
         temperature: 0.5,
@@ -150,7 +150,7 @@ export class SearchService {
     return data.choices[0].message.content;
   }
 
-  private async searchWithOpenAI(query: string): Promise<string> {
+  private async searchWithOpenAI(_query: string): Promise<string> {
     const apiKeys = this.configStore.getState().apiKeys;
     
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -168,7 +168,7 @@ export class SearchService {
           },
           { 
             role: 'user', 
-            content: query 
+            content: _query 
           }
         ],
         temperature: 0.5,
@@ -184,7 +184,7 @@ export class SearchService {
     return data.choices[0].message.content;
   }
 
-  private async searchWithAnthropic(query: string): Promise<string> {
+  private async searchWithAnthropic(_query: string): Promise<string> {
     const apiKeys = this.configStore.getState().apiKeys;
     
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -199,7 +199,7 @@ export class SearchService {
         messages: [
           { 
             role: 'user', 
-            content: query 
+            content: _query 
           }
         ],
         max_tokens: 500
@@ -214,7 +214,7 @@ export class SearchService {
     return data.content[0].text;
   }
 
-  private async searchWithXai(query: string): Promise<string> {
+  private async searchWithXai(_query: string): Promise<string> {
     const apiKeys = this.configStore.getState().apiKeys;
     
     const response = await fetch('https://api.x.ai/v1/chat/completions', {
@@ -232,7 +232,7 @@ export class SearchService {
           },
           { 
             role: 'user', 
-            content: query 
+            content: _query 
           }
         ],
         max_tokens: 500
@@ -247,7 +247,7 @@ export class SearchService {
     return data.choices[0].message.content;
   }
 
-  private async searchWithGroq(query: string): Promise<string> {
+  private async searchWithGroq(_query: string): Promise<string> {
     const apiKeys = this.configStore.getState().apiKeys;
     
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -265,7 +265,7 @@ export class SearchService {
           },
           { 
             role: 'user', 
-            content: query 
+            content: _query 
           }
         ],
         temperature: 0.5,
@@ -282,7 +282,7 @@ export class SearchService {
   }
 
   // Helper to generate sample source results for UI demonstration
-  private generateSampleSources(query: string, sort: string): any[] {
+  private generateSampleSources(_query: string, _sort: string): any[] {
     const domains = [
       'wikipedia.org', 'github.com', 'stackoverflow.com',
       'medium.com', 'dev.to', 'ycombinator.com',
@@ -292,11 +292,11 @@ export class SearchService {
     
     const types = ['web', 'code', 'news', 'academic'];
     
-    const getRandomInt = (min: number, max: number) => {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
+    const getRandomInt = (_min: number, _max: number) => {
+      return Math.floor(Math.random() * (_max - _min + 1)) + _min;
     };
     
-    const sources = Array(getRandomInt(4, 8)).fill(0).map((_, i) => {
+    const sources = Array(getRandomInt(4, 8)).fill(0).map((_, _i) => {
       const domain = domains[Math.floor(Math.random() * domains.length)];
       const type = types[Math.floor(Math.random() * types.length)];
       const daysAgo = getRandomInt(0, 365);
@@ -305,9 +305,9 @@ export class SearchService {
       
       return {
         type: 'source',
-        title: `${query} - Result from ${domain}`,
-        content: `This is a sample result about "${query}" from ${domain}. This text would contain a snippet or summary of the information found at this source.`,
-        url: `https://www.${domain}/path/to/${query.replace(/\s+/g, '-').toLowerCase()}`,
+        title: `${_query} - Result from ${domain}`,
+        content: `This is a sample result about "${_query}" from ${domain}. This text would contain a snippet or summary of the information found at this source.`,
+        url: `https://www.${domain}/path/to/${_query.replace(/\s+/g, '-').toLowerCase()}`,
         sourceType: type,
         timestamp: timestamp.toISOString(),
         relevanceScore: getRandomInt(60, 95) / 100
@@ -315,10 +315,10 @@ export class SearchService {
     });
     
     // Sort based on selected option
-    if (sort === 'recency') {
-      sources.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    if (_sort === 'recency') {
+      sources.sort((_a, _b) => new Date(_b.timestamp).getTime() - new Date(_a.timestamp).getTime());
     } else {
-      sources.sort((a, b) => b.relevanceScore - a.relevanceScore);
+      sources.sort((_a, _b) => _b.relevanceScore - _a.relevanceScore);
     }
     
     return sources;

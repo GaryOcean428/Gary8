@@ -20,9 +20,9 @@ export class MiniAgent extends BaseAgent {
     this.capabilities = new Set(capabilities);
   }
 
-  async processMessage(message: Message): Promise<Message> {
+  async processMessage(_message: Message): Promise<Message> {
     // Mini agents are designed for specific tasks with lower complexity
-    const result = await this.executeTask(message.content);
+    const result = await this.executeTask(_message.content);
 
     // Report results to superior
     await this.reportToSuperior(result);
@@ -36,31 +36,31 @@ export class MiniAgent extends BaseAgent {
     };
   }
 
-  private async executeTask(task: string): Promise<unknown> {
+  private async executeTask(_task: string): Promise<unknown> {
     if (this.capabilities.has('code-execution')) {
-      return this.executeCode(task);
+      return this.executeCode(_task);
     }
     if (this.capabilities.has('data-analysis')) {
-      return this.analyzeData(task);
+      return this.analyzeData(_task);
     }
-    return task;
+    return _task;
   }
 
-  private async executeCode(code: string): Promise<unknown> {
+  private async executeCode(_code: string): Promise<unknown> {
     // Safe code execution implementation
-    return `Executed code: ${code}`;
+    return `Executed code: ${_code}`;
   }
 
-  private async analyzeData(data: string): Promise<unknown> {
+  private async analyzeData(_data: string): Promise<unknown> {
     // Data analysis implementation
-    return `Analyzed data: ${data}`;
+    return `Analyzed data: ${_data}`;
   }
 
-  private async reportToSuperior(result: unknown): Promise<void> {
+  private async reportToSuperior(_result: unknown): Promise<void> {
     this.emit('report', {
       agentId: this.getId(),
       superiorId: this.superiorId,
-      result
+      _result
     });
   }
 
@@ -72,15 +72,15 @@ export class MiniAgent extends BaseAgent {
     return this.superiorId;
   }
 
-  hasCapability(capability: AgentCapability): boolean {
-    return this.capabilities.has(capability);
+  hasCapability(_capability: AgentCapability): boolean {
+    return this.capabilities.has(_capability);
   }
 
-  addCapability(capability: AgentCapability): void {
-    this.capabilities.add(capability);
+  addCapability(_capability: AgentCapability): void {
+    this.capabilities.add(_capability);
   }
 
-  removeCapability(capability: AgentCapability): void {
-    this.capabilities.delete(capability);
+  removeCapability(_capability: AgentCapability): void {
+    this.capabilities.delete(_capability);
   }
 }

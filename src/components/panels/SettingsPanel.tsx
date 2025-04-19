@@ -20,7 +20,7 @@ export function SettingsPanel() {
     { id: 'notifications', icon: Settings, title: 'Notifications', component: NotificationSettings }
   ];
 
-  const ActiveComponent = sections.find(s => s.id === activeSection)?.component || APISettings;
+  const ActiveComponent = sections.find(_s => _s.id === activeSection)?.component || APISettings;
 
   return (
     <div className="flex-1 p-6 overflow-auto">
@@ -33,18 +33,18 @@ export function SettingsPanel() {
         <div className="flex space-x-6">
           {/* Navigation */}
           <div className="w-64 space-y-2">
-            {sections.map(section => (
+            {sections.map(_section => (
               <button
-                key={section.id}
-                onClick={() => setActiveSection(section.id)}
+                key={_section.id}
+                onClick={() => setActiveSection(_section.id)}
                 className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg transition-colors ${
-                  activeSection === section.id
+                  activeSection === _section.id
                     ? 'bg-blue-600 text-white'
                     : 'text-gray-400 hover:bg-gray-800'
                 }`}
               >
-                <section.icon className="w-5 h-5" />
-                <span>{section.title}</span>
+                <_section.icon className="w-5 h-5" />
+                <span>{_section.title}</span>
               </button>
             ))}
           </div>

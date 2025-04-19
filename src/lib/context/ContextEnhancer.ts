@@ -26,57 +26,57 @@ export class ContextEnhancer {
       // Code-related context
       {
         pattern: /```[\s\S]*?```/g,
-        enhance: (match, message) => {
-          const code = match[0].replace(/```(\w+)?\n?/, '').replace(/```$/, '');
+        enhance: (_match, _message) => {
+          const code = _match[0].replace(/```(\w+)?\n?/, '').replace(/```$/, '');
           return `[Code Block] Language context: The user is working with code. Previous code snippet:\n${code}`;
         }
       },
       // Technical terms
       {
         pattern: /\b(api|function|component|database|server|client|endpoint)\b/gi,
-        enhance: (match, message) => `[Technical Context] The conversation involves technical concepts, specifically: ${match[0]}`
+        enhance: (_match, _message) => `[Technical Context] The conversation involves technical concepts, specifically: ${_match[0]}`
       },
       // Questions and inquiries
       {
         pattern: /\b(how|what|why|when|where|who|can you|could you)\b.*\?/gi,
-        enhance: (match, message) => `[Question Context] The user is asking for information about: ${match[0]}`
+        enhance: (_match, _message) => `[Question Context] The user is asking for information about: ${_match[0]}`
       },
       // Action requests
       {
         pattern: /\b(create|make|build|implement|add|update|delete|remove)\b/gi,
-        enhance: (match, message) => `[Action Context] The user wants to perform an action: ${match[0]}`
+        enhance: (_match, _message) => `[Action Context] The user wants to perform an action: ${_match[0]}`
       },
       // Error-related context
       {
         pattern: /\b(error|bug|issue|problem|fail|crash)\b/gi,
-        enhance: (match, message) => `[Error Context] The user is experiencing issues: ${match[0]}`
+        enhance: (_match, _message) => `[Error Context] The user is experiencing issues: ${_match[0]}`
       }
     ];
   }
 
-  enhanceContext(message: Message): string {
+  enhanceContext(_message: Message): string {
     thoughtLogger.log('execution', 'Enhancing message context');
 
     try {
       let enhancedContext = '';
-      const content = message.content;
+      const content = _message.content;
 
       // Apply each rule and collect enhancements
-      this.rules.forEach(rule => {
-        const matches = content.match(rule.pattern);
+      this.rules.forEach(_rule => {
+        const matches = content.match(_rule.pattern);
         if (matches) {
-          matches.forEach(match => {
-            const enhancement = rule.enhance([match], message);
+          matches.forEach(_match => {
+            const enhancement = _rule.enhance([_match], _message);
             enhancedContext += enhancement + '\n';
           });
         }
       });
 
       // Add role-specific context
-      enhancedContext += this.getRoleContext(message);
+      enhancedContext += this.getRoleContext(_message);
 
       // Add temporal context
-      enhancedContext += this.getTemporalContext(message);
+      enhancedContext += this.getTemporalContext(_message);
 
       thoughtLogger.log('success', 'Context enhanced successfully');
       return enhancedContext;
@@ -86,8 +86,8 @@ export class ContextEnhancer {
     }
   }
 
-  private getRoleContext(message: Message): string {
-    switch (message.role) {
+  private getRoleContext(_message: Message): string {
+    switch (_message.role) {
       case 'user':
         return '[Role Context] This is a direct user query or request\n';
       case 'assistant':
@@ -99,9 +99,9 @@ export class ContextEnhancer {
     }
   }
 
-  private getTemporalContext(message: Message): string {
+  private getTemporalContext(_message: Message): string {
     const now = Date.now();
-    const messageAge = now - message.timestamp;
+    const messageAge = now - _message.timestamp;
     
     if (messageAge < 60000) { // Less than 1 minute
       return '[Temporal Context] This is a very recent message\n';
@@ -112,8 +112,8 @@ export class ContextEnhancer {
     }
   }
 
-  addRule(rule: EnhancementRule): void {
-    this.rules.push(rule);
+  addRule(_rule: EnhancementRule): void {
+    this.rules.push(_rule);
   }
 
   clearRules(): void {

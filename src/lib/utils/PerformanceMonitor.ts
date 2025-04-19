@@ -4,7 +4,7 @@
 export class PerformanceMonitor {
   private measures: Record<string, {
     markName: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
     startTime: number;
   }> = {};
   
@@ -13,7 +13,7 @@ export class PerformanceMonitor {
   // Memory metrics over time for trend analysis
   private memoryHistory: Array<{
     timestamp: number;
-    metrics: any;
+    metrics: unknown;
   }> = [];
   
   // Performance metrics storage
@@ -40,41 +40,41 @@ export class PerformanceMonitor {
   
   /**
    * Start measuring a performance metric
-   * @param name Measurement name
-   * @param metadata Additional context data
+   * @param _name Measurement name
+   * @param _metadata Additional context data
    */
-  startMeasure(name: string, metadata: Record<string, any> = {}): void {
+  startMeasure(_name: string, _metadata: Record<string, unknown> = {}): void {
     if (typeof performance === 'undefined') return;
     
-    const markName = `${name}_start_${Date.now()}`;
+    const markName = `${_name}_start_${Date.now()}`;
     performance.mark(markName);
-    this.measures[name] = { markName, metadata, startTime: Date.now() };
+    this.measures[_name] = { markName, _metadata, startTime: Date.now() };
   }
   
   /**
    * End a performance measurement
-   * @param name Measurement name
+   * @param _name Measurement name
    */
-  endMeasure(name: string): void {
-    if (typeof performance === 'undefined' || !this.measures[name]) return;
+  endMeasure(_name: string): void {
+    if (typeof performance === 'undefined' || !this.measures[_name]) return;
     
-    const { markName, metadata, startTime } = this.measures[name];
-    const endMarkName = `${name}_end_${Date.now()}`;
+    const { markName, metadata, startTime } = this.measures[_name];
+    const endMarkName = `${_name}_end_${Date.now()}`;
     performance.mark(endMarkName);
     
     try {
-      performance.measure(name, markName, endMarkName);
+      performance.measure(_name, markName, endMarkName);
       
       const duration = Date.now() - startTime;
       
       // Store the metric
-      if (name === 'message_processing') {
+      if (_name === 'message_processing') {
         this.metrics.messageProcessingTime.push(duration);
         // Keep only last 20 measurements
         if (this.metrics.messageProcessingTime.length > 20) {
           this.metrics.messageProcessingTime.shift();
         }
-      } else if (name === 'api_request') {
+      } else if (_name === 'api_request') {
         this.metrics.apiLatency.push(duration);
         if (this.metrics.apiLatency.length > 20) {
           this.metrics.apiLatency.shift();
@@ -83,7 +83,7 @@ export class PerformanceMonitor {
       
       if (process.env.NODE_ENV === 'development') {
         console.info(
-          `%c Performance: ${name} took ${duration}ms`, 
+          `%c Performance: ${_name} took ${duration}ms`, 
           'color: #3b82f6; font-weight: bold;', 
           metadata
         );
@@ -91,29 +91,29 @@ export class PerformanceMonitor {
       
       // Log slow operations
       if (duration > 1000) {
-        console.warn(`Slow operation detected: ${name} took ${duration}ms`, metadata);
+        console.warn(`Slow operation detected: ${_name} took ${duration}ms`, metadata);
       }
     } catch (e) {
       // Some browsers have limitations with performance marks
     }
     
-    delete this.measures[name];
+    delete this.measures[_name];
   }
   
   /**
    * Record streaming metrics
    */
-  measureStreamingPerformance(metrics: StreamingMetrics): void {
+  measureStreamingPerformance(_metrics: StreamingMetrics): void {
     if (typeof performance === 'undefined') return;
     
     // Record metrics
     if (process.env.NODE_ENV === 'development') {
-      console.debug('Streaming metrics', metrics);
+      console.debug('Streaming metrics', _metrics);
     }
     
     // Track long-running streams that might indicate issues
-    if (metrics.streamDuration > 10000 && metrics.contentSize < 500) {
-      console.warn('Potentially stalled stream detected', metrics);
+    if (_metrics.streamDuration > 10000 && _metrics.contentSize < 500) {
+      console.warn('Potentially stalled stream detected', _metrics);
     }
   }
   
@@ -195,25 +195,25 @@ export class PerformanceMonitor {
     };
   }
   
-  private getAverage(values: number[]): number {
-    if (values.length === 0) return 0;
-    return values.reduce((sum, val) => sum + val, 0) / values.length;
+  private getAverage(_values: number[]): number {
+    if (_values.length === 0) return 0;
+    return _values.reduce((_sum, _val) => _sum + _val, 0) / _values.length;
   }
   
-  private getMin(values: number[]): number {
-    if (values.length === 0) return 0;
-    return Math.min(...values);
+  private getMin(_values: number[]): number {
+    if (_values.length === 0) return 0;
+    return Math.min(..._values);
   }
   
-  private getMax(values: number[]): number {
-    if (values.length === 0) return 0;
-    return Math.max(...values);
+  private getMax(_values: number[]): number {
+    if (_values.length === 0) return 0;
+    return Math.max(..._values);
   }
   
-  private calculateTrend(values: number[]): 'increasing' | 'decreasing' | 'stable' {
-    if (values.length < 5) return 'stable';
+  private calculateTrend(_values: number[]): 'increasing' | 'decreasing' | 'stable' {
+    if (_values.length < 5) return 'stable';
     
-    const recentValues = values.slice(-5);
+    const recentValues = _values.slice(-5);
     const firstValue = recentValues[0];
     const lastValue = recentValues[recentValues.length - 1];
     
@@ -235,7 +235,7 @@ export interface StreamingMetrics {
   avgChunkSize: number;
   windowWidth: number;
   domNodes?: number;
-  memoryUsage?: any;
+  memoryUsage?: unknown;
 }
 
 export const performanceMonitor = PerformanceMonitor.getInstance();

@@ -4,10 +4,10 @@ export class StreamProcessor {
 
   constructor(private onProgress: (content: string) => void) {}
 
-  async processStream(reader: ReadableStreamDefaultReader<Uint8Array>): Promise<void> {
+  async processStream(_reader: ReadableStreamDefaultReader<Uint8Array>): Promise<void> {
     try {
       while (true) {
-        const { done, value } = await reader.read();
+        const { done, value } = await _reader.read();
         
         if (done) break;
 

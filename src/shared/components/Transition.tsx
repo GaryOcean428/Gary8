@@ -62,7 +62,7 @@ const variants = {
 };
 
 export const Transition = forwardRef<HTMLDivElement, TransitionProps>(
-  ({ variant = 'fade', duration = 0.3, delay = 0, children, ...props }, ref) => {
+  ({ variant = 'fade', duration = 0.3, delay = 0, children, ...props }, _ref) => {
     // Create transition settings
     const transition = {
       duration,
@@ -75,7 +75,7 @@ export const Transition = forwardRef<HTMLDivElement, TransitionProps>(
 
     return (
       <motion.div
-        ref={ref}
+        ref={_ref}
         initial={variantSettings.initial}
         animate={variantSettings.animate}
         exit={variantSettings.exit}

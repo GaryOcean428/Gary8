@@ -41,16 +41,16 @@ export class HTTPClient {
   }
 
   async fetch<T>(
-    url: string,
-    options: RequestOptions = {},
-    cacheOptions?: CacheOptions
+    _url: string,
+    _options: RequestOptions = {},
+    _cacheOptions?: CacheOptions
   ): Promise<T> {
-    const fullUrl = this.baseUrl + url;
-    const finalOptions = { ...this.defaultOptions, ...options };
+    const fullUrl = this.baseUrl + _url;
+    const finalOptions = { ...this.defaultOptions, ..._options };
 
     // Check cache first if cache options provided
-    if (cacheOptions) {
-      const cacheKey = cacheOptions.key || fullUrl;
+    if (_cacheOptions) {
+      const cacheKey = _cacheOptions.key || fullUrl;
       const cached = this.getFromCache<T>(cacheKey);
       if (cached) return cached;
     }
@@ -110,9 +110,9 @@ export class HTTPClient {
         }
         
         // Cache response if cache options provided
-        if (cacheOptions) {
-          const cacheKey = cacheOptions.key || fullUrl;
-          this.setCache(cacheKey, data, cacheOptions.ttl);
+        if (_cacheOptions) {
+          const cacheKey = _cacheOptions.key || fullUrl;
+          this.setCache(cacheKey, data, _cacheOptions.ttl);
         }
 
         thoughtLogger.log('success', 'HTTP request successful');
@@ -134,16 +134,16 @@ export class HTTPClient {
   }
 
   private async timeoutFetch(
-    url: string,
-    options: RequestOptions
+    _url: string,
+    _options: RequestOptions
   ): Promise<Response> {
-    const { timeout = 30000, ...fetchOptions } = options;
+    const { timeout = 30000, ...fetchOptions } = _options;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(_url, {
         ...fetchOptions,
         signal: controller.signal,
       });
@@ -153,22 +153,22 @@ export class HTTPClient {
     }
   }
 
-  private getFromCache<T>(key: string): T | null {
-    const cached = this.cache.get(key);
+  private getFromCache<T>(_key: string): T | null {
+    const cached = this.cache.get(_key);
     if (!cached) return null;
     
     if (Date.now() > cached.expires) {
-      this.cache.delete(key);
+      this.cache.delete(_key);
       return null;
     }
     
     return cached.data as T;
   }
 
-  private setCache(key: string, data: unknown, ttl: number): void {
-    this.cache.set(key, {
-      data,
-      expires: Date.now() + ttl,
+  private setCache(_key: string, _data: unknown, _ttl: number): void {
+    this.cache.set(_key, {
+      _data,
+      expires: Date.now() + _ttl,
     });
     
     // Cleanup old cache entries if cache gets too large (more than 100 entries)
@@ -178,7 +178,7 @@ export class HTTPClient {
         .filter(([_, value]) => value.expires < now)
         .map(([key]) => key);
       
-      keysToDelete.forEach(key => this.cache.delete(key));
+      keysToDelete.forEach(_key => this.cache.delete(_key));
     }
   }
   
@@ -191,9 +191,9 @@ export class HTTPClient {
   
   /**
    * Clear specific cache entry
-   * @param key Cache key to clear
+   * @param _key Cache key to clear
    */
-  clearCacheEntry(key: string): void {
-    this.cache.delete(this.baseUrl + key);
+  clearCacheEntry(_key: string): void {
+    this.cache.delete(this.baseUrl + _key);
   }
 }

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Define capability requirements schema
-const CapabilityRequirement = z.enum([
+const _CapabilityRequirement = z.enum([
   'REASONING',     // Enhanced reasoning
   'CODE',          // Code generation and understanding
   'KNOWLEDGE',     // Factual retrieval and processing
@@ -13,7 +13,7 @@ const CapabilityRequirement = z.enum([
   'COMPUTER_USE',  // Computer use capability
 ]);
 
-type Capability = z.infer<typeof CapabilityRequirement>;
+type Capability = z.infer<typeof _CapabilityRequirement>;
 
 // Model tiers with modern capabilities
 enum ModelTier {
@@ -42,7 +42,7 @@ interface ModelConfig {
     apiVersion?: string;
     responseFormat?: string;
     headers?: Record<string, string>;
-    params?: Record<string, any>;
+    params?: Record<string, unknown>;
   };
 }
 
@@ -66,7 +66,7 @@ interface AIRouterResult {
   capabilities: Capability[];
   responseStrategy: string;
   routingExplanation: string;
-  configOverrides?: Record<string, any>;
+  configOverrides?: Record<string, unknown>;
 }
 
 /**

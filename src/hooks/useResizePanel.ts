@@ -1,25 +1,25 @@
 import { useState, useEffect } from 'react';
 
 export function useResizePanel(
-  initialWidth: number,
-  setWidth: (width: number) => void,
-  minWidth = 300,
-  maxWidth = 800
+  _initialWidth: number,
+  _setWidth: (width: number) => void,
+  _minWidth = 300,
+  _maxWidth = 800
 ) {
   const [isDragging, setIsDragging] = useState(false);
 
-  const startResize = (event: React.MouseEvent) => {
-    event.preventDefault();
+  const startResize = (_event: React.MouseEvent) => {
+    _event.preventDefault();
     setIsDragging(true);
   };
 
   useEffect(() => {
-    const handleResize = (event: MouseEvent) => {
+    const handleResize = (_event: MouseEvent) => {
       if (!isDragging) return;
 
-      const newWidth = window.innerWidth - event.clientX;
-      if (newWidth >= minWidth && newWidth <= maxWidth) {
-        setWidth(newWidth);
+      const newWidth = window.innerWidth - _event.clientX;
+      if (newWidth >= _minWidth && newWidth <= _maxWidth) {
+        _setWidth(newWidth);
       }
     };
 
@@ -36,7 +36,7 @@ export function useResizePanel(
       document.removeEventListener('mousemove', handleResize);
       document.removeEventListener('mouseup', stopResize);
     };
-  }, [isDragging, setWidth, minWidth, maxWidth]);
+  }, [isDragging, _setWidth, _minWidth, _maxWidth]);
 
   return { isDragging, startResize };
 }

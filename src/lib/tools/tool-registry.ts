@@ -30,16 +30,16 @@ class ToolRegistry {
   private registerDefaultTools(): void {
     try {
       // Register GitHub tools
-      this.githubTools.getTools().forEach(tool => this.register(tool));
+      this.githubTools.getTools().forEach(_tool => this.register(_tool));
 
       // Register web data tools
       this.register({
         name: 'scrape-github-links',
         description: 'Scrape repository links from a GitHub page and export to CSV',
-        execute: async (url: string) => {
-          thoughtLogger.log('plan', `Starting GitHub scraping for ${url}`);
+        execute: async (_url: string) => {
+          thoughtLogger.log('plan', `Starting GitHub scraping for ${_url}`);
           try {
-            const links = await this.webDataTools.scrapeGitHubLinks(url);
+            const links = await this.webDataTools.scrapeGitHubLinks(_url);
             const csv = await this.webDataTools.exportToCSV(links);
             
             return {
@@ -62,9 +62,9 @@ class ToolRegistry {
       this.register({
         name: 'analyze-competitors',
         description: 'Analyze competitors in a specific industry and region',
-        execute: async (industry: string, region: string) => {
-          thoughtLogger.log('plan', `Starting competitor analysis for ${industry} in ${region}`);
-          return this.competitorAnalysisTool.analyzeCompetitors(industry, region);
+        execute: async (_industry: string, _region: string) => {
+          thoughtLogger.log('plan', `Starting competitor analysis for ${_industry} in ${_region}`);
+          return this.competitorAnalysisTool.analyzeCompetitors(_industry, _region);
         }
       });
 
@@ -75,24 +75,24 @@ class ToolRegistry {
     }
   }
 
-  register(tool: Tool): void {
+  register(_tool: Tool): void {
     try {
-      if (!tool.name || !tool.execute) {
+      if (!_tool.name || !_tool.execute) {
         throw new ToolError('Invalid tool configuration');
       }
 
-      this.tools.set(tool.name, tool);
-      thoughtLogger.log('success', `Tool registered: ${tool.name}`);
+      this.tools.set(_tool.name, _tool);
+      thoughtLogger.log('success', `Tool registered: ${_tool.name}`);
     } catch (error) {
-      thoughtLogger.log('error', `Failed to register tool: ${tool.name}`, { error });
-      throw new ToolError(`Failed to register tool: ${tool.name}`, error);
+      thoughtLogger.log('error', `Failed to register tool: ${_tool.name}`, { error });
+      throw new ToolError(`Failed to register tool: ${_tool.name}`, error);
     }
   }
 
-  async executeTool(name: string, ...args: any[]): Promise<ToolResult> {
-    const tool = this.tools.get(name);
+  async executeTool(_name: string, ..._args: any[]): Promise<ToolResult> {
+    const tool = this.tools.get(_name);
     if (!tool) {
-      const error = `Tool "${name}" not found`;
+      const error = `Tool "${_name}" not found`;
       thoughtLogger.log('error', error);
       return {
         success: false,
@@ -101,12 +101,12 @@ class ToolRegistry {
     }
 
     try {
-      thoughtLogger.log('execution', `Executing tool: ${name}`, { args });
-      const result = await tool.execute(...args);
-      thoughtLogger.log('success', `Tool execution completed: ${name}`);
+      thoughtLogger.log('execution', `Executing tool: ${_name}`, { _args });
+      const result = await tool.execute(..._args);
+      thoughtLogger.log('success', `Tool execution completed: ${_name}`);
       return result;
     } catch (error) {
-      thoughtLogger.log('error', `Tool execution failed: ${name}`, { error });
+      thoughtLogger.log('error', `Tool execution failed: ${_name}`, { error });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'

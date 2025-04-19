@@ -4,8 +4,8 @@ export class ChatContext {
   private recentMessages: Message[] = [];
   private maxRecentMessages = 10;
 
-  addMessage(message: Message): void {
-    this.recentMessages.push(message);
+  addMessage(_message: Message): void {
+    this.recentMessages.push(_message);
     if (this.recentMessages.length > this.maxRecentMessages) {
       this.recentMessages.shift();
     }
@@ -13,7 +13,7 @@ export class ChatContext {
 
   getRecentContext(): string {
     return this.recentMessages
-      .map(msg => `${msg.role}: ${msg.content}`)
+      .map(_msg => `${_msg.role}: ${_msg.content}`)
       .join('\n');
   }
 

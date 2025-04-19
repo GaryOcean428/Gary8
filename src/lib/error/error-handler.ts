@@ -1,26 +1,26 @@
 import type { ProcessingError } from '../../types';
 
 export class ErrorHandler {
-  static createError(code: string, message: string, details?: any): ProcessingError {
-    const error = new Error(message) as ProcessingError;
-    error.code = code;
-    error.details = details;
+  static createError(_code: string, _message: string, _details?: unknown): ProcessingError {
+    const error = new Error(_message) as ProcessingError;
+    error.code = _code;
+    error.details = _details;
     return error;
   }
 
-  static handleError(error: Error | ProcessingError): ProcessingError {
-    if ((error as ProcessingError).code) {
-      return error as ProcessingError;
+  static handleError(_error: Error | ProcessingError): ProcessingError {
+    if ((_error as ProcessingError).code) {
+      return _error as ProcessingError;
     }
 
     return this.createError(
       'UNKNOWN_ERROR',
-      error.message || 'An unknown error occurred',
-      { originalError: error }
+      _error.message || 'An unknown error occurred',
+      { originalError: _error }
     );
   }
 
-  static isProcessingError(error: any): error is ProcessingError {
-    return error && typeof error === 'object' && 'code' in error;
+  static isProcessingError(_error: unknown): _error is ProcessingError {
+    return _error && typeof _error === 'object' && 'code' in _error;
   }
 }

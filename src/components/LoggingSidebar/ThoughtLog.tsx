@@ -9,8 +9,8 @@ interface ThoughtLogProps {
 }
 
 export function ThoughtLog({ thought }: ThoughtLogProps) {
-  const getIcon = (type: ThoughtType) => {
-    switch (type) {
+  const getIcon = (_type: ThoughtType) => {
+    switch (_type) {
       case 'observation':
         return Brain;
       case 'reasoning':
@@ -42,8 +42,8 @@ export function ThoughtLog({ thought }: ThoughtLogProps) {
     }
   };
 
-  const getTypeColor = (type: ThoughtType) => {
-    switch (type) {
+  const getTypeColor = (_type: ThoughtType) => {
+    switch (_type) {
       case 'observation':
         return 'text-blue-400 border-blue-400/20 bg-blue-400/10';
       case 'reasoning':

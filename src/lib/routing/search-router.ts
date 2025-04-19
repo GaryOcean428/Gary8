@@ -24,13 +24,13 @@ export class SearchRouter {
   private readonly localKeywords = ['near me', 'nearby', 'location', 'local', 'locally', 'in my area', 'city', 'region', 'around me'];
   private readonly entityKeywords = ['who is', 'who was', 'what is', 'information about', 'person', 'company', 'organization', 'product', 'entity', 'profile'];
 
-  async route(query: string, history: Message[]): Promise<SearchRouterConfig> {
+  async route(_query: string, _history: Message[]): Promise<SearchRouterConfig> {
     thoughtLogger.log('reasoning', 'Analyzing search query for provider selection');
 
-    const q = query.toLowerCase();
+    const q = _query.toLowerCase();
     // Treat interrogatives, 'Explain ...', and 'Recipe ...' as question-like to avoid low-confidence default
     const isQuestion = /\b(who|what|when|where|why|how)\b.*\?|^explain\b|^recipe\b/i.test(q);
-    const needsSearch = this.assessSearchNeed(query);
+    const needsSearch = this.assessSearchNeed(_query);
 
     // Image search detection
     if (/\b(images?|pictures?)\b/.test(q) || /\bphoto\b/.test(q) || /\bvisual\b/.test(q) || q.includes('look like') || q.includes('appearance') || q.includes('how does it look')) {
@@ -103,7 +103,7 @@ export class SearchRouter {
     };
   }
 
-  private assessSearchNeed(query: string): number {
+  private assessSearchNeed(_query: string): number {
     const searchKeywords = [
       'search', 'find', 'look up', 'locate', 'discover',
       'who', 'what', 'when', 'where', 'why', 'how',
@@ -111,11 +111,11 @@ export class SearchRouter {
       'information', 'details', 'tell me about'
     ];
 
-    const queryLower = query.toLowerCase();
+    const queryLower = _query.toLowerCase();
     
     // Count how many search keywords appear in the query
-    const keywordMatches = searchKeywords.filter(keyword => 
-      queryLower.includes(keyword.toLowerCase())
+    const keywordMatches = searchKeywords.filter(_keyword => 
+      queryLower.includes(_keyword.toLowerCase())
     ).length;
     
     // Calculate match ratio relative to query length
@@ -129,42 +129,42 @@ export class SearchRouter {
     return Math.min(keywordRatio * 0.7 + (isQuestion ? 0.3 : 0), 1);
   }
 
-  private requiresImages(query: string): boolean {
-    const queryLower = query.toLowerCase();
+  private requiresImages(_query: string): boolean {
+    const queryLower = _query.toLowerCase();
     // Match multi-word phrases with simple includes, single words with word boundaries
-    return this.imageKeywords.some(keyword => {
-      if (keyword.includes(' ')) {
-        return queryLower.includes(keyword);
+    return this.imageKeywords.some(_keyword => {
+      if (_keyword.includes(' ')) {
+        return queryLower.includes(_keyword);
       }
-      const pattern = new RegExp(`\\b${keyword}\\b`);
+      const pattern = new RegExp(`\\b${_keyword}\\b`);
       return pattern.test(queryLower);
     });
   }
 
-  private requiresNews(query: string): boolean {
-    const queryLower = query.toLowerCase();
-    return this.newsKeywords.some(keyword => queryLower.includes(keyword));
+  private requiresNews(_query: string): boolean {
+    const queryLower = _query.toLowerCase();
+    return this.newsKeywords.some(_keyword => queryLower.includes(_keyword));
   }
 
-  private requiresAcademic(query: string): boolean {
-    const queryLower = query.toLowerCase();
-    return this.academicKeywords.some(keyword => queryLower.includes(keyword));
+  private requiresAcademic(_query: string): boolean {
+    const queryLower = _query.toLowerCase();
+    return this.academicKeywords.some(_keyword => queryLower.includes(_keyword));
   }
 
-  private requiresLocal(query: string): boolean {
-    const queryLower = query.toLowerCase();
-    return this.localKeywords.some(keyword => queryLower.includes(keyword));
+  private requiresLocal(_query: string): boolean {
+    const queryLower = _query.toLowerCase();
+    return this.localKeywords.some(_keyword => queryLower.includes(_keyword));
   }
 
-  private requiresEntity(query: string): boolean {
-    const queryLower = query.toLowerCase();
-    return this.entityKeywords.some(keyword => queryLower.includes(keyword));
+  private requiresEntity(_query: string): boolean {
+    const queryLower = _query.toLowerCase();
+    return this.entityKeywords.some(_keyword => queryLower.includes(_keyword));
   }
 
-  private extractQueryContext(history: Message[]): string {
+  private extractQueryContext(_history: Message[]): string {
     // Extract context from recent messages
-    return history.slice(-3)
-      .map(msg => msg.content)
+    return _history.slice(-3)
+      .map(_msg => _msg.content)
       .join('\n');
   }
 }

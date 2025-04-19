@@ -25,46 +25,46 @@ export class ModelAPI {
   }
 
   async callModel(
-    messages: Array<{ role: string; content: string }>,
-    model: string,
-    onProgress?: (content: string) => void
+    _messages: Array<{ role: string; content: string }>,
+    _model: string,
+    _onProgress?: (content: string) => void
   ): Promise<ModelResponse> {
-    thoughtLogger.log('execution', `Calling model: ${model}`);
+    thoughtLogger.log('execution', `Calling model: ${_model}`);
 
     // Validate API keys
-    if (model.startsWith('llama') && !config.apiKeys.groq) {
+    if (_model.startsWith('llama') && !config.apiKeys.groq) {
       throw new APIError('Groq API key not configured', 401);
     }
-    if (model.startsWith('grok') && !config.apiKeys.xai) {
+    if (_model.startsWith('grok') && !config.apiKeys.xai) {
       throw new APIError('X.AI API key not configured', 401);
     }
-    if (model.includes('sonar') && !config.apiKeys.perplexity) {
+    if (_model.includes('sonar') && !config.apiKeys.perplexity) {
       throw new APIError('Perplexity API key not configured', 401);
     }
 
-    const { endpoint, headers } = this.getEndpointConfig(model);
+    const { endpoint, headers } = this.getEndpointConfig(_model);
 
     try {
       // Set up proper request based on the model provider
       let requestBody: any;
       
       // Anthropic has a different message format
-      if (model.includes('claude')) {
+      if (_model.includes('claude')) {
         requestBody = {
-          model,
-          messages,
+          _model,
+          _messages,
           max_tokens: 4096,
           temperature: 0.7,
-          stream: Boolean(onProgress)
+          stream: Boolean(_onProgress)
         };
       } else {
         // Standard OpenAI-compatible format for others
         requestBody = {
-          messages,
-          model,
+          _messages,
+          _model,
           temperature: 0.7,
           max_tokens: 4096,
-          stream: Boolean(onProgress)
+          stream: Boolean(_onProgress)
         };
       }
 
@@ -83,15 +83,15 @@ export class ModelAPI {
         );
       }
 
-      if (onProgress && response.body) {
-        return this.handleStreamingResponse(response.body, model, onProgress);
+      if (_onProgress && response.body) {
+        return this.handleStreamingResponse(response.body, _model, _onProgress);
       }
 
       const data = await response.json();
       
       // Extract content based on model provider
       let content = '';
-      if (model.includes('claude')) {
+      if (_model.includes('claude')) {
         content = data.content?.[0]?.text || '';
       } else {
         content = data.choices?.[0]?.message?.content || '';
@@ -99,7 +99,7 @@ export class ModelAPI {
 
       return {
         content,
-        model,
+        _model,
         confidence: 0.9
       };
     } catch (error) {
@@ -120,8 +120,8 @@ export class ModelAPI {
     }
   }
 
-  private getEndpointConfig(model: string): { endpoint: string; headers: HeadersInit } {
-    if (model.startsWith('llama')) {
+  private getEndpointConfig(_model: string): { endpoint: string; headers: HeadersInit } {
+    if (_model.startsWith('llama')) {
       return {
         endpoint: 'https://api.groq.com/openai/v1/chat/completions',
         headers: {
@@ -131,7 +131,7 @@ export class ModelAPI {
       };
     }
 
-    if (model.startsWith('grok')) {
+    if (_model.startsWith('grok')) {
       return {
         endpoint: 'https://api.x.ai/v1/chat/completions',
         headers: {
@@ -141,7 +141,7 @@ export class ModelAPI {
       };
     }
 
-    if (model.includes('sonar')) {
+    if (_model.includes('sonar')) {
       return {
         endpoint: 'https://api.perplexity.ai/chat/completions',
         headers: {
@@ -151,7 +151,7 @@ export class ModelAPI {
       };
     }
     
-    if (model.includes('claude')) {
+    if (_model.includes('claude')) {
       return {
         endpoint: 'https://api.anthropic.com/v1/messages',
         headers: {
@@ -173,11 +173,11 @@ export class ModelAPI {
   }
 
   private async handleStreamingResponse(
-    body: ReadableStream<Uint8Array>,
-    model: string,
-    onProgress: (content: string) => void
+    _body: ReadableStream<Uint8Array>,
+    _model: string,
+    _onProgress: (content: string) => void
   ): Promise<ModelResponse> {
-    const reader = body.getReader();
+    const reader = _body.getReader();
     const decoder = new TextDecoder();
     let fullContent = '';
 
@@ -200,7 +200,7 @@ export class ModelAPI {
               // Handle different streaming formats
               let content;
               
-              if (model.includes('claude')) {
+              if (_model.includes('claude')) {
                 // Anthropic streaming format
                 content = parsed.delta?.text || parsed.content?.[0]?.text;
               } else {
@@ -210,7 +210,7 @@ export class ModelAPI {
               
               if (content) {
                 fullContent += content;
-                onProgress(content);
+                _onProgress(content);
               }
             } catch (e) {
               thoughtLogger.log('error', 'Failed to parse streaming response', { error: e });
@@ -221,7 +221,7 @@ export class ModelAPI {
 
       return {
         content: fullContent,
-        model,
+        _model,
         confidence: 0.9
       };
     } finally {

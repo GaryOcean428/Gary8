@@ -20,13 +20,13 @@ export class GraniteAPI extends BaseAPI {
     return GraniteAPI.instance;
   }
 
-  async chat(messages: Message[], onProgress?: (content: string) => void): Promise<string> {
+  async chat(_messages: Message[], _onProgress?: (content: string) => void): Promise<string> {
     if (!this.config.apiKeys.huggingface) {
       throw new AppError('Hugging Face API key not configured', 'API_ERROR');
     }
 
     try {
-      const combinedMessage = messages.map(m => `${m.role}: ${m.content}`).join('\n');
+      const combinedMessage = _messages.map(_m => `${_m.role}: ${_m.content}`).join('\n');
 
       const response = await fetch(
         `${this.config.services.huggingface.baseUrl}/${this.config.services.huggingface.models.granite}`,
@@ -39,7 +39,7 @@ export class GraniteAPI extends BaseAPI {
               max_new_tokens: this.config.services.huggingface.maxTokens,
               temperature: this.config.services.huggingface.temperature,
               return_full_text: false,
-              stream: Boolean(onProgress)
+              stream: Boolean(_onProgress)
             }
           })
         }
@@ -53,8 +53,8 @@ export class GraniteAPI extends BaseAPI {
         );
       }
 
-      if (onProgress && response.body) {
-        return this.handleStreamingResponse(response.body, onProgress);
+      if (_onProgress && response.body) {
+        return this.handleStreamingResponse(response.body, _onProgress);
       }
 
       const data = await response.json();
@@ -70,10 +70,10 @@ export class GraniteAPI extends BaseAPI {
   }
 
   private async handleStreamingResponse(
-    body: ReadableStream<Uint8Array>,
-    onProgress: (content: string) => void
+    _body: ReadableStream<Uint8Array>,
+    _onProgress: (content: string) => void
   ): Promise<string> {
-    const reader = body.getReader();
+    const reader = _body.getReader();
     const decoder = new TextDecoder();
     let fullContent = '';
 
@@ -94,7 +94,7 @@ export class GraniteAPI extends BaseAPI {
             if (content) {
               const newContent = content.slice(fullContent.length);
               fullContent = content;
-              onProgress(newContent);
+              _onProgress(newContent);
             }
           } catch (e) {
             thoughtLogger.log('error', 'Failed to parse streaming response', { error: e });

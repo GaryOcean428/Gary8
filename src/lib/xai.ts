@@ -9,8 +9,8 @@ export class XAIClient {
   }
 
   async chat(
-    messages: Array<{ role: string; content: string }>,
-    onProgress?: (content: string) => void
+    _messages: Array<{ role: string; content: string }>,
+    _onProgress?: (content: string) => void
   ): Promise<void> {
     const response = await fetch(`${config.baseUrl}/chat/completions`, {
       method: 'POST',
@@ -19,9 +19,9 @@ export class XAIClient {
         'Authorization': `Bearer ${this.apiKey}`,
       },
       body: JSON.stringify({
-        messages,
+        _messages,
         model: config.defaultModel,
-        stream: Boolean(onProgress),
+        stream: Boolean(_onProgress),
         temperature: config.temperature,
         max_tokens: config.maxTokens,
       }),
@@ -31,9 +31,9 @@ export class XAIClient {
       throw new Error('Chat API request failed');
     }
 
-    if (onProgress && response.body) {
+    if (_onProgress && response.body) {
       const reader = response.body.getReader();
-      const processor = new StreamProcessor(onProgress);
+      const processor = new StreamProcessor(_onProgress);
       await processor.processStream(reader);
     }
   }

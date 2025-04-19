@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExternalLink, Code, Search, FileText, Calendar, User, Star, Image, Newspaper, Book, Database } from 'lucide-react';
+import { ExternalLink, Code, Search, FileText, Image, Newspaper, Book, Database } from 'lucide-react';
 import { useSearch } from '../context/SearchContext';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,31 +16,31 @@ export default function SearchResults({ isStreaming, streamingPhase }: SearchRes
   const [selectedTab, setSelectedTab] = useState<'all' | 'web' | 'images' | 'news' | 'academic'>('all');
   const [modalImage, setModalImage] = useState<string | null>(null);
   
-  const toggleExpanded = (id: string) => {
-    setExpandedResultIds(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
+  const toggleExpanded = (_id: string) => {
+    setExpandedResultIds(_prev => {
+      const newSet = new Set(_prev);
+      if (newSet.has(_id)) {
+        newSet.delete(_id);
       } else {
-        newSet.add(id);
+        newSet.add(_id);
       }
       return newSet;
     });
   };
 
-  const getResultIcon = (type: string, url?: string) => {
+  const getResultIcon = (_type: string, _url?: string) => {
     // Determine icon based on URL pattern or explicitly provided type
-    if (type === 'code' || url?.includes('github.com')) {
+    if (_type === 'code' || _url?.includes('github.com')) {
       return <Code className="result-icon result-icon-code" />;
-    } else if (type === 'document' || url?.endsWith('.pdf') || url?.includes('docs.')) {
+    } else if (_type === 'document' || _url?.endsWith('.pdf') || _url?.includes('docs.')) {
       return <FileText className="result-icon result-icon-doc" />;
-    } else if (url?.includes('scholar.') || url?.includes('academic') || type === 'academic') {
+    } else if (_url?.includes('scholar.') || _url?.includes('academic') || _type === 'academic') {
       return <Book className="result-icon result-icon-academic" />;
-    } else if (url?.includes('news.') || url?.includes('nytimes') || url?.includes('bbc') || type === 'news') {
+    } else if (_url?.includes('news.') || _url?.includes('nytimes') || _url?.includes('bbc') || _type === 'news') {
       return <Newspaper className="result-icon result-icon-news" />;
-    } else if (type === 'image') {
+    } else if (_type === 'image') {
       return <Image className="result-icon result-icon-image" />;
-    } else if (type === 'database') {
+    } else if (_type === 'database') {
       return <Database className="result-icon result-icon-database" />;
     } else {
       return <Search className="result-icon result-icon-web" />;
@@ -53,23 +53,23 @@ export default function SearchResults({ isStreaming, streamingPhase }: SearchRes
       return results;
     }
     
-    return results.filter(result => {
-      if (result.type === 'answer') return true;
+    return results.filter(_result => {
+      if (_result.type === 'answer') return true;
       
-      if (selectedTab === 'images' && result.type === 'image') return true;
-      if (selectedTab === 'news' && (result.sourceType === 'news' || result.url?.includes('news'))) return true;
-      if (selectedTab === 'academic' && (result.sourceType === 'academic' || result.url?.includes('scholar'))) return true;
-      if (selectedTab === 'web' && result.type === 'source') return true;
+      if (selectedTab === 'images' && _result.type === 'image') return true;
+      if (selectedTab === 'news' && (_result.sourceType === 'news' || _result.url?.includes('news'))) return true;
+      if (selectedTab === 'academic' && (_result.sourceType === 'academic' || _result.url?.includes('scholar'))) return true;
+      if (selectedTab === 'web' && _result.type === 'source') return true;
       
       return false;
     });
   };
 
   // Helper to fetch favicon
-  const getFavicon = (url?: string) => {
-    if (!url) return null;
+  const getFavicon = (_url?: string) => {
+    if (!_url) return null;
     try {
-      const domain = new URL(url).hostname;
+      const domain = new URL(_url).hostname;
       return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
     } catch {
       return null;
@@ -77,10 +77,10 @@ export default function SearchResults({ isStreaming, streamingPhase }: SearchRes
   };
 
   // Extract domain name from URL for display
-  const getDomain = (url?: string) => {
-    if (!url) return "";
+  const getDomain = (_url?: string) => {
+    if (!_url) return "";
     try {
-      const domain = new URL(url).hostname.replace('www.', '');
+      const domain = new URL(_url).hostname.replace('www.', '');
       return domain;
     } catch {
       return "";
@@ -159,7 +159,7 @@ export default function SearchResults({ isStreaming, streamingPhase }: SearchRes
       </div>
 
       {/* Answer result (if present) */}
-      {filteredResults.find(r => r.type === 'answer') && (
+      {filteredResults.find(_r => _r.type === 'answer') && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -170,17 +170,17 @@ export default function SearchResults({ isStreaming, streamingPhase }: SearchRes
         >
           <div className="prose prose-invert max-w-none">
             <ReactMarkdown>
-              {filteredResults.find(r => r.type === 'answer')?.content || ''}
+              {filteredResults.find(_r => _r.type === 'answer')?.content || ''}
             </ReactMarkdown>
           </div>
           
-          {filteredResults.find(r => r.type === 'answer')?.provider && (
+          {filteredResults.find(_r => _r.type === 'answer')?.provider && (
             <div className="mt-3 flex items-center text-sm text-muted-foreground">
-              <span>Source: {filteredResults.find(r => r.type === 'answer')?.provider}</span>
+              <span>Source: {filteredResults.find(_r => _r.type === 'answer')?.provider}</span>
               
-              {filteredResults.find(r => r.type === 'answer')?.warningNote && (
+              {filteredResults.find(_r => _r.type === 'answer')?.warningNote && (
                 <Badge variant="warning" className="ml-2">
-                  {filteredResults.find(r => r.type === 'answer')?.warningNote}
+                  {filteredResults.find(_r => _r.type === 'answer')?.warningNote}
                 </Badge>
               )}
             </div>
@@ -191,41 +191,41 @@ export default function SearchResults({ isStreaming, streamingPhase }: SearchRes
       {/* Source results */}
       <div className="space-y-4">
         {filteredResults
-          .filter(result => result.type === 'source')
-          .map((result, index) => (
+          .filter(_result => _result.type === 'source')
+          .map((_result, _index) => (
             <motion.div
-              key={`source-${index}`}
+              key={`source-${_index}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
+              transition={{ duration: 0.3, delay: _index * 0.1 }}
               className="card-glass hover:card-elevated transition-all cursor-pointer"
-              onClick={() => toggleExpanded(`source-${index}`)}
+              onClick={() => toggleExpanded(`source-${_index}`)}
             >
               <div className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
-                    {getResultIcon(result.sourceType || 'web', result.url)}
+                    {getResultIcon(_result.sourceType || 'web', _result.url)}
                     <div>
-                      <h3 className="text-lg font-medium">{result.title || 'Untitled Source'}</h3>
+                      <h3 className="text-lg font-medium">{_result.title || 'Untitled Source'}</h3>
                       
-                      {result.url && (
+                      {_result.url && (
                         <div className="flex items-center mt-1 text-sm text-muted-foreground">
-                          {getFavicon(result.url) && (
+                          {getFavicon(_result.url) && (
                             <img 
-                              src={getFavicon(result.url) || ''} 
+                              src={getFavicon(_result.url) || ''} 
                               alt="" 
                               className="w-4 h-4 mr-1 rounded-sm"
                             />
                           )}
-                          <span>{getDomain(result.url)}</span>
+                          <span>{getDomain(_result.url)}</span>
                           
                           {/* Metadata badges */}
                           <div className="flex ml-3 gap-2">
-                            {result.timestamp && (
+                            {_result.timestamp && (
                               <span className="badge badge-secondary flex items-center gap-0.5">
                                 <Calendar className="w-3 h-3" />
                                 <span>
-                                  {new Date(result.timestamp).toLocaleDateString()}
+                                  {new Date(_result.timestamp).toLocaleDateString()}
                                 </span>
                               </span>
                             )}
@@ -235,13 +235,13 @@ export default function SearchResults({ isStreaming, streamingPhase }: SearchRes
                     </div>
                   </div>
                   
-                  {result.url && (
+                  {_result.url && (
                     <a
-                      href={result.url}
+                      href={_result.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-muted-foreground hover:text-primary ml-2 p-1 rounded-full hover:bg-primary/10 transition-colors"
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={(_e) => _e.stopPropagation()}
                     >
                       <ExternalLink className="w-5 h-5" />
                     </a>
@@ -249,16 +249,16 @@ export default function SearchResults({ isStreaming, streamingPhase }: SearchRes
                 </div>
                 
                 <div className={`mt-2 text-muted-foreground ${
-                  expandedResultIds.has(`source-${index}`) ? '' : 'line-clamp-3'
+                  expandedResultIds.has(`source-${_index}`) ? '' : 'line-clamp-3'
                 }`}>
-                  {result.content}
+                  {_result.content}
                 </div>
                 
-                {result.content?.length > 200 && !expandedResultIds.has(`source-${index}`) && (
+                {_result.content?.length > 200 && !expandedResultIds.has(`source-${_index}`) && (
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleExpanded(`source-${index}`);
+                    onClick={(_e) => {
+                      _e.stopPropagation();
+                      toggleExpanded(`source-${_index}`);
                     }}
                     className="mt-1 text-primary hover:underline text-sm"
                   >
@@ -271,7 +271,7 @@ export default function SearchResults({ isStreaming, streamingPhase }: SearchRes
         
         {/* Image results */}
         {filteredResults
-          .filter(result => result.type === 'image')
+          .filter(_result => _result.type === 'image')
           .length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -285,16 +285,16 @@ export default function SearchResults({ isStreaming, streamingPhase }: SearchRes
               
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {filteredResults
-                  .filter(result => result.type === 'image')
-                  .map((result, index) => (
+                  .filter(_result => _result.type === 'image')
+                  .map((_result, _index) => (
                     <div 
-                      key={`image-${index}`}
+                      key={`image-${_index}`}
                       className="relative aspect-square rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-all"
-                      onClick={() => setModalImage(result.content)}
+                      onClick={() => setModalImage(_result.content)}
                     >
                       <img 
-                        src={result.content} 
-                        alt={result.title || 'Search result'} 
+                        src={_result.content} 
+                        alt={_result.title || 'Search result'} 
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -321,7 +321,7 @@ export default function SearchResults({ isStreaming, streamingPhase }: SearchRes
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
               className="max-w-4xl max-h-[90vh]"
-              onClick={e => e.stopPropagation()}
+              onClick={_e => _e.stopPropagation()}
             >
               <img 
                 src={modalImage} 

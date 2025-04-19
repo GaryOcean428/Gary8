@@ -10,7 +10,7 @@ export class SerpAPI {
     this.baseUrl = 'https://serpapi.com/search';
   }
 
-  async search(query: string): Promise<string> {
+  async search(_query: string): Promise<string> {
     const apiKey = this.configStore.getState().apiKeys.serp;
     
     if (!apiKey) {
@@ -19,7 +19,7 @@ export class SerpAPI {
 
     try {
       const response = await fetch(
-        `${this.baseUrl}?api_key=${apiKey}&q=${encodeURIComponent(query)}&num=5`
+        `${this.baseUrl}?api_key=${apiKey}&q=${encodeURIComponent(_query)}&num=5`
       );
 
       if (!response.ok) {
@@ -37,7 +37,7 @@ export class SerpAPI {
       }
 
       return data.organic_results
-        .map((result: any) => `${result.title}\n${result.snippet}`)
+        .map((_result: unknown) => `${_result.title}\n${_result.snippet}`)
         .join('\n\n');
     } catch (error) {
       thoughtLogger.log('error', 'SERP search failed', { error });

@@ -25,9 +25,9 @@ describe('VectorMemory', () => {
       expect(results[0].content).toContain('JavaScript');
       
       // Scores should be between 0 and 1
-      results.forEach(result => {
-        expect(result.score).toBeGreaterThan(0);
-        expect(result.score).toBeLessThanOrEqual(1);
+      results.forEach(_result => {
+        expect(_result.score).toBeGreaterThan(0);
+        expect(_result.score).toBeLessThanOrEqual(1);
       });
     });
     

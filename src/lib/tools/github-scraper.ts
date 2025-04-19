@@ -24,11 +24,11 @@ export class GitHubScraper {
     return GitHubScraper.instance;
   }
 
-  async scrapeRepoLinks(url: string): Promise<RepoLink[]> {
-    thoughtLogger.log('execution', `Scraping GitHub repo links from ${url}`);
+  async scrapeRepoLinks(_url: string): Promise<RepoLink[]> {
+    thoughtLogger.log('execution', `Scraping GitHub repo links from ${_url}`);
 
     try {
-      const response = await fetch(url);
+      const response = await fetch(_url);
       
       if (!response.ok) {
         throw new AppError(
@@ -52,16 +52,16 @@ export class GitHubScraper {
 
       const elements = content.querySelectorAll('h1, h2, h3, li');
       
-      elements.forEach(element => {
-        if (element.tagName.toLowerCase().startsWith('h')) {
-          currentCategory = element.textContent?.trim() || '';
-        } else if (element.tagName.toLowerCase() === 'li') {
-          const link = element.querySelector('a');
+      elements.forEach(_element => {
+        if (_element.tagName.toLowerCase().startsWith('h')) {
+          currentCategory = _element.textContent?.trim() || '';
+        } else if (_element.tagName.toLowerCase() === 'li') {
+          const link = _element.querySelector('a');
           if (link && link.href.includes('github.com')) {
             links.push({
               name: link.textContent?.trim() || '',
               url: link.href,
-              description: element.textContent?.replace(link.textContent || '', '').trim() || '',
+              description: _element.textContent?.replace(link.textContent || '', '').trim() || '',
               category: currentCategory
             });
           }
@@ -76,18 +76,18 @@ export class GitHubScraper {
     }
   }
 
-  async exportToCSV(links: RepoLink[]): Promise<string> {
+  async exportToCSV(_links: RepoLink[]): Promise<string> {
     thoughtLogger.log('execution', 'Generating CSV export');
 
     try {
       const headers = ['Name', 'URL', 'Description', 'Category'];
       const rows = [
         headers.join(','),
-        ...links.map(link => [
-          this.escapeCSV(link.name),
-          this.escapeCSV(link.url),
-          this.escapeCSV(link.description),
-          this.escapeCSV(link.category)
+        ..._links.map(_link => [
+          this.escapeCSV(_link.name),
+          this.escapeCSV(_link.url),
+          this.escapeCSV(_link.description),
+          this.escapeCSV(_link.category)
         ].join(','))
       ];
 
@@ -105,7 +105,7 @@ export class GitHubScraper {
       URL.revokeObjectURL(url);
 
       thoughtLogger.log('success', 'CSV export completed', {
-        rowCount: links.length
+        rowCount: _links.length
       });
 
       return csvContent;
@@ -115,9 +115,9 @@ export class GitHubScraper {
     }
   }
 
-  private escapeCSV(str: string): string {
-    if (!str) return '""';
-    const escaped = str.replace(/"/g, '""');
+  private escapeCSV(_str: string): string {
+    if (!_str) return '""';
+    const escaped = _str.replace(/"/g, '""');
     return `"${escaped}"`;
   }
 }

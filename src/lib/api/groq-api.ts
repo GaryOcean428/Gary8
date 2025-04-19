@@ -21,15 +21,15 @@ export class GroqAPI {
     return GroqAPI.instance;
   }
 
-  setApiKey(apiKey: string): void {
-    this.apiKey = apiKey;
+  setApiKey(_apiKey: string): void {
+    this.apiKey = _apiKey;
   }
 
   async chat(
-    messages: Message[],
-    model: string = 'llama-3.3-70b-versatile',
-    onProgress?: (content: string) => void,
-    options: {
+    _messages: Message[],
+    _model: string = 'llama-3.3-70b-versatile',
+    _onProgress?: (content: string) => void,
+    _options: {
       temperature?: number;
       maxTokens?: number;
       topP?: number;
@@ -49,14 +49,14 @@ export class GroqAPI {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model,
-          messages: messages.map(({ role, content }) => ({ role, content })),
-          temperature: options.temperature ?? config.services.groq.temperature,
-          max_tokens: options.maxTokens ?? config.services.groq.maxTokens,
-          top_p: options.topP ?? 1.0,
-          frequency_penalty: options.frequencyPenalty ?? 0,
-          presence_penalty: options.presencePenalty ?? 0,
-          stream: Boolean(onProgress)
+          _model,
+          messages: _messages.map(({ role, content }) => ({ role, content })),
+          temperature: _options.temperature ?? config.services.groq.temperature,
+          max_tokens: _options.maxTokens ?? config.services.groq.maxTokens,
+          top_p: _options.topP ?? 1.0,
+          frequency_penalty: _options.frequencyPenalty ?? 0,
+          presence_penalty: _options.presencePenalty ?? 0,
+          stream: Boolean(_onProgress)
         })
       });
 
@@ -71,8 +71,8 @@ export class GroqAPI {
         );
       }
 
-      if (onProgress && response.body) {
-        return this.handleStreamingResponse(response.body, onProgress);
+      if (_onProgress && response.body) {
+        return this.handleStreamingResponse(response.body, _onProgress);
       }
 
       const data = await response.json();
@@ -115,7 +115,7 @@ export class GroqAPI {
       }
 
       const data = await response.json();
-      return data.data?.map((model: any) => model.id) || [];
+      return data.data?.map((_model: unknown) => _model.id) || [];
     } catch (error) {
       thoughtLogger.log('error', 'Groq model listing failed', { error });
       throw error instanceof AppError ? error : new AppError(
@@ -127,10 +127,10 @@ export class GroqAPI {
   }
 
   private async handleStreamingResponse(
-    body: ReadableStream<Uint8Array>,
-    onProgress: (content: string) => void
+    _body: ReadableStream<Uint8Array>,
+    _onProgress: (content: string) => void
   ): Promise<string> {
-    const reader = body.getReader();
+    const reader = _body.getReader();
     const decoder = new TextDecoder();
     let fullContent = '';
 
@@ -152,7 +152,7 @@ export class GroqAPI {
               const content = parsed.choices[0]?.delta?.content;
               if (content) {
                 fullContent += content;
-                onProgress(content);
+                _onProgress(content);
               }
             } catch (e) {
               thoughtLogger.log('error', 'Failed to parse Groq streaming response', { error: e });
@@ -167,7 +167,7 @@ export class GroqAPI {
     }
   }
 
-  getModelInfo(modelId: string): {
+  getModelInfo(_modelId: string): {
     name: string;
     contextWindow: number;
     description: string;
@@ -241,7 +241,7 @@ export class GroqAPI {
       }
     };
 
-    return modelMap[modelId] || null;
+    return modelMap[_modelId] || null;
   }
 }
 

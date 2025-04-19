@@ -21,9 +21,9 @@ export class XaiAPI extends BaseAPI {
   }
 
   async chat(
-    messages: Message[], 
-    onProgress?: (content: string) => void,
-    options: {
+    _messages: Message[], 
+    _onProgress?: (content: string) => void,
+    _options: {
       model?: string;
       temperature?: number;
       maxTokens?: number;
@@ -42,11 +42,11 @@ export class XaiAPI extends BaseAPI {
           'X-API-Version': this.config.services.xai.apiVersion
         },
         body: JSON.stringify({
-          model: options.model || this.config.services.xai.models.latest,
-          messages: messages.map(({ role, content }) => ({ role, content })),
-          temperature: options.temperature || this.config.services.xai.temperature,
-          max_tokens: options.maxTokens || this.config.services.xai.maxTokens,
-          stream: Boolean(onProgress)
+          model: _options.model || this.config.services.xai.models.latest,
+          messages: _messages.map(({ role, content }) => ({ role, content })),
+          temperature: _options.temperature || this.config.services.xai.temperature,
+          max_tokens: _options.maxTokens || this.config.services.xai.maxTokens,
+          stream: Boolean(_onProgress)
         })
       });
 
@@ -59,8 +59,8 @@ export class XaiAPI extends BaseAPI {
         );
       }
 
-      if (onProgress && response.body) {
-        return this.handleStreamingResponse(response.body, onProgress);
+      if (_onProgress && response.body) {
+        return this.handleStreamingResponse(response.body, _onProgress);
       }
 
       const data = await response.json();
@@ -76,10 +76,10 @@ export class XaiAPI extends BaseAPI {
   }
 
   private async handleStreamingResponse(
-    body: ReadableStream<Uint8Array>,
-    onProgress: (content: string) => void
+    _body: ReadableStream<Uint8Array>,
+    _onProgress: (content: string) => void
   ): Promise<string> {
-    const reader = body.getReader();
+    const reader = _body.getReader();
     const decoder = new TextDecoder();
     let fullContent = '';
 
@@ -101,7 +101,7 @@ export class XaiAPI extends BaseAPI {
               const content = parsed.choices[0]?.delta?.content;
               if (content) {
                 fullContent += content;
-                onProgress(content);
+                _onProgress(content);
               }
             } catch (e) {
               thoughtLogger.log('error', 'Failed to parse streaming response', { error: e });

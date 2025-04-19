@@ -1,0 +1,44 @@
+import React, { useState } from 'react';
+import { Wand2 } from 'lucide-react';
+
+interface BenchPromptProps {
+  readonly onSubmit: (prompt: string) => Promise<void>;
+  readonly isGenerating: boolean;
+}
+
+export function BenchPrompt({ onSubmit, isGenerating }: BenchPromptProps) {
+  const [prompt, setPrompt] = useState('');
+
+  const handleSubmit = async (_e: React.FormEvent) => {
+    _e.preventDefault();
+    if (!prompt.trim() || isGenerating) return;
+
+    await onSubmit(prompt.trim());
+    setPrompt('');
+  };
+
+  return (
+    <div className="absolute top-4 left-4 right-4 z-10">
+      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
+        <div className="relative">
+          <input
+            type="text"
+            value={prompt}
+            onChange={(_e) => setPrompt(_e.target.value)}
+            placeholder="Describe what you want to create in the workbench..."
+            className="w-full bg-white rounded-lg pl-4 pr-12 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
+            disabled={isGenerating}
+          />
+          <button
+            type="submit"
+            aria-label="Generate AI interface"
+            disabled={!prompt.trim() || isGenerating}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-blue-600 hover:text-blue-700 disabled:opacity-50 disabled:hover:text-blue-600"
+          >
+            <Wand2 className="w-5 h-5" />
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

@@ -5,7 +5,7 @@ export class WebSearch {
 
   constructor() {}
 
-  async search(query: string): Promise<string> {
+  async search(_query: string): Promise<string> {
     try {
       const apiKeys = this.configStore.getState().apiKeys;
       
@@ -24,7 +24,7 @@ export class WebSearch {
           messages: [
             {
               role: 'user',
-              content: `Search the internet and provide current information about: ${query}`
+              content: `Search the internet and provide current information about: ${_query}`
             }
           ],
           temperature: 0.7,
@@ -45,7 +45,7 @@ export class WebSearch {
     }
   }
 
-  async fetchContent(url: string): Promise<string> {
+  async fetchContent(_url: string): Promise<string> {
     try {
       const apiKeys = this.configStore.getState().apiKeys;
       
@@ -64,7 +64,7 @@ export class WebSearch {
           messages: [
             {
               role: 'user',
-              content: `Please fetch and summarize the content from this URL: ${url}`
+              content: `Please fetch and summarize the content from this URL: ${_url}`
             }
           ],
           temperature: 0.5,

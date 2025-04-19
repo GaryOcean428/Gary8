@@ -10,7 +10,7 @@ export class GoogleSearchAPI {
     this.baseUrl = 'https://www.googleapis.com/customsearch/v1';
   }
 
-  async search(query: string): Promise<string> {
+  async search(_query: string): Promise<string> {
     const apiKey = this.configStore.getState().apiKeys.google;
     
     if (!apiKey) {
@@ -19,7 +19,7 @@ export class GoogleSearchAPI {
 
     try {
       const response = await fetch(
-        `${this.baseUrl}?key=${apiKey}&q=${encodeURIComponent(query)}&num=5`
+        `${this.baseUrl}?key=${apiKey}&q=${encodeURIComponent(_query)}&num=5`
       );
 
       if (!response.ok) {
@@ -37,7 +37,7 @@ export class GoogleSearchAPI {
       }
 
       return data.items
-        .map((item: any) => `${item.title}\n${item.snippet}`)
+        .map((_item: unknown) => `${_item.title}\n${_item.snippet}`)
         .join('\n\n');
     } catch (error) {
       thoughtLogger.log('error', 'Google search failed', { error });

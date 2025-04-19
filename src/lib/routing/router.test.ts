@@ -167,12 +167,12 @@ describe('ModelRouter Calibration Tests', () => {
       ];
 
       const results = await Promise.all(
-        queries.map(query => router.route(query, []))
+        queries.map(_query => router.route(_query, []))
       );
 
-      const modelCounts = results.reduce((acc, result) => {
-        acc[result.model] = (acc[result.model] || 0) + 1;
-        return acc;
+      const modelCounts = results.reduce((_acc, _result) => {
+        _acc[_result.model] = (_acc[_result.model] || 0) + 1;
+        return _acc;
       }, {} as Record<string, number>);
 
       // Verify distribution matches calibration targets

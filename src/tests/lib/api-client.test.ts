@@ -51,14 +51,14 @@ describe('APIClient', () => {
     vi.resetAllMocks();
     
     // Setup fetch mock for different responses
-    (global.fetch as any).mockImplementation((url: string) => {
-      if (url.includes('openai')) {
+    (global.fetch as any).mockImplementation((_url: string) => {
+      if (_url.includes('openai')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ choices: [{ message: { content: 'OpenAI test result' } }] })
         });
       }
-      if (url.includes('groq')) {
+      if (_url.includes('groq')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ choices: [{ message: { content: 'Groq test result' } }] })
@@ -131,10 +131,10 @@ describe('APIClient', () => {
       
       // Mock a streaming response
       const mockBody = new ReadableStream({
-        start(controller) {
-          controller.enqueue(new TextEncoder().encode('data: {"choices":[{"delta":{"content":"Test"}}]}\n\n'));
-          controller.enqueue(new TextEncoder().encode('data: {"choices":[{"delta":{"content":" content"}}]}\n\n'));
-          controller.close();
+        start(_controller) {
+          _controller.enqueue(new TextEncoder().encode('data: {"choices":[{"delta":{"content":"Test"}}]}\n\n'));
+          _controller.enqueue(new TextEncoder().encode('data: {"choices":[{"delta":{"content":" content"}}]}\n\n'));
+          _controller.close();
         }
       });
       

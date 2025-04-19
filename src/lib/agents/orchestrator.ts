@@ -27,20 +27,20 @@ export class Orchestrator extends EventEmitter {
     this.registry.on('agent-event', this.handleAgentEvent.bind(this));
   }
 
-  async processTask(content: string): Promise<void> {
+  async processTask(_content: string): Promise<void> {
     const taskId = crypto.randomUUID();
     thoughtLogger.log('plan', 'Orchestrator processing new task', { taskId });
 
     try {
       // Generate task plan
-      const plan = await this.planner.createPlan(content);
+      const plan = await this.planner.createPlan(_content);
       
       // Route to appropriate agents
-      const routerConfig = await this.router.route(content, []);
+      const routerConfig = await this.router.route(_content, []);
       
       // Create agent swarm
       const agents = await this.createAgentSwarm(plan, routerConfig);
-      this.activeTasks.set(taskId, agents.map(a => a.id));
+      this.activeTasks.set(taskId, agents.map(_a => _a.id));
 
       // Execute plan with agents
       for (const step of plan.steps) {
@@ -61,15 +61,15 @@ export class Orchestrator extends EventEmitter {
         await this.sendMessage(message);
         
         // Wait for step completion
-        await new Promise((resolve, reject) => {
+        await new Promise((_resolve, _reject) => {
           const timeout = setTimeout(() => {
-            reject(new Error('Step execution timeout'));
+            _reject(new Error('Step execution timeout'));
           }, 30000);
 
           this.once('step-completed', ({ stepId }) => {
             if (stepId === step.id) {
               clearTimeout(timeout);
-              resolve(true);
+              _resolve(true);
             }
           });
         });
@@ -84,11 +84,11 @@ export class Orchestrator extends EventEmitter {
     }
   }
 
-  private async createAgentSwarm(plan: any, config: any): Promise<AgentConfig[]> {
+  private async createAgentSwarm(_plan: unknown, _config: unknown): Promise<AgentConfig[]> {
     const requiredRoles = new Set<string>();
     
     // Analyze plan steps to determine required agent roles
-    for (const step of plan.steps) {
+    for (const step of _plan.steps) {
       switch (step.type) {
         case 'research':
           requiredRoles.add('researcher');
@@ -119,7 +119,7 @@ export class Orchestrator extends EventEmitter {
         name: `${role}-agent`,
         role: role as any,
         capabilities: this.getCapabilitiesForRole(role),
-        model: this.getModelForRole(role, config),
+        model: this.getModelForRole(role, _config),
         temperature: 0.7,
         maxTokens: 4096,
         systemPrompt: this.getSystemPromptForRole(role),
@@ -131,7 +131,7 @@ export class Orchestrator extends EventEmitter {
     return agents;
   }
 
-  private getCapabilitiesForRole(role: string): string[] {
+  private getCapabilitiesForRole(_role: string): string[] {
     // Map roles to required capabilities
     const capabilityMap: Record<string, string[]> = {
       researcher: ['web-search', 'memory-access'],
@@ -141,12 +141,12 @@ export class Orchestrator extends EventEmitter {
       critic: ['error-handling', 'self-reflection'],
       executor: ['tool-usage', 'agent-communication']
     };
-    return capabilityMap[role] || [];
+    return capabilityMap[_role] || [];
   }
 
-  private getModelForRole(role: string, config: any): string {
+  private getModelForRole(_role: string, _config: unknown): string {
     // Map roles to appropriate models based on requirements
-    switch (role) {
+    switch (_role) {
       case 'researcher':
         return 'llama-3.1-sonar-large-128k-online';
       case 'analyst':
@@ -160,11 +160,11 @@ export class Orchestrator extends EventEmitter {
       case 'executor':
         return 'llama-3.2-3b-preview';
       default:
-        return config.model;
+        return _config.model;
     }
   }
 
-  private getSystemPromptForRole(role: string): string {
+  private getSystemPromptForRole(_role: string): string {
     // Role-specific system prompts
     const prompts: Record<string, string> = {
       researcher: 'You are a research specialist focused on gathering accurate and relevant information...',
@@ -174,10 +174,10 @@ export class Orchestrator extends EventEmitter {
       critic: 'You are a quality control specialist focused on reviewing and improving work...',
       executor: 'You are a task execution specialist skilled at using tools and completing objectives...'
     };
-    return prompts[role] || '';
+    return prompts[_role] || '';
   }
 
-  private getToolsForRole(role: string): string[] {
+  private getToolsForRole(_role: string): string[] {
     // Map roles to available tools
     const toolMap: Record<string, string[]> = {
       researcher: ['web-search', 'document-retrieval'],
@@ -187,62 +187,62 @@ export class Orchestrator extends EventEmitter {
       critic: ['code-review', 'content-review'],
       executor: ['file-operations', 'system-commands']
     };
-    return toolMap[role] || [];
+    return toolMap[_role] || [];
   }
 
-  private findBestAgent(agents: AgentConfig[], step: any): AgentConfig | undefined {
-    return agents.find(agent => 
-      agent.capabilities.some(cap => 
-        step.requiredCapabilities.includes(cap)
+  private findBestAgent(_agents: AgentConfig[], _step: unknown): AgentConfig | undefined {
+    return _agents.find(_agent => 
+      _agent.capabilities.some(_cap => 
+        _step.requiredCapabilities.includes(_cap)
       )
     );
   }
 
-  private async sendMessage(message: AgentMessage): Promise<void> {
+  private async sendMessage(_message: AgentMessage): Promise<void> {
     thoughtLogger.log('execution', 'Sending message', {
-      from: message.from,
-      to: message.to,
-      type: message.type
+      from: _message.from,
+      to: _message.to,
+      type: _message.type
     });
 
     try {
-      const agent = this.registry.getAgent(message.to);
+      const agent = this.registry.getAgent(_message.to);
       if (!agent) {
-        throw new Error(`Agent ${message.to} not found`);
+        throw new Error(`Agent ${_message.to} not found`);
       }
 
-      await agent.receiveMessage(message);
+      await agent.receiveMessage(_message);
     } catch (error) {
       thoughtLogger.log('error', 'Failed to send message', { error });
       throw error;
     }
   }
 
-  private handleAgentEvent(event: AgentEvent): void {
+  private handleAgentEvent(_event: AgentEvent): void {
     thoughtLogger.log('observation', 'Received agent event', {
-      type: event.type,
-      agentId: event.agentId
+      type: _event.type,
+      agentId: _event.agentId
     });
 
-    switch (event.type) {
+    switch (_event.type) {
       case 'task-completed':
         this.emit('step-completed', {
-          stepId: event.data.stepId,
-          result: event.data.result
+          stepId: _event.data.stepId,
+          result: _event.data.result
         });
         break;
       
       case 'task-failed':
         this.emit('step-failed', {
-          stepId: event.data.stepId,
-          error: event.data.error
+          stepId: _event.data.stepId,
+          error: _event.data.error
         });
         break;
       
       case 'error-occurred':
         thoughtLogger.log('error', 'Agent error occurred', {
-          agentId: event.agentId,
-          error: event.data.error
+          agentId: _event.agentId,
+          error: _event.data.error
         });
         break;
     }

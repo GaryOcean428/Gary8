@@ -13,21 +13,21 @@ export abstract class BaseAPI {
   /**
    * Makes an authenticated API request
    * @template T Response data type
-   * @param endpoint API endpoint path
-   * @param options Request options
+   * @param _endpoint API endpoint path
+   * @param _options Request options
    * @returns Promise resolving to response data
    * @throws {AppError} On request failure
    */
   protected async request<T>(
-    endpoint: string,
-    options: RequestOptions = {}
+    _endpoint: string,
+    _options: RequestOptions = {}
   ): Promise<APIResponse<T>> {
-    const { method = 'GET', body, headers = {}, signal } = options;
+    const { method = 'GET', body, headers = {}, signal } = _options;
 
     try {
-      thoughtLogger.log('execution', `API Request: ${method} ${endpoint}`);
+      thoughtLogger.log('execution', `API Request: ${method} ${_endpoint}`);
 
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      const response = await fetch(`${this.baseUrl}${_endpoint}`, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -72,15 +72,15 @@ export abstract class BaseAPI {
 
   /**
    * Handles streaming responses
-   * @param response Fetch Response object
-   * @param onProgress Progress callback
+   * @param _response Fetch Response object
+   * @param _onProgress Progress callback
    * @returns Promise resolving to complete response content
    */
   protected async handleStream(
-    response: Response,
-    onProgress?: (content: string) => void
+    _response: Response,
+    _onProgress?: (content: string) => void
   ): Promise<string> {
-    const reader = response.body?.getReader();
+    const reader = _response.body?.getReader();
     if (!reader) {
       throw new AppError('No response body available for streaming', 'STREAM_ERROR');
     }
@@ -106,7 +106,7 @@ export abstract class BaseAPI {
               const content = parsed.choices?.[0]?.delta?.content;
               if (content) {
                 fullContent += content;
-                onProgress?.(content);
+                _onProgress?.(content);
               }
             } catch (e) {
               thoughtLogger.log('error', 'Failed to parse streaming response', { error: e });

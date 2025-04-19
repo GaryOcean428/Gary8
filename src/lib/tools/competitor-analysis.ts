@@ -30,12 +30,12 @@ export class CompetitorAnalysisTool {
     return CompetitorAnalysisTool.instance;
   }
 
-  async analyzeCompetitors(industry: string, region: string): Promise<ToolResult> {
-    thoughtLogger.log('plan', `Starting competitor analysis for ${industry} in ${region}`);
+  async analyzeCompetitors(_industry: string, _region: string): Promise<ToolResult> {
+    thoughtLogger.log('plan', `Starting competitor analysis for ${_industry} in ${_region}`);
 
     try {
       // Fetch competitor data from reliable sources
-      const competitors = await this.fetchCompetitorData(industry, region);
+      const competitors = await this.fetchCompetitorData(_industry, _region);
       
       // Generate analysis report
       const report = this.generateReport(competitors);
@@ -43,7 +43,7 @@ export class CompetitorAnalysisTool {
       // Prepare CSV export data
       const csvData = this.prepareCSVData(competitors);
 
-      thoughtLogger.log('success', `Completed competitor analysis for ${industry}`);
+      thoughtLogger.log('success', `Completed competitor analysis for ${_industry}`);
 
       return {
         success: true,
@@ -62,7 +62,7 @@ export class CompetitorAnalysisTool {
     }
   }
 
-  private async fetchCompetitorData(industry: string, region: string): Promise<CompetitorData[]> {
+  private async fetchCompetitorData(_industry: string, _region: string): Promise<CompetitorData[]> {
     thoughtLogger.log('execution', 'Fetching competitor data from sources');
 
     // Example GTO competitors (in production, this would fetch from APIs/databases)
@@ -106,63 +106,63 @@ export class CompetitorAnalysisTool {
     ];
   }
 
-  private generateReport(competitors: CompetitorData[]): string {
+  private generateReport(_competitors: CompetitorData[]): string {
     thoughtLogger.log('execution', 'Generating competitor analysis report');
 
     return `
 # Group Training Organisation (GTO) Competitor Analysis Report
 
 ## Overview
-Analysis of ${competitors.length} major GTOs operating in Australia.
+Analysis of ${_competitors.length} major GTOs operating in Australia.
 
 ## Key Findings
-${this.generateKeyFindings(competitors)}
+${this.generateKeyFindings(_competitors)}
 
 ## Detailed Analysis
-${this.generateDetailedAnalysis(competitors)}
+${this.generateDetailedAnalysis(_competitors)}
 
 ## Pricing Analysis
-${this.generatePricingAnalysis(competitors)}
+${this.generatePricingAnalysis(_competitors)}
 
 ## Market Opportunities
-${this.generateOpportunities(competitors)}
+${this.generateOpportunities(_competitors)}
 
 Report generated: ${new Date().toLocaleDateString()}
     `.trim();
   }
 
-  private generateKeyFindings(competitors: CompetitorData[]): string {
-    const services = new Set(competitors.flatMap(c => c.services));
-    const specializations = new Set(competitors.flatMap(c => c.specializations));
+  private generateKeyFindings(_competitors: CompetitorData[]): string {
+    const services = new Set(_competitors.flatMap(_c => _c.services));
+    const specializations = new Set(_competitors.flatMap(_c => _c.specializations));
 
     return `
-- ${competitors.length} major GTOs analyzed
+- ${_competitors.length} major GTOs analyzed
 - Core services: ${Array.from(services).join(', ')}
 - Key specializations: ${Array.from(specializations).join(', ')}
-- Price range for host employers: ${this.getPriceRange(competitors)}
+- Price range for host employers: ${this.getPriceRange(_competitors)}
     `.trim();
   }
 
-  private generateDetailedAnalysis(competitors: CompetitorData[]): string {
-    return competitors.map(c => `
-### ${c.name}
-- Website: ${c.website}
-- Location: ${c.location}
-- Services: ${c.services.join(', ')}
-- Specializations: ${c.specializations.join(', ')}
-${c.pricing ? `- Host Employer Rate: ${c.pricing.hostEmployerRate}` : ''}
+  private generateDetailedAnalysis(_competitors: CompetitorData[]): string {
+    return _competitors.map(_c => `
+### ${_c.name}
+- Website: ${_c.website}
+- Location: ${_c.location}
+- Services: ${_c.services.join(', ')}
+- Specializations: ${_c.specializations.join(', ')}
+${_c.pricing ? `- Host Employer Rate: ${_c.pricing.hostEmployerRate}` : ''}
     `.trim()).join('\n\n');
   }
 
-  private generatePricingAnalysis(competitors: CompetitorData[]): string {
-    const priceRange = this.getPriceRange(competitors);
+  private generatePricingAnalysis(_competitors: CompetitorData[]): string {
+    const priceRange = this.getPriceRange(_competitors);
     return `
 Average host employer rates across analyzed GTOs range from ${priceRange}.
 Most GTOs offer government-funded training programs with additional support services.
     `.trim();
   }
 
-  private generateOpportunities(competitors: CompetitorData[]): string {
+  private generateOpportunities(_competitors: CompetitorData[]): string {
     return `
 1. Market gaps in specialized industry sectors
 2. Potential for competitive pricing strategies
@@ -171,24 +171,24 @@ Most GTOs offer government-funded training programs with additional support serv
     `.trim();
   }
 
-  private getPriceRange(competitors: CompetitorData[]): string {
-    const rates = competitors
-      .filter(c => c.pricing?.hostEmployerRate)
-      .map(c => c.pricing!.hostEmployerRate!);
+  private getPriceRange(_competitors: CompetitorData[]): string {
+    const rates = _competitors
+      .filter(_c => _c.pricing?.hostEmployerRate)
+      .map(_c => _c.pricing!.hostEmployerRate!);
     
     return rates.length ? rates.join(' - ') : 'Pricing data not available';
   }
 
-  private prepareCSVData(competitors: CompetitorData[]): any[] {
-    return competitors.map(c => ({
-      Name: c.name,
-      Website: c.website,
-      Location: c.location,
-      Services: c.services.join('; '),
-      HostEmployerRate: c.pricing?.hostEmployerRate || 'N/A',
-      TrainingCost: c.pricing?.trainingCost || 'N/A',
-      Specializations: c.specializations.join('; '),
-      LastUpdated: c.lastUpdated
+  private prepareCSVData(_competitors: CompetitorData[]): any[] {
+    return _competitors.map(_c => ({
+      Name: _c.name,
+      Website: _c.website,
+      Location: _c.location,
+      Services: _c.services.join('; '),
+      HostEmployerRate: _c.pricing?.hostEmployerRate || 'N/A',
+      TrainingCost: _c.pricing?.trainingCost || 'N/A',
+      Specializations: _c.specializations.join('; '),
+      LastUpdated: _c.lastUpdated
     }));
   }
 }

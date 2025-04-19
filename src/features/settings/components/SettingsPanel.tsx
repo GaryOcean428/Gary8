@@ -29,7 +29,7 @@ export function SettingsPanel({ onToggleOptimizedUI, optimizedUI }: SettingsPane
     { id: 'notifications', icon: Settings, title: 'Notifications', component: NotificationSettings }
   ];
 
-  const ActiveComponent = sections.find(s => s.id === activeSection)?.component || APISettings;
+  const ActiveComponent = sections.find(_s => _s.id === activeSection)?.component || APISettings;
 
   return (
     <div className="flex-1 p-4 sm:p-6 overflow-auto">
@@ -68,21 +68,21 @@ export function SettingsPanel({ onToggleOptimizedUI, optimizedUI }: SettingsPane
         <div className="flex flex-col lg:flex-row space-y-6 lg:space-y-0 lg:space-x-6">
           {/* Navigation */}
           <div className={`lg:w-64 space-y-2 ${isMobileNavOpen ? 'block' : 'hidden lg:block'}`}>
-            {sections.map(section => (
+            {sections.map(_section => (
               <button
-                key={section.id}
+                key={_section.id}
                 onClick={() => {
-                  setActiveSection(section.id);
+                  setActiveSection(_section.id);
                   setIsMobileNavOpen(false);
                 }}
                 className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg transition-colors ${
-                  activeSection === section.id
+                  activeSection === _section.id
                     ? 'bg-primary text-primary-foreground'
                     : 'text-muted-foreground hover:bg-muted'
                 }`}
               >
-                <section.icon className="w-5 h-5" />
-                <span>{section.title}</span>
+                <_section.icon className="w-5 h-5" />
+                <span>{_section.title}</span>
               </button>
             ))}
           </div>

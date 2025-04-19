@@ -16,18 +16,18 @@ export class PrimaryAgent extends BaseAgent {
     this.messageQueue.registerHandler('query', this.handleQuery.bind(this));
   }
 
-  async processMessage(message: AgentMessage): Promise<void> {
+  async processMessage(_message: AgentMessage): Promise<void> {
     const startTime = Date.now();
     try {
       this.setStatus('active');
 
       // Route message based on complexity
-      const routerConfig = await this.router.route(message.content, []);
+      const routerConfig = await this.router.route(_message.content, []);
       
       if (this.shouldDelegateToSpecialist(routerConfig)) {
-        await this.delegateToSpecialist(message, routerConfig);
+        await this.delegateToSpecialist(_message, routerConfig);
       } else {
-        await this.executeTask(message.content);
+        await this.executeTask(_message.content);
       }
 
       this.updateMetrics(true, Date.now() - startTime);
@@ -39,44 +39,44 @@ export class PrimaryAgent extends BaseAgent {
     }
   }
 
-  async executeTask(task: string): Promise<unknown> {
+  async executeTask(_task: string): Promise<unknown> {
     try {
       // Primary agent's direct task execution logic
-      return { status: 'completed', task };
+      return { status: 'completed', _task };
     } catch (error) {
       const handled = ErrorHandler.handle(error);
       throw new Error(`Task execution failed: ${handled.message}`);
     }
   }
 
-  private async handleCommand(message: AgentMessage): Promise<void> {
+  private async handleCommand(_message: AgentMessage): Promise<void> {
     // Handle commands from user
-    await this.processMessage(message);
+    await this.processMessage(_message);
   }
 
-  private async handleReport(message: AgentMessage): Promise<void> {
+  private async handleReport(_message: AgentMessage): Promise<void> {
     // Process reports from subordinates
-    this.emit('report-received', message);
+    this.emit('report-received', _message);
   }
 
-  private async handleQuery(message: AgentMessage): Promise<void> {
+  private async handleQuery(_message: AgentMessage): Promise<void> {
     // Handle queries from subordinates or user
-    const response = await this.executeTask(message.content);
+    const response = await this.executeTask(_message.content);
     await this.sendMessage({
       from: this.config.id,
-      to: message.from,
+      to: _message.from,
       content: JSON.stringify(response),
       type: 'response'
     });
   }
 
-  private shouldDelegateToSpecialist(routerConfig: any): boolean {
-    return routerConfig.model.includes('3b') || routerConfig.model.includes('7b');
+  private shouldDelegateToSpecialist(_routerConfig: unknown): boolean {
+    return _routerConfig.model.includes('3b') || _routerConfig.model.includes('7b');
   }
 
-  private async delegateToSpecialist(message: AgentMessage, routerConfig: any): Promise<void> {
-    const specialists = this.getSubordinates().filter(agent => 
-      agent.getRole() === 'specialist'
+  private async delegateToSpecialist(_message: AgentMessage, _routerConfig: unknown): Promise<void> {
+    const specialists = this.getSubordinates().filter(_agent => 
+      _agent.getRole() === 'specialist'
     );
 
     if (specialists.length === 0) {
@@ -84,14 +84,14 @@ export class PrimaryAgent extends BaseAgent {
     }
 
     // Select appropriate specialist based on model tier
-    const specialist = specialists.find(agent => 
-      (agent as any).getModelTier() === routerConfig.model
+    const specialist = specialists.find(_agent => 
+      (_agent as any).getModelTier() === _routerConfig.model
     );
 
     if (specialist) {
-      await this.delegateTask(message.content, specialist.getId());
+      await this.delegateTask(_message.content, specialist.getId());
     } else {
-      throw new Error(`No specialist available for model ${routerConfig.model}`);
+      throw new Error(`No specialist available for model ${_routerConfig.model}`);
     }
   }
 }

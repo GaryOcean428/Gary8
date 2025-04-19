@@ -13,7 +13,7 @@ interface AnalysisParams {
 export function CompetitorAnalysis() {
   const [isLoading, setIsLoading] = useState(false);
   const [report, setReport] = useState<string>('');
-  const [csvData, setCsvData] = useState<any[]>([]);
+  const [csvData, setCsvData] = useState<unknown[]>([]);
   const [params, setParams] = useState<AnalysisParams>({
     industry: '',
     region: '',
@@ -54,12 +54,12 @@ export function CompetitorAnalysis() {
     }
   };
 
-  const toggleCriterion = (criterionId: string) => {
-    setParams((prev: AnalysisParams) => ({ // Add type for prev
-      ...prev,
-      criteria: prev.criteria.includes(criterionId)
-        ? prev.criteria.filter((c: string) => c !== criterionId) // Add type for c
-        : [...prev.criteria, criterionId]
+  const toggleCriterion = (_criterionId: string) => {
+    setParams((_prev: AnalysisParams) => ({ // Add type for prev
+      ..._prev,
+      criteria: _prev.criteria.includes(_criterionId)
+        ? _prev.criteria.filter((_c: string) => _c !== _criterionId) // Add type for c
+        : [..._prev.criteria, _criterionId]
     }));
   };
 
@@ -101,7 +101,7 @@ export function CompetitorAnalysis() {
               id="industryInput" // Add id
               type="text"
               value={params.industry}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setParams((prev: AnalysisParams) => ({ ...prev, industry: e.target.value }))} // Add types
+              onChange={(_e: React.ChangeEvent<HTMLInputElement>) => setParams((_prev: AnalysisParams) => ({ ..._prev, industry: _e.target.value }))} // Add types
               placeholder="e.g., Software Development, Healthcare, Retail"
               className="input"
             />
@@ -112,7 +112,7 @@ export function CompetitorAnalysis() {
               id="regionInput" // Add id
               type="text"
               value={params.region}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setParams((prev: AnalysisParams) => ({ ...prev, region: e.target.value }))} // Add types
+              onChange={(_e: React.ChangeEvent<HTMLInputElement>) => setParams((_prev: AnalysisParams) => ({ ..._prev, region: _e.target.value }))} // Add types
               placeholder="e.g., North America, Europe, Global"
               className="input"
             />
@@ -124,18 +124,18 @@ export function CompetitorAnalysis() {
             Analysis Criteria
           </label>
           <div className="flex flex-wrap gap-2">
-            {analysisCriteria.map(criterion => (
+            {analysisCriteria.map(_criterion => (
               <button
-                key={criterion.id}
-                onClick={() => toggleCriterion(criterion.id)}
+                key={_criterion.id}
+                onClick={() => toggleCriterion(_criterion.id)}
                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm transition-colors ${
-                  params.criteria.includes(criterion.id)
+                  params.criteria.includes(_criterion.id)
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                 }`}
               >
                 <Filter className="w-3 h-3 mr-1" />
-                {criterion.label}
+                {_criterion.label}
               </button>
             ))}
           </div>

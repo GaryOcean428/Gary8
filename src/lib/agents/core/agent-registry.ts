@@ -21,7 +21,7 @@ export class AgentRegistry extends EventEmitter {
     return AgentRegistry.instance;
   }
 
-  async createAgent(config: AgentConfig): Promise<AgentConfig> {
+  async createAgent(_config: AgentConfig): Promise<AgentConfig> {
     try {
       // Validate config using Zod schema
       const validatedConfig = await z.object({
@@ -34,7 +34,7 @@ export class AgentRegistry extends EventEmitter {
         maxTokens: z.number(),
         systemPrompt: z.string(),
         tools: z.array(z.string())
-      }).parseAsync(config);
+      }).parseAsync(_config);
 
       // Check if agent has MCP capabilities
       if (validatedConfig.capabilities.includes('mcp') && !this.mcpClients.has(validatedConfig.id)) {
@@ -48,11 +48,11 @@ export class AgentRegistry extends EventEmitter {
       this.agents.set(validatedConfig.id, validatedConfig);
 
       // Index capabilities
-      validatedConfig.capabilities.forEach(capability => {
-        if (!this.capabilities.has(capability)) {
-          this.capabilities.set(capability, new Set());
+      validatedConfig.capabilities.forEach(_capability => {
+        if (!this.capabilities.has(_capability)) {
+          this.capabilities.set(_capability, new Set());
         }
-        this.capabilities.get(capability)?.add(validatedConfig.id);
+        this.capabilities.get(_capability)?.add(validatedConfig.id);
       });
 
       thoughtLogger.log('success', 'Agent created successfully', {
@@ -67,53 +67,53 @@ export class AgentRegistry extends EventEmitter {
     }
   }
 
-  getAgent(id: string): AgentConfig | undefined {
-    return this.agents.get(id);
+  getAgent(_id: string): AgentConfig | undefined {
+    return this.agents.get(_id);
   }
 
-  findAgentsByCapability(capability: string): AgentConfig[] {
-    const agentIds = this.capabilities.get(capability);
+  findAgentsByCapability(_capability: string): AgentConfig[] {
+    const agentIds = this.capabilities.get(_capability);
     if (!agentIds) return [];
 
     return Array.from(agentIds)
-      .map(id => this.agents.get(id))
-      .filter((agent): agent is AgentConfig => agent !== undefined);
+      .map(_id => this.agents.get(_id))
+      .filter((_agent): _agent is AgentConfig => _agent !== undefined);
   }
 
-  findAgentsByRole(role: string): AgentConfig[] {
+  findAgentsByRole(_role: string): AgentConfig[] {
     return Array.from(this.agents.values())
-      .filter(agent => agent.role === role);
+      .filter(_agent => _agent.role === _role);
   }
 
-  async removeAgent(id: string): Promise<void> {
-    const agent = this.agents.get(id);
+  async removeAgent(_id: string): Promise<void> {
+    const agent = this.agents.get(_id);
     if (!agent) return;
 
     // Clean up MCP client if exists
-    if (this.mcpClients.has(id)) {
-      const mcpClient = this.mcpClients.get(id);
+    if (this.mcpClients.has(_id)) {
+      const mcpClient = this.mcpClients.get(_id);
       await mcpClient?.disconnect();
-      this.mcpClients.delete(id);
+      this.mcpClients.delete(_id);
     }
 
     // Remove from capabilities index
-    agent.capabilities.forEach(capability => {
-      this.capabilities.get(capability)?.delete(id);
+    agent.capabilities.forEach(_capability => {
+      this.capabilities.get(_capability)?.delete(_id);
     });
 
     // Remove agent
-    this.agents.delete(id);
+    this.agents.delete(_id);
 
-    thoughtLogger.log('success', 'Agent removed', { agentId: id });
+    thoughtLogger.log('success', 'Agent removed', { agentId: _id });
   }
 
-  emitAgentEvent(event: AgentEvent): void {
+  emitAgentEvent(_event: AgentEvent): void {
     thoughtLogger.log('observation', 'Agent event emitted', {
-      type: event.type,
-      agentId: event.agentId
+      type: _event.type,
+      agentId: _event.agentId
     });
 
-    this.emit('agent-event', event);
+    this.emit('agent-event', _event);
   }
 
   getAgentCount(): number {
@@ -128,8 +128,8 @@ export class AgentRegistry extends EventEmitter {
     return Array.from(this.agents.values());
   }
   
-  getMCPClient(agentId: string): MCPClient | undefined {
-    return this.mcpClients.get(agentId);
+  getMCPClient(_agentId: string): MCPClient | undefined {
+    return this.mcpClients.get(_agentId);
   }
   
   getAllMCPClients(): MCPClient[] {
@@ -141,7 +141,7 @@ export class AgentRegistry extends EventEmitter {
     this.capabilities.clear();
     
     // Clean up all MCP clients
-    this.mcpClients.forEach(client => client.disconnect());
+    this.mcpClients.forEach(_client => _client.disconnect());
     this.mcpClients.clear();
     
     thoughtLogger.log('success', 'Agent registry cleared');

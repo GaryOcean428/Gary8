@@ -46,26 +46,49 @@ const presetThemes = {
 
 export function ThemeSettings() {
   const { settings, updateSettings } = useSettings();
-  const [localSettings, setLocalSettings] = useState(settings.theme);
-  const isDirty = JSON.stringify(localSettings) !== JSON.stringify(settings.theme);
+  // Ensure settings.theme exists before accessing its properties
+  const initialTheme = settings?.theme || presetThemes.default.dark; 
+  const [localSettings, setLocalSettings] = useState(initialTheme);
+  
+  // Check if settings.theme exists before comparing
+  const isDirty = settings?.theme ? JSON.stringify(localSettings) !== JSON.stringify(settings.theme) : true;
 
   const handleSave = async () => {
-    await updateSettings('theme', localSettings);
+    // Ensure updateSettings is called correctly
+    await updateSettings({ theme: localSettings }); 
   };
 
-  const handleThemeChange = (mode: 'light' | 'dark' | 'system') => {
-    setLocalSettings(prev => ({
-      ...prev,
-      mode,
-      colors: mode === 'light' ? presetThemes.default.light : presetThemes.default.dark
+  const handleThemeChange = (_mode: 'light' | 'dark' | 'system') => {
+    setLocalSettings(_prev => ({
+      ..._prev,
+      mode: _mode, // Corrected property name
+      colors: _mode === 'light' ? presetThemes.default.light : presetThemes.default.dark
     }));
   };
 
-  const handlePresetChange = (preset: keyof typeof presetThemes) => {
-    setLocalSettings(prev => ({
-      ...prev,
-      colors: presetThemes[preset][prev.mode]
-    }));
+  const handlePresetChange = (_preset: keyof typeof presetThemes) => {
+    setLocalSettings(_prev => {
+      // Handle 'system' mode by defaulting to 'dark' for preset selection
+      const modeForPreset = (_prev?.mode === 'system' ? 'dark' : _prev?.mode) || 'dark'; 
+      const validModeKey = modeForPreset as keyof typeof presetThemes.default; // 'light' | 'dark'
+      
+      const currentPreset = presetThemes[_preset];
+      let colorsToApply;
+
+      // Check if the current preset exists and has the required mode key ('light' or 'dark')
+      if (currentPreset && validModeKey in currentPreset) {
+         // Type assertion needed here because TS can't infer that validModeKey is a key of currentPreset specifically
+        colorsToApply = currentPreset[validModeKey as keyof typeof currentPreset];
+      } else {
+        // Fallback to the default theme's corresponding mode colors
+        colorsToApply = presetThemes.default[validModeKey];
+      }
+
+      return {
+        ..._prev,
+        colors: colorsToApply
+      };
+    });
   };
 
   return (
@@ -82,17 +105,17 @@ export function ThemeSettings() {
         <div>
           <label className="block font-medium mb-2">Theme Mode</label>
           <div className="flex space-x-4">
-            {(['light', 'dark', 'system'] as const).map(mode => (
+            {(['light', 'dark', 'system'] as const).map(_mode => (
               <button
-                key={mode}
-                onClick={() => handleThemeChange(mode)}
+                key={_mode}
+                onClick={() => handleThemeChange(_mode)}
                 className={`px-4 py-2 rounded-lg ${
-                  localSettings.mode === mode
+                  localSettings.mode === _mode
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 }`}
               >
-                {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                {_mode.charAt(0).toUpperCase() + _mode.slice(1)}
               </button>
             ))}
           </div>
@@ -101,22 +124,21 @@ export function ThemeSettings() {
         <div>
           <label className="block font-medium mb-2">Color Preset</label>
           <div className="grid grid-cols-3 gap-4">
-            {Object.keys(presetThemes).map(preset => (
+            {Object.keys(presetThemes).map(_preset => (
               <button
-                key={preset}
-                onClick={() => handlePresetChange(preset as keyof typeof presetThemes)}
+                key={_preset}
+                onClick={() => handlePresetChange(_preset as keyof typeof presetThemes)}
                 className="p-4 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
               >
                 <div className="flex space-x-2 mb-2">
-                  {Object.values(presetThemes[preset as keyof typeof presetThemes].dark).map((color, i) => (
+                  {Object.values(presetThemes[_preset as keyof typeof presetThemes].dark).map((_color, _i) => (
                     <div
-                      key={i}
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: color }}
+                      key={_i}
+                      className={`w-4 h-4 rounded-full theme-color-preview bg-${_color.replace('#', '')}`}
                     />
                   ))}
                 </div>
-                <span className="text-sm">{preset.charAt(0).toUpperCase() + preset.slice(1)}</span>
+                <span className="text-sm">{_preset.charAt(0).toUpperCase() + _preset.slice(1)}</span>
               </button>
             ))}
           </div>
@@ -132,15 +154,21 @@ export function ThemeSettings() {
                 </label>
                 <input
                   type="color"
-                  value={value}
-                  onChange={(e) => setLocalSettings(prev => ({
-                    ...prev,
-                    colors: {
-                      ...prev.colors,
-                      [key]: e.target.value
-                    }
-                  }))}
+                  value={value as string} // Ensure value is treated as string
+                  onChange={(_e: React.ChangeEvent<HTMLInputElement>) => setLocalSettings(_prev => {
+                    // Ensure _prev and _prev.colors exist before spreading
+                    const prevColors = _prev?.colors || {};
+                    return {
+                      ..._prev,
+                      colors: {
+                        ...prevColors,
+                        [key]: _e.target.value as string
+                      }
+                    } as typeof localSettings; // Add type assertion
+                  })}
                   className="w-full h-8 rounded cursor-pointer"
+                  aria-label={`Select color for ${key}`}
+                  placeholder={`Choose ${key} color`}
                 />
               </div>
             ))}
