@@ -72,9 +72,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true
   },
   global: {
-    fetch: (...args) => {
+    fetch: (..._args) => {
       // Add better timeout handling
-      const [url, options = {}] = args;
+      const [url, options = {}] = _args;
       options.signal = AbortSignal.timeout(30000); // 30 second timeout
       return fetch(url, options);
     }

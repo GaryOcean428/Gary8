@@ -27,15 +27,15 @@ export function PromptEnhancer({ onEnhance, activeEnhancement }: PromptEnhancerP
 
   return (
     <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden w-64">
-      {enhancements.map((enhancement) => (
+      {enhancements.map((_enhancement) => (
         <button
-          key={enhancement.name}
-          onClick={() => onEnhance(enhancement.prompt)}
+          key={_enhancement.name}
+          onClick={() => onEnhance(_enhancement.prompt)}
           className={`w-full px-4 py-2 text-left hover:bg-gray-700 transition-colors ${
-            activeEnhancement === enhancement.prompt ? 'bg-gray-700' : ''
+            activeEnhancement === _enhancement.prompt ? 'bg-gray-700' : ''
           }`}
         >
-          {enhancement.name}
+          {_enhancement.name}
         </button>
       ))}
     </div>

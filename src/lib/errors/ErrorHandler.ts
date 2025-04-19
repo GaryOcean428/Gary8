@@ -2,27 +2,27 @@ import { AppError, APIError, NetworkError } from './AppError';
 import { thoughtLogger } from '../logging/thought-logger';
 
 export class ErrorHandler {
-  static handle(error: unknown): { message: string; details?: any } {
+  static handle(_error: unknown): { message: string; details?: unknown } {
     let message: string;
     let details: any;
 
-    if (error instanceof APIError) {
+    if (_error instanceof APIError) {
       // Use the original message for API errors
-      message = error.message;
+      message = _error.message;
       // Include status code and response, and any additional details
       details = {
-        statusCode: error.statusCode,
-        response: error.response,
-        ...(error.details || {})
+        statusCode: _error.statusCode,
+        response: _error.response,
+        ...(_error.details || {})
       };
-    } else if (error instanceof AppError) {
-      message = error.message;
-      details = error.details;
-    } else if (error instanceof Error) {
-      message = error.message;
-      details = { stack: error.stack };
+    } else if (_error instanceof AppError) {
+      message = _error.message;
+      details = _error.details;
+    } else if (_error instanceof Error) {
+      message = _error.message;
+      details = { stack: _error.stack };
     } else {
-      message = String(error);
+      message = String(_error);
     }
 
     thoughtLogger.log('error', message, details);
@@ -30,10 +30,10 @@ export class ErrorHandler {
   }
 
   static async handleAsync<T>(
-    promise: Promise<T>
+    _promise: Promise<T>
   ): Promise<[T | null, Error | null]> {
     try {
-      const result = await promise;
+      const result = await _promise;
       return [result, null];
     } catch (error) {
       const handled = error instanceof Error ? error : new Error(String(error));
@@ -41,36 +41,36 @@ export class ErrorHandler {
     }
   }
 
-  static createAPIError(response: Response, data?: any): APIError {
-    const message = this.getErrorMessageFromResponse(response, data);
-    return new APIError(message, response.status, response, data);
+  static createAPIError(_response: Response, _data?: unknown): APIError {
+    const message = this.getErrorMessageFromResponse(_response, _data);
+    return new APIError(message, _response.status, _response, _data);
   }
 
-  private static getAPIErrorMessage(error: APIError): string {
-    if (error.response) {
-      return this.getErrorMessageFromResponse(error.response, error.details);
+  private static getAPIErrorMessage(_error: APIError): string {
+    if (_error.response) {
+      return this.getErrorMessageFromResponse(_error.response, _error.details);
     }
-    return error.message || 'API request failed';
+    return _error.message || 'API request failed';
   }
 
-  private static getErrorMessageFromResponse(response: Response, data?: any): string {
-    if (data?.message) {
-      return data.message;
+  private static getErrorMessageFromResponse(_response: Response, _data?: unknown): string {
+    if (_data?.message) {
+      return _data.message;
     }
-    if (data?.error) {
-      return typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
+    if (_data?.error) {
+      return typeof _data.error === 'string' ? _data.error : JSON.stringify(_data.error);
     }
-    return `${response.status} ${response.statusText}`;
+    return `${_response.status} ${_response.statusText}`;
   }
 
-  static isNetworkError(error: unknown): boolean {
-    const isFetchError = error instanceof TypeError &&
-      (error as Error).message.includes('Failed to fetch');
+  static isNetworkError(_error: unknown): boolean {
+    const isFetchError = _error instanceof TypeError &&
+      (_error as Error).message.includes('Failed to fetch');
     const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
     return isFetchError || isOffline;
   }
 
-  static isAPIError(error: unknown): error is APIError {
-    return error instanceof APIError;
+  static isAPIError(_error: unknown): _error is APIError {
+    return _error instanceof APIError;
   }
 }

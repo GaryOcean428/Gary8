@@ -30,9 +30,9 @@ export function NotificationSettings() {
               <span className="text-sm">Show error notifications</span>
               <Toggle
                 enabled={localSettings.showErrors}
-                onChange={(enabled) => setLocalSettings(prev => ({
-                  ...prev,
-                  showErrors: enabled
+                onChange={(_enabled) => setLocalSettings(_prev => ({
+                  ..._prev,
+                  showErrors: _enabled
                 }))}
               />
             </div>
@@ -40,9 +40,9 @@ export function NotificationSettings() {
               <span className="text-sm">Show success notifications</span>
               <Toggle
                 enabled={localSettings.showSuccess}
-                onChange={(enabled) => setLocalSettings(prev => ({
-                  ...prev,
-                  showSuccess: enabled
+                onChange={(_enabled) => setLocalSettings(_prev => ({
+                  ..._prev,
+                  showSuccess: _enabled
                 }))}
               />
             </div>
@@ -59,9 +59,9 @@ export function NotificationSettings() {
               <span className="text-sm">Show agent assignments</span>
               <Toggle
                 enabled={localSettings.showAgentAssignments}
-                onChange={(enabled) => setLocalSettings(prev => ({
-                  ...prev,
-                  showAgentAssignments: enabled
+                onChange={(_enabled) => setLocalSettings(_prev => ({
+                  ..._prev,
+                  showAgentAssignments: _enabled
                 }))}
               />
             </div>
@@ -69,9 +69,9 @@ export function NotificationSettings() {
               <span className="text-sm">Show task completion</span>
               <Toggle
                 enabled={localSettings.showTaskCompletion}
-                onChange={(enabled) => setLocalSettings(prev => ({
-                  ...prev,
-                  showTaskCompletion: enabled
+                onChange={(_enabled) => setLocalSettings(_prev => ({
+                  ..._prev,
+                  showTaskCompletion: _enabled
                 }))}
               />
             </div>
@@ -88,9 +88,9 @@ export function NotificationSettings() {
               <span className="text-sm">Enable sound effects</span>
               <Toggle
                 enabled={localSettings.soundEnabled}
-                onChange={(enabled) => setLocalSettings(prev => ({
-                  ...prev,
-                  soundEnabled: enabled
+                onChange={(_enabled) => setLocalSettings(_prev => ({
+                  ..._prev,
+                  soundEnabled: _enabled
                 }))}
               />
             </div>
@@ -101,9 +101,9 @@ export function NotificationSettings() {
                 min="0"
                 max="100"
                 value={localSettings.volume}
-                onChange={(e) => setLocalSettings(prev => ({
-                  ...prev,
-                  volume: parseInt(e.target.value)
+                onChange={(_e) => setLocalSettings(_prev => ({
+                  ..._prev,
+                  volume: parseInt(_e.target.value)
                 }))}
                 className="w-full"
               />

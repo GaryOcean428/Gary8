@@ -11,9 +11,9 @@ export class UtilityAgent extends BaseAgent {
     this.superiorId = superiorId;
   }
 
-  async processMessage(message: Message): Promise<Message> {
+  async processMessage(_message: Message): Promise<Message> {
     // Utility agents are designed for specific tasks
-    const result = await this.executeTask(message.content);
+    const result = await this.executeTask(_message.content);
 
     // Report results to superior if one exists
     if (this.superiorId) {
@@ -28,32 +28,32 @@ export class UtilityAgent extends BaseAgent {
     };
   }
 
-  private async executeTask(task: string): Promise<unknown> {
+  private async executeTask(_task: string): Promise<unknown> {
     // Execute task based on agent's capabilities
     if (this.hasCapability('code-execution')) {
-      return this.executeCode(task);
+      return this.executeCode(_task);
     }
     if (this.hasCapability('data-analysis')) {
-      return this.analyzeData(task);
+      return this.analyzeData(_task);
     }
-    return task;
+    return _task;
   }
 
-  private async executeCode(code: string): Promise<unknown> {
+  private async executeCode(_code: string): Promise<unknown> {
     // Safe code execution implementation
-    return `Executed code: ${code}`;
+    return `Executed code: ${_code}`;
   }
 
-  private async analyzeData(data: string): Promise<unknown> {
+  private async analyzeData(_data: string): Promise<unknown> {
     // Data analysis implementation
-    return `Analyzed data: ${data}`;
+    return `Analyzed data: ${_data}`;
   }
 
-  private async reportToSuperior(result: unknown): Promise<void> {
+  private async reportToSuperior(_result: unknown): Promise<void> {
     this.emit('report', {
       agentId: this.getId(),
       superiorId: this.superiorId,
-      result
+      _result
     });
   }
 }

@@ -12,12 +12,12 @@ interface ConfigStore {
 }
 
 // Helper to safely get environment variables with fallbacks
-const getEnvVar = (key: string, fallback: string = ''): string => {
-  const value = import.meta.env[key];
-  return value !== undefined ? String(value) : fallback;
+const getEnvVar = (_key: string, _fallback: string = ''): string => {
+  const value = import.meta.env[_key];
+  return value !== undefined ? String(value) : _fallback;
 };
 
-export const useConfigStore = create<ConfigStore>((set) => ({
+export const useConfigStore = create<ConfigStore>((_set) => ({
   apiKeys: {
     groq: getEnvVar('VITE_GROQ_API_KEY'),
     perplexity: getEnvVar('VITE_PERPLEXITY_API_KEY'),
@@ -32,17 +32,17 @@ export const useConfigStore = create<ConfigStore>((set) => ({
   },
   useEdgeFunctions: false, // Disabled Edge Functions to use direct API calls
   fallbackToDirectApi: true, // Ensure direct API fallback is enabled
-  updateApiKeys: (keys) => set((state) => ({
-    apiKeys: { ...state.apiKeys, ...keys }
+  updateApiKeys: (_keys) => _set((_state) => ({
+    apiKeys: { ..._state.apiKeys, ..._keys }
   })),
-  setApiKey: (provider, key) => set((state) => ({
-    apiKeys: { ...state.apiKeys, [provider]: key }
+  setApiKey: (_provider, _key) => _set((_state) => ({
+    apiKeys: { ..._state.apiKeys, [_provider]: _key }
   })),
-  setEdgeFunctions: (enabled) => set(() => ({
-    useEdgeFunctions: enabled
+  setEdgeFunctions: (_enabled) => _set(() => ({
+    useEdgeFunctions: _enabled
   })),
-  setFallbackToDirectApi: (enabled) => set(() => ({
-    fallbackToDirectApi: enabled
+  setFallbackToDirectApi: (_enabled) => _set(() => ({
+    fallbackToDirectApi: _enabled
   }))
 }));
 

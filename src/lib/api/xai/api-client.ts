@@ -40,15 +40,15 @@ export class XaiAPI extends BaseAPI {
 
   /**
    * Sends a chat completion request
-   * @param messages Chat messages
-   * @param onProgress Optional progress callback for streaming
-   * @param options Request options
+   * @param _messages Chat messages
+   * @param _onProgress Optional progress callback for streaming
+   * @param _options Request options
    * @returns Promise resolving to response content
    */
   async chat(
-    messages: Message[],
-    onProgress?: (content: string) => void,
-    options: XAIRequestOptions = {}
+    _messages: Message[],
+    _onProgress?: (content: string) => void,
+    _options: XAIRequestOptions = {}
   ): Promise<string> {
     try {
       // Check if API key is available
@@ -56,7 +56,7 @@ export class XaiAPI extends BaseAPI {
         throw new AppError('X.AI API key not configured', 'API_ERROR');
       }
       
-      const estimatedTokens = this.estimateTokenCount(messages);
+      const estimatedTokens = this.estimateTokenCount(_messages);
       await this.rateLimiter.checkRateLimit(estimatedTokens);
 
       const controller = new AbortController();
@@ -70,11 +70,11 @@ export class XaiAPI extends BaseAPI {
           'X-API-Version': xaiConfig.apiVersion
         },
         body: JSON.stringify({
-          model: options.model || xaiConfig.models.beta,
-          messages: messages.map(({ role, content }) => ({ role, content })),
-          temperature: options.temperature ?? xaiConfig.temperature,
-          max_tokens: options.maxTokens ?? xaiConfig.maxTokens,
-          stream: Boolean(onProgress)
+          model: _options.model || xaiConfig.models.beta,
+          messages: _messages.map(({ role, content }) => ({ role, content })),
+          temperature: _options.temperature ?? xaiConfig.temperature,
+          max_tokens: _options.maxTokens ?? xaiConfig.maxTokens,
+          stream: Boolean(_onProgress)
         }),
         signal: controller.signal
       });
@@ -90,17 +90,17 @@ export class XaiAPI extends BaseAPI {
         );
       }
 
-      if (onProgress && response.body) {
-        return this.handleStream(response, onProgress);
+      if (_onProgress && response.body) {
+        return this.handleStream(response, _onProgress);
       }
 
       const { data } = await this.request<ChatResponse>('/chat/completions', {
         method: 'POST',
         body: {
-          model: options.model || xaiConfig.models.beta,
-          messages: messages.map(({ role, content }) => ({ role, content })),
-          temperature: options.temperature ?? xaiConfig.temperature,
-          max_tokens: options.maxTokens ?? xaiConfig.maxTokens
+          model: _options.model || xaiConfig.models.beta,
+          messages: _messages.map(({ role, content }) => ({ role, content })),
+          temperature: _options.temperature ?? xaiConfig.temperature,
+          max_tokens: _options.maxTokens ?? xaiConfig.maxTokens
         }
       });
 
@@ -118,7 +118,7 @@ export class XaiAPI extends BaseAPI {
     }
   }
 
-  private estimateTokenCount(messages: Message[]): number {
-    return messages.reduce((sum, msg) => sum + Math.ceil(msg.content.length / 4), 0);
+  private estimateTokenCount(_messages: Message[]): number {
+    return _messages.reduce((_sum, _msg) => _sum + Math.ceil(_msg.content.length / 4), 0);
   }
 }

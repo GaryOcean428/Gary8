@@ -1,6 +1,15 @@
 .animation-scene-container {
-  /* width and height will be set via props */
   perspective: 1000px; /* Added for potential 3D effects if needed */
+}
+
+/* 
+  Use CSS variables for dimensions instead of inline styles.
+  This resolves the Microsoft Edge Tools warning about inline styles.
+  The variables are set via style attribute in the component.
+*/
+.scene-dimensions {
+  width: var(--scene-width, 800px); /* Default fallback width if variable not set */
+  height: var(--scene-height, 600px); /* Default fallback height if variable not set */
 }
 
 .perspective-transform-container {
@@ -8,4 +17,19 @@
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
+}
+
+/* For animated icons (e.g., stars, sun, moon, etc.) */
+.animated-icon {
+  position: absolute;
+  z-index: 10;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+}
+
+/* For abstract animated shapes (circle, triangle, rectangle) */
+.animated-shape {
+  position: absolute;
+  filter: blur(8px);
+  /* border-radius and clip-path will be set dynamically */
+  z-index: 5;
 }

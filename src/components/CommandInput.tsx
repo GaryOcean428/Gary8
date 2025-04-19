@@ -14,8 +14,8 @@ export function CommandInput({ onSendMessage, isProcessing }: Readonly<CommandIn
     inputRef.current?.focus();
   }, [isProcessing]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (_e: React.FormEvent) => {
+    _e.preventDefault();
     if (input.trim() && !isProcessing) {
       onSendMessage(input.trim());
       setInput('');
@@ -29,7 +29,7 @@ export function CommandInput({ onSendMessage, isProcessing }: Readonly<CommandIn
           ref={inputRef}
           type="text"
           value={input}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} // Add type for e
+          onChange={(_e: React.ChangeEvent<HTMLInputElement>) => setInput(_e.target.value)} // Add type for e
           className="flex-1 bg-transparent text-white px-4 py-2 focus:outline-none font-mono"
           placeholder={isProcessing ? 'Waiting for response...' : 'Enter a command...'}
           disabled={isProcessing}

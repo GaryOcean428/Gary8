@@ -22,14 +22,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session?.user) {
-          setUser(session.user);
+      (_event, _session) => {
+        if (_session?.user) {
+          setUser(_session.user);
         } else {
           setUser(null);
         }
         setLoading(false);
-        thoughtLogger.log('observation', `Auth state changed: ${event}`);
+        thoughtLogger.log('observation', `Auth state changed: ${_event}`);
       }
     );
 
@@ -61,14 +61,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const handleAuthError = (error: AuthError | Error) => {
+  const handleAuthError = (_error: AuthError | Error) => {
     // Enhanced network connectivity check
     if (!getNetworkStatus() || 
-        (error.message && (
-          error.message.includes('fetch') || 
-          error.message.includes('network') ||
-          error.message.includes('connection') ||
-          error.message.includes('offline')
+        (_error.message && (
+          _error.message.includes('fetch') || 
+          _error.message.includes('network') ||
+          _error.message.includes('connection') ||
+          _error.message.includes('offline')
         ))
     ) {
       const networkError = 'Network error. Please check your connection and try again.';
@@ -90,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       'Rate limit exceeded': 'Too many attempts. Please try again later'
     };
 
-    const friendlyMessage = error.message ? (errorMessages[error.message] || error.message) : 'An unknown error occurred';
+    const friendlyMessage = _error.message ? (errorMessages[_error.message] || _error.message) : 'An unknown error occurred';
 
     addToast({
       type: 'error',
@@ -99,10 +99,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       duration: 5000
     });
 
-    throw new AppError(friendlyMessage, 'AUTH_ERROR', error);
+    throw new AppError(friendlyMessage, 'AUTH_ERROR', _error);
   };
 
-  const handleSignIn = async (email: string, password: string) => {
+  const handleSignIn = async (_email: string, _password: string) => {
     try {
       thoughtLogger.log('execution', 'Attempting sign in');
       
@@ -118,8 +118,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       try {
         const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
+          _email,
+          _password
         });
 
         clearTimeout(timeoutId);
@@ -155,7 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const handleSignUp = async (email: string, password: string) => {
+  const handleSignUp = async (_email: string, _password: string) => {
     try {
       thoughtLogger.log('execution', 'Attempting sign up');
       
@@ -171,8 +171,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       try {
         const { data, error } = await supabase.auth.signUp({
-          email,
-          password
+          _email,
+          _password
         });
 
         clearTimeout(timeoutId);

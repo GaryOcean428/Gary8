@@ -8,7 +8,7 @@ import { Badge } from '../../../shared/components/ui/Badge';
 
 export function APISettings() {
   const { settings, updateSettings } = useSettings();
-  const updateApiKeys = useConfigStore(state => state.updateApiKeys);
+  const updateApiKeys = useConfigStore(_state => _state.updateApiKeys);
   const [localSettings, setLocalSettings] = useState(settings.apiKeys || {});
   const [testStatus, setTestStatus] = useState<Record<string, { status: 'success' | 'error' | 'testing' | null, message: string }>>({});
   const [isTestingAll, setIsTestingAll] = useState(false);
@@ -84,26 +84,26 @@ export function APISettings() {
     apiClient.setUseEdgeFunctions(useEdgeFunctions);
   };
 
-  const testConnection = async (key: string) => {
-    setTestStatus(prev => ({
-      ...prev,
-      [key]: { status: 'testing', message: 'Testing connection...' }
+  const testConnection = async (_key: string) => {
+    setTestStatus(_prev => ({
+      ..._prev,
+      [_key]: { status: 'testing', message: 'Testing connection...' }
     }));
 
     try {
-      const result = await apiClient.testConnection(key);
+      const result = await apiClient.testConnection(_key);
 
-      setTestStatus(prev => ({
-        ...prev,
-        [key]: { 
+      setTestStatus(_prev => ({
+        ..._prev,
+        [_key]: { 
           status: result.success ? 'success' : 'error',
           message: result.message
         }
       }));
     } catch (error) {
-      setTestStatus(prev => ({
-        ...prev,
-        [key]: { 
+      setTestStatus(_prev => ({
+        ..._prev,
+        [_key]: { 
           status: 'error',
           message: error instanceof Error ? error.message : 'An unknown error occurred'
         }
@@ -126,7 +126,7 @@ export function APISettings() {
     for (const key of activeKeys) {
       await testConnection(key);
       // Small delay between tests to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(_resolve => setTimeout(_resolve, 500));
     }
     
     setIsTestingAll(false);
@@ -206,16 +206,16 @@ export function APISettings() {
       </div>
 
       <div className="grid gap-6">
-        {apiConfigs.map(config => (
-          <div key={config.key} className="bg-card/50 rounded-lg p-6 backdrop-blur-sm border border-border">
+        {apiConfigs.map(_config => (
+          <div key={_config.key} className="bg-card/50 rounded-lg p-6 backdrop-blur-sm border border-border">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <label htmlFor={config.key} className="block font-medium text-base">
-                  {config.label}
+                <label htmlFor={_config.key} className="block font-medium text-base">
+                  {_config.label}
                 </label>
                 <div className="flex flex-wrap items-center gap-1.5 mt-1">
                   <a
-                    href={config.docs}
+                    href={_config.docs}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-primary hover:text-primary/80"
@@ -224,28 +224,28 @@ export function APISettings() {
                   </a>
                   <span className="text-muted-foreground">•</span>
                   <div className="flex flex-wrap gap-1">
-                    {config.models.map(model => (
-                      <Badge key={model} variant="outline" className="text-xs bg-muted">
-                        {model}
+                    {_config.models.map(_model => (
+                      <Badge key={_model} variant="outline" className="text-xs bg-muted">
+                        {_model}
                       </Badge>
                     ))}
                   </div>
                 </div>
               </div>
-              {testStatus[config.key] && (
+              {testStatus[_config.key] && (
                 <div className={`text-sm flex items-center gap-1 px-2 py-1 rounded ${
-                  testStatus[config.key].status === 'success' 
+                  testStatus[_config.key].status === 'success' 
                     ? 'text-success bg-success/10' 
-                    : testStatus[config.key].status === 'error'
+                    : testStatus[_config.key].status === 'error'
                     ? 'text-destructive bg-destructive/10'
                     : 'text-muted-foreground bg-muted/50'
                 }`}>
-                  {testStatus[config.key].status === 'success' && <Check className="w-3.5 h-3.5" />}
-                  {testStatus[config.key].status === 'error' && <XCircle className="w-3.5 h-3.5" />}
-                  {testStatus[config.key].status === 'testing' && <Loader className="w-3.5 h-3.5 animate-spin" />}
+                  {testStatus[_config.key].status === 'success' && <Check className="w-3.5 h-3.5" />}
+                  {testStatus[_config.key].status === 'error' && <XCircle className="w-3.5 h-3.5" />}
+                  {testStatus[_config.key].status === 'testing' && <Loader className="w-3.5 h-3.5 animate-spin" />}
                   <span className="text-xs">{
-                    testStatus[config.key].status === 'success' ? 'Connected' : 
-                    testStatus[config.key].status === 'testing' ? 'Testing...' : 
+                    testStatus[_config.key].status === 'success' ? 'Connected' : 
+                    testStatus[_config.key].status === 'testing' ? 'Testing...' : 
                     'Failed'
                   }</span>
                 </div>
@@ -254,51 +254,51 @@ export function APISettings() {
             
             <div className="relative flex items-center gap-2">
               <input
-                id={config.key}
+                id={_config.key}
                 type="password"
                 autoComplete="off"
-                value={localSettings[config.key] || ''}
-                onChange={(e) => setLocalSettings(prev => ({ 
-                  ...prev, 
-                  [config.key]: e.target.value 
+                value={localSettings[_config.key] || ''}
+                onChange={(_e) => setLocalSettings(_prev => ({ 
+                  ..._prev, 
+                  [_config.key]: _e.target.value 
                 }))}
                 className="input text-base"
-                placeholder={config.placeholder}
+                placeholder={_config.placeholder}
               />
               <button
                 type="button"
-                onClick={() => testConnection(config.key)}
+                onClick={() => testConnection(_config.key)}
                 className={`flex-none px-4 py-2.5 rounded-lg transition-colors font-medium text-sm ${
-                  testStatus[config.key]?.status === 'testing' ? 'bg-muted text-muted-foreground animate-pulse' :
-                  testStatus[config.key]?.status === 'success' ? 'bg-success/20 text-success' :
-                  testStatus[config.key]?.status === 'error' ? 'bg-destructive/20 text-destructive' :
+                  testStatus[_config.key]?.status === 'testing' ? 'bg-muted text-muted-foreground animate-pulse' :
+                  testStatus[_config.key]?.status === 'success' ? 'bg-success/20 text-success' :
+                  testStatus[_config.key]?.status === 'error' ? 'bg-destructive/20 text-destructive' :
                   'bg-primary text-primary-foreground hover:bg-primary/90'
                 }`}
-                disabled={testStatus[config.key]?.status === 'testing' || !localSettings[config.key]}
+                disabled={testStatus[_config.key]?.status === 'testing' || !localSettings[_config.key]}
               >
-                {testStatus[config.key]?.status === 'testing' ? 'Testing...' :
-                 testStatus[config.key]?.status === 'success' ? 'Valid' :
-                 testStatus[config.key]?.status === 'error' ? 'Invalid' : 
+                {testStatus[_config.key]?.status === 'testing' ? 'Testing...' :
+                 testStatus[_config.key]?.status === 'success' ? 'Valid' :
+                 testStatus[_config.key]?.status === 'error' ? 'Invalid' : 
                  'Test Key'}
               </button>
             </div>
             
-            {testStatus[config.key]?.status === 'error' && (
+            {testStatus[_config.key]?.status === 'error' && (
               <div className="mt-2 text-sm text-destructive flex items-start gap-1.5">
                 <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <span>{testStatus[config.key]?.message || 'Connection failed'}</span>
+                <span>{testStatus[_config.key]?.message || 'Connection failed'}</span>
               </div>
             )}
 
-            {!localSettings[config.key] && useEdgeFunctions && (
+            {!localSettings[_config.key] && useEdgeFunctions && (
               <div className="mt-2 text-xs text-primary">
-                Note: If you don't configure a local {config.label}, requests will use the API key from Edge Functions
+                Note: If you don't configure a local {_config.label}, requests will use the API key from Edge Functions
               </div>
             )}
             
-            {!localSettings[config.key] && !useEdgeFunctions && (
+            {!localSettings[_config.key] && !useEdgeFunctions && (
               <div className="mt-2 text-xs text-muted-foreground">
-                Note: If you don't have a {config.label}, you can still use other providers
+                Note: If you don't have a {_config.label}, you can still use other providers
               </div>
             )}
           </div>

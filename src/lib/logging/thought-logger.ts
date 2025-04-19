@@ -47,10 +47,10 @@ export class ThoughtLogger extends EventEmitter {
   }
 
   log(
-    level: ThoughtType,
-    message: string,
-    metadata?: Record<string, unknown>,
-    options: {
+    _level: ThoughtType,
+    _message: string,
+    _metadata?: Record<string, unknown>,
+    _options: {
       agentId?: string;
       collaborationId?: string;
       parentThoughtId?: string;
@@ -60,27 +60,27 @@ export class ThoughtLogger extends EventEmitter {
   ): void {
     const thought: Thought = {
       id: crypto.randomUUID(),
-      level,
-      message,
+      _level,
+      _message,
       timestamp: Date.now(),
-      metadata,
-      ...options
+      _metadata,
+      ..._options
     };
 
     // Track collaborations
-    if (options.collaborationId) {
-      const thoughts = this.activeCollaborations.get(options.collaborationId) || [];
+    if (_options.collaborationId) {
+      const thoughts = this.activeCollaborations.get(_options.collaborationId) || [];
       thoughts.push(thought.id);
-      this.activeCollaborations.set(options.collaborationId, thoughts);
+      this.activeCollaborations.set(_options.collaborationId, thoughts);
     }
 
     // Track tasks
-    if (options.taskId) {
-      const agents = this.activeTasks.get(options.taskId) || new Set();
-      if (options.agentId) {
-        agents.add(options.agentId);
+    if (_options.taskId) {
+      const agents = this.activeTasks.get(_options.taskId) || new Set();
+      if (_options.agentId) {
+        agents.add(_options.agentId);
       }
-      this.activeTasks.set(options.taskId, agents);
+      this.activeTasks.set(_options.taskId, agents);
     }
 
     this.thoughts.push(thought);
@@ -89,16 +89,16 @@ export class ThoughtLogger extends EventEmitter {
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
       const prefix = [
-        options.agentId ? `[${options.agentId}]` : '',
-        options.taskId ? `(Task ${options.taskId})` : '',
-        level.toUpperCase()
+        _options.agentId ? `[${_options.agentId}]` : '',
+        _options.taskId ? `(Task ${_options.taskId})` : '',
+        _level.toUpperCase()
       ].filter(Boolean).join(' ');
       
-      console.log(`${prefix}: ${message}`, metadata || '');
+      console.log(`${prefix}: ${_message}`, _metadata || '');
     }
   }
 
-  getThoughts(options: {
+  getThoughts(_options: {
     agentId?: string;
     collaborationId?: string;
     level?: ThoughtType;
@@ -108,40 +108,40 @@ export class ThoughtLogger extends EventEmitter {
   } = {}): Thought[] {
     let filtered = [...this.thoughts];
 
-    if (options.agentId) {
-      filtered = filtered.filter(t => t.agentId === options.agentId);
+    if (_options.agentId) {
+      filtered = filtered.filter(_t => _t.agentId === _options.agentId);
     }
 
-    if (options.collaborationId) {
-      filtered = filtered.filter(t => t.collaborationId === options.collaborationId);
+    if (_options.collaborationId) {
+      filtered = filtered.filter(_t => _t.collaborationId === _options.collaborationId);
     }
 
-    if (options.level) {
-      filtered = filtered.filter(t => t.level === options.level);
+    if (_options.level) {
+      filtered = filtered.filter(_t => _t.level === _options.level);
     }
 
-    if (options.since) {
-      filtered = filtered.filter(t => t.timestamp >= options.since);
+    if (_options.since) {
+      filtered = filtered.filter(_t => _t.timestamp >= _options.since);
     }
 
-    if (options.taskId) {
-      filtered = filtered.filter(t => t.taskId === options.taskId);
+    if (_options.taskId) {
+      filtered = filtered.filter(_t => _t.taskId === _options.taskId);
     }
 
-    if (options.source) {
-      filtered = filtered.filter(t => t.source === options.source);
+    if (_options.source) {
+      filtered = filtered.filter(_t => _t.source === _options.source);
     }
 
     return filtered;
   }
 
-  getCollaborationThoughts(collaborationId: string): Thought[] {
-    const thoughtIds = this.activeCollaborations.get(collaborationId) || [];
-    return this.thoughts.filter(t => thoughtIds.includes(t.id));
+  getCollaborationThoughts(_collaborationId: string): Thought[] {
+    const thoughtIds = this.activeCollaborations.get(_collaborationId) || [];
+    return this.thoughts.filter(_t => thoughtIds.includes(_t.id));
   }
 
-  getTaskAgents(taskId: string): string[] {
-    return Array.from(this.activeTasks.get(taskId) || []);
+  getTaskAgents(_taskId: string): string[] {
+    return Array.from(this.activeTasks.get(_taskId) || []);
   }
 
   getActiveTaskCount(): number {
@@ -166,18 +166,18 @@ export class ThoughtLogger extends EventEmitter {
     };
   }
 
-  subscribe(listener: (thoughts: Thought[]) => void): () => void {
-    this.listeners.add(listener);
-    listener(this.getThoughts());
+  subscribe(_listener: (thoughts: Thought[]) => void): () => void {
+    this.listeners.add(_listener);
+    _listener(this.getThoughts());
 
     return () => {
-      this.listeners.delete(listener);
+      this.listeners.delete(_listener);
     };
   }
 
   private notifyListeners(): void {
     const thoughts = this.getThoughts();
-    this.listeners.forEach(listener => listener(thoughts));
+    this.listeners.forEach(_listener => _listener(thoughts));
   }
 
   clear(): void {

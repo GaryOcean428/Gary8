@@ -61,9 +61,9 @@ export class APIClient {
     return APIClient.instance;
   }
 
-  setUseEdgeFunctions(enabled: boolean): void {
-    this.useEdgeFunctions = enabled;
-    if (enabled) {
+  setUseEdgeFunctions(_enabled: boolean): void {
+    this.useEdgeFunctions = _enabled;
+    if (_enabled) {
       thoughtLogger.log('execution', 'Using Edge Functions for API keys');
     } else {
       thoughtLogger.log('execution', 'Using local API keys');
@@ -124,7 +124,7 @@ export class APIClient {
     thoughtLogger.log('success', 'API client initialized successfully');
   }
 
-  async testConnection(provider: string): Promise<{success: boolean; message: string}> {
+  async testConnection(_provider: string): Promise<{success: boolean; message: string}> {
     // Check network connectivity first
     if (!getNetworkStatus()) {
       return {
@@ -137,11 +137,11 @@ export class APIClient {
     if (this.useEdgeFunctions && this.edgeFunctionStatus['test-connection']) {
       try {
         const { data, error } = await supabase.functions.invoke('test-connection', {
-          body: { provider }
+          body: { _provider }
         });
         
         if (!error && data) {
-          this.connectionStatus[provider] = data.success;
+          this.connectionStatus[_provider] = data.success;
           return data;
         }
       } catch (error) {
@@ -155,14 +155,14 @@ export class APIClient {
     // Retrieve configured API keys if available
     const rawState = typeof this.configStore.getState === 'function' ? this.configStore.getState() : undefined;
     const apiKeys = rawState?.apiKeys;
-    const apiKey = apiKeys?.[provider];
+    const apiKey = apiKeys?.[_provider];
     // If keys object provided (e.g., in tests), enforce key presence and format
     if (apiKeys) {
       if (!apiKey || apiKey.trim() === '') {
-        return { success: false, message: `No API key configured for ${provider}` };
+        return { success: false, message: `No API key configured for ${_provider}` };
       }
-      if (!looseValidateApiKey(provider, apiKey)) {
-        return { success: false, message: `Invalid API key format for ${provider}` };
+      if (!looseValidateApiKey(_provider, apiKey)) {
+        return { success: false, message: `Invalid API key format for ${_provider}` };
       }
     }
     
@@ -174,7 +174,7 @@ export class APIClient {
     let body: any = {};
 
     try {
-      switch(provider) {
+      switch(_provider) {
         case 'openai':
           endpoint = 'https://api.openai.com/v1/models';
           headers['Authorization'] = `Bearer ${apiKey}`;
@@ -231,7 +231,7 @@ export class APIClient {
         default:
           return {
             success: false,
-            message: `Unknown provider: ${provider}`
+            message: `Unknown provider: ${_provider}`
           };
       }
       
@@ -242,27 +242,27 @@ export class APIClient {
       try {
         // Make a simple request to check if API key is valid
         const response = await fetch(endpoint, {
-          method: provider === 'anthropic' ? 'POST' : 'GET',
+          method: _provider === 'anthropic' ? 'POST' : 'GET',
           headers,
-          body: provider === 'anthropic' ? JSON.stringify(body) : undefined,
+          body: _provider === 'anthropic' ? JSON.stringify(body) : undefined,
           signal: controller.signal
         });
         
         clearTimeout(timeoutId);
         
         // Update connection status
-        this.connectionStatus[provider] = response.ok;
+        this.connectionStatus[_provider] = response.ok;
   
         if (response.ok) {
           return {
             success: true,
-            message: `Successfully connected to ${provider} API`
+            message: `Successfully connected to ${_provider} API`
           };
         } else {
           const error = await response.json().catch(() => ({}));
           return {
             success: false,
-            message: `Failed to connect to ${provider} API: ${response.status} ${response.statusText}${
+            message: `Failed to connect to ${_provider} API: ${response.status} ${response.statusText}${
               error.error?.message ? ` - ${error.error.message}` : ''
             }`
           };
@@ -273,27 +273,27 @@ export class APIClient {
       }
     } catch (error) {
       // Update connection status
-      this.connectionStatus[provider] = false;
+      this.connectionStatus[_provider] = false;
       
       // Check for specific network errors
       let message = error instanceof Error ? error.message : String(error);
       
       if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        message = `Network error connecting to ${provider} API. Please check your internet connection.`;
+        message = `Network error connecting to ${_provider} API. Please check your internet connection.`;
       } else if (error instanceof DOMException && error.name === 'AbortError') {
-        message = `Connection to ${provider} API timed out. The service may be unavailable.`;
+        message = `Connection to ${_provider} API timed out. The service may be unavailable.`;
       }
       
       return {
         success: false,
-        message: `Error testing connection to ${provider}: ${message}`
+        message: `Error testing connection to ${_provider}: ${message}`
       };
     }
   }
 
   async chat(
-    messages: Message[], 
-    onProgress?: (content: string) => void
+    _messages: Message[], 
+    _onProgress?: (content: string) => void
   ): Promise<string> {
     // Check network connectivity first
     if (!getNetworkStatus()) {
@@ -316,7 +316,7 @@ export class APIClient {
 
     // Route to appropriate model and provider
     // Determine routing configuration; provide defaults if router returns falsy
-    const rawConfig = await this.router.route(messages[0].content, messages);
+    const rawConfig = await this.router.route(_messages[0].content, _messages);
     const routerConfig = rawConfig ?? { model: '', temperature: undefined as any, maxTokens: undefined as any, confidence: undefined };
     thoughtLogger.log('decision', `Selected model: ${routerConfig.model}`, {
       confidence: routerConfig.confidence
@@ -346,11 +346,11 @@ export class APIClient {
             },
             body: JSON.stringify({
               ...apiConfig.bodyTransform({
-                messages: messages.map(({ role, content }) => ({ role, content })),
+                messages: _messages.map(({ role, content }) => ({ role, content })),
                 model: routerConfig.model,
                 temperature: routerConfig.temperature,
                 max_tokens: routerConfig.maxTokens,
-                stream: Boolean(onProgress)
+                stream: Boolean(_onProgress)
               })
             }),
             signal: controller.signal
@@ -364,11 +364,11 @@ export class APIClient {
               'API_ERROR', { status: response.status, ...errorData }
             );
           }
-          if (onProgress && response.body) {
+          if (_onProgress && response.body) {
             return this.handleStreamingResponse(
               response.body,
               routerConfig.model,
-              onProgress,
+              _onProgress,
               apiConfig.streamParser
             );
           }
@@ -392,7 +392,7 @@ export class APIClient {
         );
       }
       // Fallback to alternates
-      return await this.chatWithFallback(messages, onProgress, provider);
+      return await this.chatWithFallback(_messages, _onProgress, provider);
     }
   }
 
@@ -497,26 +497,26 @@ export class APIClient {
     return { ...this.edgeFunctionStatus };
   }
 
-  private getProviderForModel(model: string): string {
-    if (model.includes('gpt') || model.includes('o1') || model.includes('o3')) return 'openai';
-    if (model.includes('claude')) return 'anthropic';
-    if (model.includes('llama') || model.startsWith('llama3')) return 'groq';
-    if (model.includes('grok')) return 'xai';
-    if (model.includes('sonar')) return 'perplexity';
-    if (model.includes('gemini')) return 'google';
+  private getProviderForModel(_model: string): string {
+    if (_model.includes('gpt') || _model.includes('o1') || _model.includes('o3')) return 'openai';
+    if (_model.includes('claude')) return 'anthropic';
+    if (_model.includes('llama') || _model.startsWith('llama3')) return 'groq';
+    if (_model.includes('grok')) return 'xai';
+    if (_model.includes('sonar')) return 'perplexity';
+    if (_model.includes('gemini')) return 'google';
     // Default to openai
     return 'openai';
   }
 
   private async chatWithFallback(
-    messages: Message[],
-    onProgress?: (content: string) => void,
-    initialProvider?: string
+    _messages: Message[],
+    _onProgress?: (content: string) => void,
+    _initialProvider?: string
   ): Promise<string> {
     // Determine which providers are available for fallback (exclude initial provider)
     const apiKeys = this.configStore.getState().apiKeys;
     const fallbackProviders = Object.entries(apiKeys)
-      .filter(([provider, key]) => provider !== initialProvider && key && key.trim().length > 10 && looseValidateApiKey(provider as any, key))
+      .filter(([provider, key]) => provider !== _initialProvider && key && key.trim().length > 10 && looseValidateApiKey(provider as any, key))
       .map(([provider]) => provider);
     thoughtLogger.log('decision', `Fallback provider order: ${fallbackProviders.join(', ')}`);
     
@@ -527,10 +527,10 @@ export class APIClient {
       
       try {
         return await this.openaiAPI.chat(
-          messages,
+          _messages,
           apiKeys.openai,
           { model },
-          onProgress
+          _onProgress
         );
       } catch (error) {
         throw new AppError(`OpenAI fallback failed: ${error instanceof Error ? error.message : String(error)}`, 'API_ERROR');
@@ -553,11 +553,11 @@ export class APIClient {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              messages: messages.map(({ role, content }) => ({ role, content })),
+              messages: _messages.map(({ role, content }) => ({ role, content })),
               model: model,
               temperature: 0.7,
               max_tokens: 4096,
-              stream: Boolean(onProgress)
+              stream: Boolean(_onProgress)
             }),
             signal: controller.signal
           });
@@ -568,8 +568,8 @@ export class APIClient {
             throw new Error(`Groq API error: ${response.status} ${response.statusText}`);
           }
           
-          if (onProgress && response.body) {
-            return this.handleStreamingResponse(response.body, model, onProgress);
+          if (_onProgress && response.body) {
+            return this.handleStreamingResponse(response.body, model, _onProgress);
           }
           
           const data = await response.json();
@@ -599,11 +599,11 @@ export class APIClient {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              messages: messages.map(({ role, content }) => ({ role, content })),
+              messages: _messages.map(({ role, content }) => ({ role, content })),
               model: model,
               temperature: 0.7,
               max_tokens: 4096,
-              stream: Boolean(onProgress)
+              stream: Boolean(_onProgress)
             }),
             signal: controller.signal
           });
@@ -614,8 +614,8 @@ export class APIClient {
             throw new Error(`Perplexity API error: ${response.status} ${response.statusText}`);
           }
           
-          if (onProgress && response.body) {
-            return this.handleStreamingResponse(response.body, model, onProgress);
+          if (_onProgress && response.body) {
+            return this.handleStreamingResponse(response.body, model, _onProgress);
           }
           
           const data = await response.json();
@@ -647,9 +647,9 @@ export class APIClient {
             },
             body: JSON.stringify({
               model: model,
-              messages: messages.map(({ role, content }) => ({ role, content })),
+              messages: _messages.map(({ role, content }) => ({ role, content })),
               max_tokens: 4096,
-              stream: Boolean(onProgress)
+              stream: Boolean(_onProgress)
             }),
             signal: controller.signal
           });
@@ -660,10 +660,10 @@ export class APIClient {
             throw new Error(`Anthropic API error: ${response.status} ${response.statusText}`);
           }
           
-          if (onProgress && response.body) {
-            return this.handleStreamingResponse(response.body, model, onProgress, (data) => {
+          if (_onProgress && response.body) {
+            return this.handleStreamingResponse(response.body, model, _onProgress, (_data) => {
               try {
-                const parsed = JSON.parse(data);
+                const parsed = JSON.parse(_data);
                 if (parsed.type === 'content_block_delta' && parsed.delta.text) {
                   return parsed.delta.text;
                 }
@@ -693,12 +693,12 @@ export class APIClient {
   }
 
   private async handleStreamingResponse(
-    body: ReadableStream<Uint8Array>,
-    model: string,
-    onProgress: (content: string) => void,
-    customParser?: (data: string) => string | undefined
+    _body: ReadableStream<Uint8Array>,
+    _model: string,
+    _onProgress: (content: string) => void,
+    _customParser?: (data: string) => string | undefined
   ): Promise<string> {
-    const reader = body.getReader();
+    const reader = _body.getReader();
     const decoder = new TextDecoder();
     let fullContent = '';
 
@@ -719,8 +719,8 @@ export class APIClient {
               let content: string | undefined;
               
               // Use custom parser if provided
-              if (customParser) {
-                content = customParser(data);
+              if (_customParser) {
+                content = _customParser(data);
               } else {
                 // Default parser for OpenAI-compatible streams
                 const parsed = JSON.parse(data);
@@ -734,7 +734,7 @@ export class APIClient {
               
               if (content) {
                 fullContent += content;
-                onProgress(content);
+                _onProgress(content);
               }
             } catch (e) {
               thoughtLogger.log('error', 'Failed to parse streaming response', { error: e });
@@ -749,67 +749,67 @@ export class APIClient {
     }
   }
 
-  private getAPIConfig(model: string, apiKeys: Record<string, string>): {
+  private getAPIConfig(_model: string, _apiKeys: Record<string, string>): {
     endpoint: string;
     apiKey: string;
     additionalHeaders: Record<string, string>;
-    bodyTransform: (data: any) => any;
-    extractContent: (data: any) => string;
+    bodyTransform: (data: unknown) => any;
+    extractContent: (data: unknown) => string;
     streamParser?: (data: string) => string | undefined;
   } {
     // Log for debugging
-    console.log(`Getting API config for model: ${model}`);
+    console.log(`Getting API config for model: ${_model}`);
     
     // Groq models (check for different pattern prefixes)
-    if (model.startsWith('llama') || model.includes('groq')) {
+    if (_model.startsWith('llama') || _model.includes('groq')) {
       return {
         endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-        apiKey: apiKeys.groq,
+        apiKey: _apiKeys.groq,
         additionalHeaders: {},
-        bodyTransform: data => data,
-        extractContent: data => data.choices[0]?.message?.content || ''
+        bodyTransform: _data => _data,
+        extractContent: _data => _data.choices[0]?.message?.content || ''
       };
     }
     
-    if (model.startsWith('grok')) {
+    if (_model.startsWith('grok')) {
       return {
         endpoint: 'https://api.x.ai/v1/chat/completions',
-        apiKey: apiKeys.xai,
+        apiKey: _apiKeys.xai,
         additionalHeaders: {
           'X-API-Version': '2023-11-01'
         },
-        bodyTransform: data => data,
-        extractContent: data => data.choices[0]?.message?.content || ''
+        bodyTransform: _data => _data,
+        extractContent: _data => _data.choices[0]?.message?.content || ''
       };
     }
     
-    if (model.includes('sonar')) {
+    if (_model.includes('sonar')) {
       return {
         endpoint: 'https://api.perplexity.ai/chat/completions',
-        apiKey: apiKeys.perplexity,
+        apiKey: _apiKeys.perplexity,
         additionalHeaders: {},
-        bodyTransform: data => data,
-        extractContent: data => data.choices[0]?.message?.content || ''
+        bodyTransform: _data => _data,
+        extractContent: _data => _data.choices[0]?.message?.content || ''
       };
     }
     
-    if (model.includes('claude')) {
+    if (_model.includes('claude')) {
       return {
         endpoint: 'https://api.anthropic.com/v1/messages',
-        apiKey: apiKeys.anthropic || '',
+        apiKey: _apiKeys.anthropic || '',
         additionalHeaders: {
           'anthropic-version': '2023-06-01'
         },
-        bodyTransform: data => ({
-          model: data.model,
-          max_tokens: data.max_tokens,
-          messages: data.messages,
-          stream: data.stream
+        bodyTransform: _data => ({
+          model: _data.model,
+          max_tokens: _data.max_tokens,
+          messages: _data.messages,
+          stream: _data.stream
         }),
-        extractContent: data => data.content?.[0]?.text || '',
-        streamParser: (data) => {
+        extractContent: _data => _data.content?.[0]?.text || '',
+        streamParser: (_data) => {
           try {
-            const parsed = JSON.parse(data);
+            const parsed = JSON.parse(_data);
             if (parsed.type === 'content_block_delta' && parsed.delta.text) {
               return parsed.delta.text;
             }
@@ -821,41 +821,41 @@ export class APIClient {
       };
     }
     
-    if (model.includes('gemini')) {
+    if (_model.includes('gemini')) {
       const baseUrl = 'https://generativelanguage.googleapis.com/v1/models';
-      const modelPath = model.replace(/\./g, '-');
+      const modelPath = _model.replace(/\./g, '-');
       
       return {
-        endpoint: `${baseUrl}/${modelPath}:generateContent?key=${apiKeys.google}`,
-        apiKey: apiKeys.google || '',
+        endpoint: `${baseUrl}/${modelPath}:generateContent?key=${_apiKeys.google}`,
+        apiKey: _apiKeys.google || '',
         additionalHeaders: {},
-        bodyTransform: data => ({
-          contents: data.messages.map((m: any) => ({
-            role: m.role === 'system' ? 'user' : m.role,
-            parts: [{ text: m.content }]
+        bodyTransform: _data => ({
+          contents: _data.messages.map((_m: unknown) => ({
+            role: _m.role === 'system' ? 'user' : _m.role,
+            parts: [{ text: _m.content }]
           })),
           generationConfig: {
-            temperature: data.temperature,
-            maxOutputTokens: data.max_tokens
+            temperature: _data.temperature,
+            maxOutputTokens: _data.max_tokens
           }
         }),
-        extractContent: data => data.candidates[0]?.content?.parts[0]?.text || ''
+        extractContent: _data => _data.candidates[0]?.content?.parts[0]?.text || ''
       };
     }
     
     // Default to OpenAI
     return {
       endpoint: 'https://api.openai.com/v1/chat/completions', 
-      apiKey: apiKeys.openai || '',
+      apiKey: _apiKeys.openai || '',
       additionalHeaders: {},
-      bodyTransform: data => data,
-      extractContent: data => data.choices[0]?.message?.content || ''
+      bodyTransform: _data => _data,
+      extractContent: _data => _data.choices[0]?.message?.content || ''
     };
   }
   
   // Get connection status for a provider
-  getConnectionStatus(provider: string): boolean {
-    return this.connectionStatus[provider] || false;
+  getConnectionStatus(_provider: string): boolean {
+    return this.connectionStatus[_provider] || false;
   }
   
   // Get all connection statuses

@@ -6,12 +6,12 @@ import type { Message } from '../types';
 export interface Tool {
   name: string;
   description: string;
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
 }
 
 export interface FunctionCallResult {
   name: string;
-  arguments: Record<string, any>;
+  arguments: Record<string, unknown>;
   responseMessage: Message;
 }
 
@@ -32,35 +32,35 @@ export class ToolCallingAPI {
   
   /**
    * Makes a tool calling request using either the Responses or Chat Completions API
-   * @param apiKey The OpenAI API key
-   * @param messages Messages to provide context
-   * @param tools Tools/functions to make available to the model
+   * @param _apiKey The OpenAI API key
+   * @param _messages Messages to provide context
+   * @param _tools Tools/functions to make available to the model
    * @returns The function call results
    */
   async callTool(
-    apiKey: string,
-    messages: Message[],
-    tools: Tool[],
-    modelName: string = 'gpt-4o'
+    _apiKey: string,
+    _messages: Message[],
+    _tools: Tool[],
+    _modelName: string = 'gpt-4o'
   ): Promise<FunctionCallResult | null> {
-    thoughtLogger.log('execution', 'Making tool calling request', { toolCount: tools.length });
+    thoughtLogger.log('execution', 'Making tool calling request', { toolCount: _tools.length });
     
     try {
       // Format tools for the Responses API
-      const toolsFormatted = tools.reduce((acc, tool) => {
-        acc[tool.name] = {
-          description: tool.description,
-          parameters: tool.parameters
+      const toolsFormatted = _tools.reduce((_acc, _tool) => {
+        _acc[_tool.name] = {
+          description: _tool.description,
+          parameters: _tool.parameters
         };
-        return acc;
-      }, {} as Record<string, any>);
+        return _acc;
+      }, {} as Record<string, unknown>);
       
       // Make the API call
       const response = await this.openai.chat(
-        messages,
-        apiKey,
+        _messages,
+        _apiKey,
         {
-          model: modelName,
+          model: _modelName,
           tools: toolsFormatted,
           temperature: 0
         }

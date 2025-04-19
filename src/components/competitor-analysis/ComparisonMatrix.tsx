@@ -24,22 +24,22 @@ export function ComparisonMatrix({ competitors }: ComparisonMatrixProps) {
         <thead>
           <tr className="border-b border-gray-700">
             <th className="p-4 text-left font-medium">Category</th>
-            {competitors.map(competitor => (
-              <th key={competitor.id} className="p-4 text-left font-medium">
-                {competitor.name}
+            {competitors.map(_competitor => (
+              <th key={_competitor.id} className="p-4 text-left font-medium">
+                {_competitor.name}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {categories.map((category, i) => (
-            <tr key={category} className={i % 2 === 0 ? 'bg-gray-800/50' : ''}>
-              <td className="p-4 font-medium">{category}</td>
-              {competitors.map(competitor => (
-                <td key={competitor.id} className="p-4">
+          {categories.map((_category, _i) => (
+            <tr key={_category} className={_i % 2 === 0 ? 'bg-gray-800/50' : ''}>
+              <td className="p-4 font-medium">{_category}</td>
+              {competitors.map(_competitor => (
+                <td key={_competitor.id} className="p-4">
                   <div className="flex items-center space-x-2">
-                    {getComparisonIcon(competitor.scores[category.toLowerCase()])}
-                    <span>{getScoreLabel(competitor.scores[category.toLowerCase()])}</span>
+                    {getComparisonIcon(_competitor.scores[_category.toLowerCase()])}
+                    <span>{getScoreLabel(_competitor.scores[_category.toLowerCase()])}</span>
                   </div>
                 </td>
               ))}
@@ -51,19 +51,19 @@ export function ComparisonMatrix({ competitors }: ComparisonMatrixProps) {
   );
 }
 
-function getComparisonIcon(score: number) {
-  if (score >= 8) {
+function getComparisonIcon(_score: number) {
+  if (_score >= 8) {
     return <Check className="w-4 h-4 text-green-400" />;
   }
-  if (score >= 5) {
+  if (_score >= 5) {
     return <Minus className="w-4 h-4 text-yellow-400" />;
   }
   return <X className="w-4 h-4 text-red-400" />;
 }
 
-function getScoreLabel(score: number): string {
-  if (score >= 8) return 'Excellent';
-  if (score >= 6) return 'Good';
-  if (score >= 4) return 'Average';
+function getScoreLabel(_score: number): string {
+  if (_score >= 8) return 'Excellent';
+  if (_score >= 6) return 'Good';
+  if (_score >= 4) return 'Average';
   return 'Poor';
 }

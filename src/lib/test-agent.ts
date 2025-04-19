@@ -5,8 +5,8 @@ export async function testAgentSystem() {
     const system = AgentSystem.getInstance();
     const response = await system.processMessage(
       "What are your core capabilities?",
-      content => console.log('Streaming:', content),
-      state => console.log('State:', state)
+      _content => console.log('Streaming:', _content),
+      _state => console.log('State:', _state)
     );
     return response;
   } catch (error) {

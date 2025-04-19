@@ -89,14 +89,14 @@ export function Sidebar({ activePanel, onPanelChange }: SidebarProps) {
               className="overflow-hidden"
             >
               <div className="pt-2 space-y-1">
-                {savedChats.map(chat => (
+                {savedChats.map(_chat => (
                   <button
-                    key={chat.id}
+                    key={_chat.id}
                     className="w-full flex flex-col px-3 py-2 text-left text-gray-400 hover:text-white rounded-lg hover:bg-gray-700/50 transition-colors"
                   >
-                    <span className="truncate">{chat.title}</span>
+                    <span className="truncate">{_chat.title}</span>
                     <span className="text-xs text-gray-500">
-                      {formatDistanceToNow(chat.timestamp)} ago
+                      {formatDistanceToNow(_chat.timestamp)} ago
                     </span>
                   </button>
                 ))}

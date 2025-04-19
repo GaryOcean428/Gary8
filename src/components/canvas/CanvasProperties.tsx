@@ -24,7 +24,7 @@ export function CanvasProperties({
             <input
               type="number"
               value={Math.round(selectedObject.left || 0)}
-              onChange={(e) => onPropertyChange('left', parseInt(e.target.value))}
+              onChange={(_e) => onPropertyChange('left', parseInt(_e.target.value))}
               className="w-full px-2 py-1 border rounded text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -33,7 +33,7 @@ export function CanvasProperties({
             <input
               type="number"
               value={Math.round(selectedObject.top || 0)}
-              onChange={(e) => onPropertyChange('top', parseInt(e.target.value))}
+              onChange={(_e) => onPropertyChange('top', parseInt(_e.target.value))}
               className="w-full px-2 py-1 border rounded text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -46,7 +46,7 @@ export function CanvasProperties({
             <input
               type="number"
               value={Math.round(selectedObject.width || 0)}
-              onChange={(e) => onPropertyChange('width', parseInt(e.target.value))}
+              onChange={(_e) => onPropertyChange('width', parseInt(_e.target.value))}
               className="w-full px-2 py-1 border rounded text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -55,7 +55,7 @@ export function CanvasProperties({
             <input
               type="number"
               value={Math.round(selectedObject.height || 0)}
-              onChange={(e) => onPropertyChange('height', parseInt(e.target.value))}
+              onChange={(_e) => onPropertyChange('height', parseInt(_e.target.value))}
               className="w-full px-2 py-1 border rounded text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -69,7 +69,7 @@ export function CanvasProperties({
               <input
                 type="color"
                 value={selectedObject.fill?.toString() || '#000000'}
-                onChange={(e) => onPropertyChange('fill', e.target.value)}
+                onChange={(_e) => onPropertyChange('fill', _e.target.value)}
                 className="w-full h-8 rounded cursor-pointer"
               />
             </div>
@@ -78,7 +78,7 @@ export function CanvasProperties({
               <input
                 type="color"
                 value={selectedObject.stroke?.toString() || '#000000'}
-                onChange={(e) => onPropertyChange('stroke', e.target.value)}
+                onChange={(_e) => onPropertyChange('stroke', _e.target.value)}
                 className="w-full h-8 rounded cursor-pointer"
               />
             </div>
@@ -87,7 +87,7 @@ export function CanvasProperties({
               <input
                 type="number"
                 value={selectedObject.strokeWidth || 0}
-                onChange={(e) => onPropertyChange('strokeWidth', parseInt(e.target.value))}
+                onChange={(_e) => onPropertyChange('strokeWidth', parseInt(_e.target.value))}
                 className="w-full px-2 py-1 border rounded text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -102,7 +102,7 @@ export function CanvasProperties({
               <input
                 type="text"
                 value={(selectedObject as fabric.Text).text}
-                onChange={(e) => onPropertyChange('text', e.target.value)}
+                onChange={(_e) => onPropertyChange('text', _e.target.value)}
                 className="w-full px-2 py-1 border rounded text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -111,7 +111,7 @@ export function CanvasProperties({
               <input
                 type="number"
                 value={(selectedObject as fabric.Text).fontSize || 16}
-                onChange={(e) => onPropertyChange('fontSize', parseInt(e.target.value))}
+                onChange={(_e) => onPropertyChange('fontSize', parseInt(_e.target.value))}
                 className="w-full px-2 py-1 border rounded text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -120,7 +120,7 @@ export function CanvasProperties({
               <input
                 type="color"
                 value={(selectedObject as fabric.Text).fill?.toString() || '#000000'}
-                onChange={(e) => onPropertyChange('fill', e.target.value)}
+                onChange={(_e) => onPropertyChange('fill', _e.target.value)}
                 className="w-full h-8 rounded cursor-pointer"
               />
             </div>

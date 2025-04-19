@@ -46,16 +46,16 @@ class ToolManager {
     });
   }
 
-  register(tool: Tool): void {
-    this.tools.set(tool.name, tool);
+  register(_tool: Tool): void {
+    this.tools.set(_tool.name, _tool);
   }
 
-  async execute(name: string, args: Record<string, unknown>): Promise<unknown> {
-    const tool = this.tools.get(name);
+  async execute(_name: string, _args: Record<string, unknown>): Promise<unknown> {
+    const tool = this.tools.get(_name);
     if (!tool) {
-      throw new Error(`Tool "${name}" not found`);
+      throw new Error(`Tool "${_name}" not found`);
     }
-    return tool.execute(args);
+    return tool.execute(_args);
   }
 
   getTools(): Tool[] {

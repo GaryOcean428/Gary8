@@ -13,18 +13,18 @@ interface PerspectiveOptions {
  * Custom hook that creates a perspective effect based on mouse input
  */
 export function usePerspective(
-  mouseX: MotionValue<number>,
-  mouseY: MotionValue<number>,
-  options: PerspectiveOptions = {}
+  _mouseX: MotionValue<number>,
+  _mouseY: MotionValue<number>,
+  _options: PerspectiveOptions = {}
 ) {
   const {
     strength = 10,
     springConfig = { stiffness: 400, damping: 30 }
-  } = options;
+  } = _options;
 
   // Convert 0-1 values to degrees for rotation, centered at 0.5
-  const rotateY = useTransform(mouseX, [0, 1], [strength, -strength]);
-  const rotateX = useTransform(mouseY, [0, 1], [-strength, strength]);
+  const rotateY = useTransform(_mouseX, [0, 1], [strength, -strength]);
+  const rotateX = useTransform(_mouseY, [0, 1], [-strength, strength]);
   
   // Add spring physics for smoother motion
   const smoothRotateX = useSpring(rotateX, {

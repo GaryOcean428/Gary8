@@ -1,28 +1,48 @@
-name: CI Pipeline
-
+name: CI
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
-
+    branches: [main]
 jobs:
-  build:
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20.x
-          cache: 'yarn'
+          node-version: '20'
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Lint
+      - name: Run ESLint
         run: yarn lint
-      - name: Type Check
+  type-check:
+    name: Type-check
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Run TypeScript
         run: yarn typecheck
-      - name: Run Tests
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    needs: [lint, type-check]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Run tests
         run: yarn test --coverage

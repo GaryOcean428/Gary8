@@ -4,7 +4,7 @@
 
 The primary focus of Phase 1 is to modernize the architecture and improve the overall code organization of the Agent One application.
 
-### Key Milestones
+### Key Milestones: Phase 1
 
 - ✅ Implement feature-based architecture
   - ✅ Create directory structure for features, shared, and core components
@@ -38,7 +38,7 @@ The primary focus of Phase 1 is to modernize the architecture and improve the ov
 
 Phase 2 will focus on enhancing the user experience with more polished UIs and new features.
 
-### Key Milestones
+### Key Milestones: Phase 2
 
 - 🟡 UI/UX Improvements
   - ✅ Implement design system with CSS variables and theme support
@@ -68,7 +68,7 @@ Phase 2 will focus on enhancing the user experience with more polished UIs and n
 
 Phase 3 will expand the AI capabilities of the system with more advanced features.
 
-### Key Milestones
+### Key Milestones: Phase 3
 
 - 🟡 Agent System
   - 🟡 Implement multi-agent collaboration

@@ -5,7 +5,7 @@ export interface Message {
 
 export interface APIError extends Error {
   status?: number;
-  response?: any;
+  response?: unknown;
 }
 
 export interface SearchResult {

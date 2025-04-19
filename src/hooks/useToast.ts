@@ -14,25 +14,25 @@ interface ToastState {
   removeToast: (id: string) => void;
 }
 
-export const useToast = create<ToastState>((set) => ({
+export const useToast = create<ToastState>((_set) => ({
   toasts: [],
-  addToast: (toast) => {
+  addToast: (_toast) => {
     const id = crypto.randomUUID();
-    set((state) => ({
-      toasts: [...state.toasts, { ...toast, id }],
+    _set((_state) => ({
+      toasts: [..._state.toasts, { ..._toast, id }],
     }));
 
     // Auto remove toast after duration
-    if (toast.duration !== 0) {
+    if (_toast.duration !== 0) {
       setTimeout(() => {
-        set((state) => ({
-          toasts: state.toasts.filter((t) => t.id !== id),
+        _set((_state) => ({
+          toasts: _state.toasts.filter((_t) => _t.id !== id),
         }));
-      }, toast.duration || 5000);
+      }, _toast.duration || 5000);
     }
   },
-  removeToast: (id) =>
-    set((state) => ({
-      toasts: state.toasts.filter((t) => t.id !== id),
+  removeToast: (_id) =>
+    _set((_state) => ({
+      toasts: _state.toasts.filter((_t) => _t.id !== _id),
     })),
 }));

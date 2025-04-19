@@ -20,21 +20,21 @@ export class DBInitializer {
       return this.initPromise;
     }
 
-    this.initPromise = new Promise((resolve, reject) => {
+    this.initPromise = new Promise((_resolve, _reject) => {
       const openRequest = indexedDB.open(DBConfig.DB_NAME, DBConfig.DB_VERSION);
 
       openRequest.onerror = () => {
         thoughtLogger.log('error', 'Failed to open database', { error: openRequest.error });
-        reject(openRequest.error);
+        _reject(openRequest.error);
       };
 
       openRequest.onsuccess = () => {
         this.db = openRequest.result;
         thoughtLogger.log('success', 'Database opened successfully');
-        resolve(this.db);
+        _resolve(this.db);
       };
 
-      openRequest.onupgradeneeded = (event) => {
+      openRequest.onupgradeneeded = (_event) => {
         thoughtLogger.log('execution', 'Database upgrade needed, creating stores');
         const db = openRequest.result;
         this.createObjectStores(db);
@@ -44,46 +44,46 @@ export class DBInitializer {
     return this.initPromise;
   }
 
-  private createObjectStores(db: IDBDatabase): void {
+  private createObjectStores(_db: IDBDatabase): void {
     // Messages store
-    if (!db.objectStoreNames.contains(DBConfig.STORES.MESSAGES)) {
-      const messagesStore = db.createObjectStore(DBConfig.STORES.MESSAGES, { keyPath: 'id' });
+    if (!_db.objectStoreNames.contains(DBConfig.STORES.MESSAGES)) {
+      const messagesStore = _db.createObjectStore(DBConfig.STORES.MESSAGES, { keyPath: 'id' });
       messagesStore.createIndex('chatId', 'chatId');
       messagesStore.createIndex('timestamp', 'timestamp');
       thoughtLogger.log('success', 'Created messages store');
     }
 
     // Memory store
-    if (!db.objectStoreNames.contains(DBConfig.STORES.MEMORY)) {
-      const memoryStore = db.createObjectStore(DBConfig.STORES.MEMORY, { keyPath: 'id' });
+    if (!_db.objectStoreNames.contains(DBConfig.STORES.MEMORY)) {
+      const memoryStore = _db.createObjectStore(DBConfig.STORES.MEMORY, { keyPath: 'id' });
       memoryStore.createIndex('timestamp', 'timestamp');
       memoryStore.createIndex('type', 'type');
       thoughtLogger.log('success', 'Created memory store');
     }
 
     // User store
-    if (!db.objectStoreNames.contains(DBConfig.STORES.USER)) {
-      db.createObjectStore(DBConfig.STORES.USER, { keyPath: 'id' });
+    if (!_db.objectStoreNames.contains(DBConfig.STORES.USER)) {
+      _db.createObjectStore(DBConfig.STORES.USER, { keyPath: 'id' });
       thoughtLogger.log('success', 'Created user store');
     }
 
     // Settings store
-    if (!db.objectStoreNames.contains(DBConfig.STORES.SETTINGS)) {
-      db.createObjectStore(DBConfig.STORES.SETTINGS, { keyPath: 'id' });
+    if (!_db.objectStoreNames.contains(DBConfig.STORES.SETTINGS)) {
+      _db.createObjectStore(DBConfig.STORES.SETTINGS, { keyPath: 'id' });
       thoughtLogger.log('success', 'Created settings store');
     }
 
     // Chats store
-    if (!db.objectStoreNames.contains(DBConfig.STORES.CHATS)) {
-      const chatsStore = db.createObjectStore(DBConfig.STORES.CHATS, { keyPath: 'id' });
+    if (!_db.objectStoreNames.contains(DBConfig.STORES.CHATS)) {
+      const chatsStore = _db.createObjectStore(DBConfig.STORES.CHATS, { keyPath: 'id' });
       chatsStore.createIndex('timestamp', 'timestamp');
       chatsStore.createIndex('title', 'title');
       thoughtLogger.log('success', 'Created chats store');
     }
 
     // Workflows store
-    if (!db.objectStoreNames.contains(DBConfig.STORES.WORKFLOWS)) {
-      const workflowsStore = db.createObjectStore(DBConfig.STORES.WORKFLOWS, { keyPath: 'id' });
+    if (!_db.objectStoreNames.contains(DBConfig.STORES.WORKFLOWS)) {
+      const workflowsStore = _db.createObjectStore(DBConfig.STORES.WORKFLOWS, { keyPath: 'id' });
       workflowsStore.createIndex('timestamp', 'timestamp');
       workflowsStore.createIndex('name', 'name');
       thoughtLogger.log('success', 'Created workflows store');

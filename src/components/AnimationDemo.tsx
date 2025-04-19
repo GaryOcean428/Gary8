@@ -19,9 +19,9 @@ export function AnimationDemo() {
   // Auto-change scene types for demo effect
   useEffect(() => {
     const interval = setInterval(() => {
-      setSceneType((prev: SceneType) => { // Add type for prev
+      setSceneType((_prev: SceneType) => { // Add type for prev
         const types: Array<SceneType> = ['nature', 'space', 'abstract', 'underwater'];
-        const currentIndex = types.indexOf(prev);
+        const currentIndex = types.indexOf(_prev);
         const nextIndex = (currentIndex + 1) % types.length;
         return types[nextIndex];
       });
@@ -84,20 +84,20 @@ export function AnimationDemo() {
             variant="outline"
             size="sm"
             leftIcon={<Palette size={16} />}
-            onClick={() => setTheme((prev: ThemeType) => prev === 'dark' ? 'light' : 'dark')} // Add type for prev
+            onClick={() => setTheme((_prev: ThemeType) => _prev === 'dark' ? 'light' : 'dark')} // Add type for prev
           >
             {theme === 'dark' ? 'Light Theme' : 'Dark Theme'}
           </Button>
           
           <div className="flex gap-1">
-            {['nature', 'space', 'underwater', 'abstract'].map(type => (
+            {['nature', 'space', 'underwater', 'abstract'].map(_type => (
               <Button
-                key={type}
-                variant={sceneType === type ? 'secondary' : 'outline'}
+                key={_type}
+                variant={sceneType === _type ? 'secondary' : 'outline'}
                 size="sm"
-                onClick={() => setSceneType(type as any)}
+            onClick={() => setSceneType(_type as SceneType)}
               >
-                {type.charAt(0).toUpperCase() + type.slice(1)}
+                {_type.charAt(0).toUpperCase() + _type.slice(1)}
               </Button>
             ))}
           </div>
@@ -106,7 +106,7 @@ export function AnimationDemo() {
             variant="ghost"
             size="sm"
             leftIcon={<RefreshCw size={16} />}
-            onClick={() => setKey((prevKey: number) => prevKey + 1)} // Add type for prevKey
+            onClick={() => setKey((_prevKey: number) => _prevKey + 1)} // Add type for prevKey
           >
             Reset
           </Button>

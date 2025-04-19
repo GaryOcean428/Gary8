@@ -105,7 +105,7 @@ export class RouterCalibration {
   }
 
   async calibrate(
-    targetDistribution: Record<string, number> = {
+    _targetDistribution: Record<string, number> = {
       'claude-3-7-sonnet-20250219': 0.4, // 40% for complex/coding tasks
       'gpt-4.5-preview': 0.2, // 20% for creative tasks
       'sonar-reasoning-pro': 0.2, // 20% for search tasks
@@ -121,7 +121,7 @@ export class RouterCalibration {
     // Try different thresholds
     for (let threshold = 0.3; threshold <= 0.9; threshold += 0.05) {
       const result = await this.evaluateThreshold(threshold);
-      const score = this.calculateScore(result, targetDistribution);
+      const score = this.calculateScore(result, _targetDistribution);
 
       if (score > bestScore) {
         bestScore = score;
@@ -147,34 +147,34 @@ export class RouterCalibration {
     };
   }
 
-  private async evaluateThreshold(threshold: number): Promise<CalibrationResult> {
+  private async evaluateThreshold(_threshold: number): Promise<CalibrationResult> {
     const results = await Promise.all(
-      this.sampleQueries.map(query => this.router.route(query.content, []))
+      this.sampleQueries.map(_query => this.router.route(_query.content, []))
     );
 
     // Calculate model distribution
-    const modelDistribution = results.reduce((acc, result) => {
-      acc[result.model] = (acc[result.model] || 0) + 1;
-      return acc;
+    const modelDistribution = results.reduce((_acc, _result) => {
+      _acc[_result.model] = (_acc[_result.model] || 0) + 1;
+      return _acc;
     }, {} as Record<string, number>);
 
     // Normalize distribution
-    const total = Object.values(modelDistribution).reduce((a, b) => a + b, 0);
-    Object.keys(modelDistribution).forEach(key => {
-      modelDistribution[key] = modelDistribution[key] / total;
+    const total = Object.values(modelDistribution).reduce((_a, _b) => _a + _b, 0);
+    Object.keys(modelDistribution).forEach(_key => {
+      modelDistribution[_key] = modelDistribution[_key] / total;
     });
 
     // Calculate average confidence
-    const averageConfidence = results.reduce((sum, r) => sum + r.confidence, 0) / results.length;
+    const averageConfidence = results.reduce((_sum, _r) => _sum + _r.confidence, 0) / results.length;
 
     // Calculate task type accuracy
-    const taskTypeAccuracy = results.reduce((correct, result, index) => {
-      const expectedModel = this.expectedResults[this.sampleQueries[index].id];
-      return correct + (result.model === expectedModel ? 1 : 0);
+    const taskTypeAccuracy = results.reduce((_correct, _result, _index) => {
+      const expectedModel = this.expectedResults[this.sampleQueries[_index].id];
+      return _correct + (_result.model === expectedModel ? 1 : 0);
     }, 0) / results.length;
 
     return {
-      threshold,
+      _threshold,
       modelDistribution,
       averageConfidence,
       taskTypeAccuracy
@@ -182,12 +182,12 @@ export class RouterCalibration {
   }
 
   private calculateScore(
-    result: CalibrationResult,
-    targetDistribution: Record<string, number>
+    _result: CalibrationResult,
+    _targetDistribution: Record<string, number>
   ): number {
     // Calculate distribution score (0-1)
-    const distributionScore = 1 - Object.keys(targetDistribution).reduce((diff, model) => {
-      return diff + Math.abs((result.modelDistribution[model] || 0) - targetDistribution[model]);
+    const distributionScore = 1 - Object.keys(_targetDistribution).reduce((_diff, _model) => {
+      return _diff + Math.abs((_result.modelDistribution[_model] || 0) - _targetDistribution[_model]);
     }, 0) / 2;
 
     // Weight the components
@@ -199,8 +199,8 @@ export class RouterCalibration {
 
     return (
       distributionScore * weights.distribution +
-      result.averageConfidence * weights.confidence +
-      result.taskTypeAccuracy * weights.accuracy
+      _result.averageConfidence * weights.confidence +
+      _result.taskTypeAccuracy * weights.accuracy
     );
   }
 

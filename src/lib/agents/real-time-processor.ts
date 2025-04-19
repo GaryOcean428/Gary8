@@ -14,9 +14,9 @@ export class RealTimeProcessor {
   }
 
   async processInRealTime(
-    message: Message,
-    onProgress: (content: string) => void,
-    onThought: (thought: string) => void
+    _message: Message,
+    _onProgress: (content: string) => void,
+    _onThought: (thought: string) => void
   ): Promise<void> {
     const streamId = crypto.randomUUID();
     const abortController = new AbortController();
@@ -26,7 +26,7 @@ export class RealTimeProcessor {
 
     try {
       // Process message in chunks for real-time response
-      const chunks = this.splitIntoChunks(message.content);
+      const chunks = this.splitIntoChunks(_message.content);
       
       for (const chunk of chunks) {
         if (abortController.signal.aborted) {
@@ -36,15 +36,15 @@ export class RealTimeProcessor {
 
         // Process chunk and emit progress
         const response = await this.processChunk(chunk);
-        onProgress(response.content);
+        _onProgress(response.content);
 
         // Emit thought process
         if (response.thought) {
-          onThought(response.thought);
+          _onThought(response.thought);
         }
 
         // Small delay between chunks for natural flow
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(_resolve => setTimeout(_resolve, 100));
       }
 
       thoughtLogger.log('success', 'Real-time processing completed', { streamId });
@@ -56,18 +56,18 @@ export class RealTimeProcessor {
     }
   }
 
-  private splitIntoChunks(content: string): string[] {
+  private splitIntoChunks(_content: string): string[] {
     // Split content into manageable chunks for real-time processing
-    return content.match(/.{1,100}/g) || [];
+    return _content.match(/.{1,100}/g) || [];
   }
 
-  private async processChunk(chunk: string): Promise<{
+  private async processChunk(_chunk: string): Promise<{
     content: string;
     thought?: string;
   }> {
     // Process individual chunk and generate response
     const response = await this.modelConnector.routeToModel(
-      [{ role: 'user', content: chunk }],
+      [{ role: 'user', content: _chunk }],
       {
         model: 'grok-beta',
         temperature: 0.7,
@@ -82,18 +82,18 @@ export class RealTimeProcessor {
     };
   }
 
-  private extractThought(content: string): string | undefined {
+  private extractThought(_content: string): string | undefined {
     // Extract thought process from response if present
-    const thoughtMatch = content.match(/\[THOUGHT\](.*?)\[\/THOUGHT\]/s);
+    const thoughtMatch = _content.match(/\[THOUGHT\](.*?)\[\/THOUGHT\]/s);
     return thoughtMatch ? thoughtMatch[1].trim() : undefined;
   }
 
-  cancelStream(streamId: string): void {
-    const controller = this.activeStreams.get(streamId);
+  cancelStream(_streamId: string): void {
+    const controller = this.activeStreams.get(_streamId);
     if (controller) {
       controller.abort();
-      this.activeStreams.delete(streamId);
-      thoughtLogger.log('observation', 'Stream cancelled', { streamId });
+      this.activeStreams.delete(_streamId);
+      thoughtLogger.log('observation', 'Stream cancelled', { _streamId });
     }
   }
 

@@ -41,18 +41,18 @@ export class ModelRouter {
     sonarPro: 'sonar-reasoning-pro'
   };
 
-  async route(query: string, history: Message[]): Promise<RouterConfig> {
+  async route(_query: string, _history: Message[]): Promise<RouterConfig> {
     thoughtLogger.log('reasoning', 'Analyzing query for model selection');
 
-    const complexity = this.assessComplexity(query);
-    const contextLength = this.calculateContextLength(history);
-    const requiresSearch = this.requiresSearch(query);
-    const requiresCode = this.requiresCodeExecution(query);
-    const requiresCreative = this.requiresCreative(query);
-    const requiresReasoning = this.requiresReasoning(query);
-    const questionType = this.classifyQuestion(query);
-    const capabilities = this.detectCapabilities(query);
-    const isCasualGreeting = this.isCasualGreeting(query);
+    const complexity = this.assessComplexity(_query);
+    const contextLength = this.calculateContextLength(_history);
+    const requiresSearch = this.requiresSearch(_query);
+    const requiresCode = this.requiresCodeExecution(_query);
+    const requiresCreative = this.requiresCreative(_query);
+    const requiresReasoning = this.requiresReasoning(_query);
+    const questionType = this.classifyQuestion(_query);
+    const capabilities = this.detectCapabilities(_query);
+    const isCasualGreeting = this.isCasualGreeting(_query);
 
     thoughtLogger.log('observation', 'Query analysis complete', {
       complexity,
@@ -84,7 +84,7 @@ export class ModelRouter {
     }
 
     // For search-related queries that genuinely need up-to-date information
-    if (requiresSearch && this.isGenuineSearchQuery(query)) {
+    if (requiresSearch && this.isGenuineSearchQuery(_query)) {
       consideredModels.push(this.models.sonarPro);
       return {
         model: this.models.sonarPro,
@@ -219,8 +219,8 @@ export class ModelRouter {
     };
   }
 
-  private getResponseStrategy(questionType: string): string {
-    switch (questionType) {
+  private getResponseStrategy(_questionType: string): string {
+    switch (_questionType) {
       case 'problem_solving':
         return 'chain_of_thought';
       case 'factual':
@@ -240,39 +240,39 @@ export class ModelRouter {
    * Assesses the complexity of a query based on multiple factors
    * Returns a score between 0 and 1, where higher values indicate greater complexity
    */
-  private assessComplexity(query: string): number {
+  private assessComplexity(_query: string): number {
     const factors = {
       // Base length factor, maxes out at 500 characters
-      length: Math.min(query.length / 500, 0.8),
+      length: Math.min(_query.length / 500, 0.8),
       
       // Question complexity factors
-      questionCount: Math.min((query.match(/\?/g) || []).length * 0.2, 0.6), // Multiple questions increase complexity
-      questionWords: Math.min((query.match(/\b(how|why|what|when|where|who)\b/gi) || []).length * 0.08, 0.4),
+      questionCount: Math.min((_query.match(/\?/g) || []).length * 0.2, 0.6), // Multiple questions increase complexity
+      questionWords: Math.min((_query.match(/\b(how|why|what|when|where|who)\b/gi) || []).length * 0.08, 0.4),
       
       // Technical content indicators
-      technicalTerms: Math.min((query.match(/\b(algorithm|function|process|system|analyze|evaluate|compare|implement|architecture|framework|infrastructure|methodology)\b/gi) || []).length * 0.12, 0.6),
-      codeRelated: /\b(code|program|debug|function|api|class|method|algorithm)\b/i.test(query) ? 0.25 : 0,
+      technicalTerms: Math.min((_query.match(/\b(algorithm|function|process|system|analyze|evaluate|compare|implement|architecture|framework|infrastructure|methodology)\b/gi) || []).length * 0.12, 0.6),
+      codeRelated: /\b(code|program|debug|function|api|class|method|algorithm)\b/i.test(_query) ? 0.25 : 0,
       
       // Structural complexity indicators
-      multipleSteps: Math.min((query.match(/\b(and|then|after|before|finally|first|second|third|next|last)\b/gi) || []).length * 0.08, 0.4),
-      complexStructures: Math.min((query.match(/\b(if|else|while|for|switch|case|however|although|despite|nevertheless|furthermore|moreover)\b/gi) || []).length * 0.12, 0.5),
+      multipleSteps: Math.min((_query.match(/\b(and|then|after|before|finally|first|second|third|next|last)\b/gi) || []).length * 0.08, 0.4),
+      complexStructures: Math.min((_query.match(/\b(if|else|while|for|switch|case|however|although|despite|nevertheless|furthermore|moreover)\b/gi) || []).length * 0.12, 0.5),
       
       // Domain-specific complexity
-      domainSpecific: Math.min((query.match(/\b(quantum|neural|genome|blockchain|cryptocurrency|theorem|philosophy|molecular|theoretical|computational|statistical|mathematical)\b/gi) || []).length * 0.15, 0.6)
+      domainSpecific: Math.min((_query.match(/\b(quantum|neural|genome|blockchain|cryptocurrency|theorem|philosophy|molecular|theoretical|computational|statistical|mathematical)\b/gi) || []).length * 0.15, 0.6)
     };
 
     // Calculate weighted sum of factors
-    const weightedSum = Object.values(factors).reduce((sum, value) => sum + value, 0);
+    const weightedSum = Object.values(factors).reduce((_sum, _value) => _sum + _value, 0);
     
     // Normalize to 0-1 range, capping at 1
     return Math.min(weightedSum / 4, 1);
   }
 
-  private calculateContextLength(history: Message[]): number {
-    return history.reduce((sum, msg) => sum + msg.content.length, 0);
+  private calculateContextLength(_history: Message[]): number {
+    return _history.reduce((_sum, _msg) => _sum + _msg.content.length, 0);
   }
 
-  private requiresCodeExecution(query: string): boolean {
+  private requiresCodeExecution(_query: string): boolean {
     const codeKeywords = [
       'code',
       'function',
@@ -291,19 +291,19 @@ export class ModelRouter {
       'framework'
     ];
 
-    const queryLower = query.toLowerCase();
+    const queryLower = _query.toLowerCase();
     
     // Count code keywords
-    const keywordMatches = codeKeywords.filter(keyword => 
-      queryLower.includes(keyword.toLowerCase())
+    const keywordMatches = codeKeywords.filter(_keyword => 
+      queryLower.includes(_keyword.toLowerCase())
     ).length;
     
     // Check for code block markers
-    const containsCodeBlock = query.includes('```');
+    const containsCodeBlock = _query.includes('```');
     const containsCodePatterns = /\b(if|for|while|class|def|function|var|const|let)\b/.test(queryLower);
     
     // More specific checks for programming tasks
-    const programmingIntent = /\bwrite (a|some|the)? code\b|create (a|some|the)? (function|class|script|program)/i.test(query);
+    const programmingIntent = /\bwrite (a|some|the)? code\b|create (a|some|the)? (function|class|script|program)/i.test(_query);
     
     return keywordMatches >= 2 || containsCodeBlock || containsCodePatterns || programmingIntent;
   }
@@ -312,8 +312,8 @@ export class ModelRouter {
    * Determines if a query requires search for up-to-date information
    * Uses more specific patterns to avoid over-triggering on common questions
    */
-  private requiresSearch(query: string): boolean {
-    const queryLower = query.toLowerCase();
+  private requiresSearch(_query: string): boolean {
+    const queryLower = _query.toLowerCase();
     
     // Explicit search intent keywords
     const explicitSearchKeywords = [
@@ -348,13 +348,13 @@ export class ModelRouter {
     ];
     
     // Check for explicit search intent
-    const hasExplicitSearchIntent = explicitSearchKeywords.some(term => queryLower.includes(term));
+    const hasExplicitSearchIntent = explicitSearchKeywords.some(_term => queryLower.includes(_term));
     
     // Check for time-sensitive information need
-    const needsCurrentInfo = timeSensitiveKeywords.some(term => queryLower.includes(term));
+    const needsCurrentInfo = timeSensitiveKeywords.some(_term => queryLower.includes(_term));
     
     // Check for news-related queries
-    const isNewsQuery = newsKeywords.some(term => queryLower.includes(term));
+    const isNewsQuery = newsKeywords.some(_term => queryLower.includes(_term));
     
     // Check for specific temporal references that require current information
     const hasTemporalReference = /\b(today|yesterday|this week|this month|this year|currently|now)\b/.test(queryLower);
@@ -371,8 +371,8 @@ export class ModelRouter {
    * Additional check to confirm if a query genuinely needs search capabilities
    * Provides a second filter to prevent over-selection of search models
    */
-  private isGenuineSearchQuery(query: string): boolean {
-    const queryLower = query.toLowerCase();
+  private isGenuineSearchQuery(_query: string): boolean {
+    const queryLower = _query.toLowerCase();
     
     // Patterns that indicate the query doesn't actually need search
     const nonSearchPatterns = [
@@ -393,11 +393,11 @@ export class ModelRouter {
     ];
     
     // Check if query matches patterns that don't require search
-    const matchesNonSearchPattern = nonSearchPatterns.some(pattern => pattern.test(queryLower));
+    const matchesNonSearchPattern = nonSearchPatterns.some(_pattern => _pattern.test(queryLower));
     
     // Named entity recognition to detect if query is about a person, place, or thing
     // This is a simple approach - in a real system you'd use NER libraries
-    const containsNamedEntity = /\b([A-Z][a-z]+ )+[A-Z][a-z]+\b/.test(query);
+    const containsNamedEntity = /\b([A-Z][a-z]+ )+[A-Z][a-z]+\b/.test(_query);
     
     // Keywords that strongly indicate need for search even for general knowledge
     const strongSearchIndicators = [
@@ -410,7 +410,7 @@ export class ModelRouter {
       'breaking news'
     ];
     
-    const hasStrongSearchIndicator = strongSearchIndicators.some(term => queryLower.includes(term));
+    const hasStrongSearchIndicator = strongSearchIndicators.some(_term => queryLower.includes(_term));
     
     // If query matches non-search patterns and doesn't have strong search indicators,
     // it probably doesn't need search
@@ -428,7 +428,7 @@ export class ModelRouter {
     return true;
   }
   
-  private requiresCreative(query: string): boolean {
+  private requiresCreative(_query: string): boolean {
     const creativeKeywords = [
       'creative',
       'write',
@@ -446,20 +446,20 @@ export class ModelRouter {
       'ideate'
     ];
     
-    const queryLower = query.toLowerCase();
+    const queryLower = _query.toLowerCase();
     
     // Check for explicit creative content requests
-    const explicitCreativeRequest = /\bwrite (a|an|some) (story|poem|essay|article|script|narrative|song|novel)/i.test(query);
+    const explicitCreativeRequest = /\bwrite (a|an|some) (story|poem|essay|article|script|narrative|song|novel)/i.test(_query);
     
     // Check for creative ideation requests
-    const ideationRequest = /\b(come up with|brainstorm|think of|generate|create) (some|a few|many|multiple|several|creative|unique|original) (ideas|concepts|options|possibilities)/i.test(query);
+    const ideationRequest = /\b(come up with|brainstorm|think of|generate|create) (some|a few|many|multiple|several|creative|unique|original) (ideas|concepts|options|possibilities)/i.test(_query);
     
-    return creativeKeywords.some(keyword => queryLower.includes(keyword)) || 
+    return creativeKeywords.some(_keyword => queryLower.includes(_keyword)) || 
            explicitCreativeRequest || 
            ideationRequest;
   }
   
-  private requiresReasoning(query: string): boolean {
+  private requiresReasoning(_query: string): boolean {
     const reasoningKeywords = [
       'explain',
       'analyze',
@@ -477,18 +477,18 @@ export class ModelRouter {
       'implications'
     ];
     
-    const queryLower = query.toLowerCase();
+    const queryLower = _query.toLowerCase();
     
     // Check for explicit reasoning tasks
-    const explicitReasoningTask = /\b(analyze|evaluate|compare|contrast) (the|this|these|those|between|among)\b/i.test(query);
+    const explicitReasoningTask = /\b(analyze|evaluate|compare|contrast) (the|this|these|those|between|among)\b/i.test(_query);
     
     // Check for deep explanation requests
-    const deepExplanationRequest = /\b(explain|elaborate on|describe in detail) (how|why|what|when|where)\b/i.test(query);
+    const deepExplanationRequest = /\b(explain|elaborate on|describe in detail) (how|why|what|when|where)\b/i.test(_query);
     
     // Check for complex question structures that suggest reasoning
-    const complexQuestionStructure = /\bwhy (is|are|does|do|would|should|could|might) .+ (if|when|while|although|despite|however|nevertheless)\b/i.test(query);
+    const complexQuestionStructure = /\bwhy (is|are|does|do|would|should|could|might) .+ (if|when|while|although|despite|however|nevertheless)\b/i.test(_query);
     
-    return reasoningKeywords.some(keyword => queryLower.includes(keyword)) || 
+    return reasoningKeywords.some(_keyword => queryLower.includes(_keyword)) || 
            explicitReasoningTask || 
            deepExplanationRequest || 
            complexQuestionStructure;
@@ -497,7 +497,7 @@ export class ModelRouter {
   /**
    * Checks if a query is a casual greeting that can be handled by a lighter model
    */
-  private isCasualGreeting(query: string): boolean {
+  private isCasualGreeting(_query: string): boolean {
     const greetingPatterns = [
       /^(hi|hello|hey|greetings|good morning|good afternoon|good evening)( there)?!?$/i,
       /^how are you( doing| today)?(\?|!)?$/i,
@@ -506,15 +506,15 @@ export class ModelRouter {
       /^(hi|hello|hey),? (there |)?(Claude|Assistant|AI)!?$/i
     ];
     
-    return greetingPatterns.some(pattern => pattern.test(query.trim()));
+    return greetingPatterns.some(_pattern => _pattern.test(_query.trim()));
   }
 
-  private classifyQuestion(query: string): string {
-    const lowerQuery = query.toLowerCase();
+  private classifyQuestion(_query: string): string {
+    const lowerQuery = _query.toLowerCase();
     
     // Check for casual greetings first
     // Check for casual greetings first
-    if (this.isCasualGreeting(query)) {
+    if (this.isCasualGreeting(_query)) {
       return 'casual';
     }
     
@@ -542,17 +542,17 @@ export class ModelRouter {
     return 'open_ended';
   }
 
-  private detectCapabilities(query: string): string[] {
+  private detectCapabilities(_query: string): string[] {
     const capabilities: string[] = [];
-    const queryLower = query.toLowerCase();
+    const queryLower = _query.toLowerCase();
     
     // Web search
-    if (this.requiresSearch(query) && this.isGenuineSearchQuery(query)) {
+    if (this.requiresSearch(_query) && this.isGenuineSearchQuery(_query)) {
       capabilities.push('web_search');
     }
     
     // Code generation
-    if (this.requiresCodeExecution(query)) {
+    if (this.requiresCodeExecution(_query)) {
       capabilities.push('code_generation');
     }
     
@@ -562,12 +562,12 @@ export class ModelRouter {
     }
     
     // Creative writing
-    if (this.requiresCreative(query)) {
+    if (this.requiresCreative(_query)) {
       capabilities.push('creative_writing');
     }
     
     // Logical reasoning
-    if (this.requiresReasoning(query)) {
+    if (this.requiresReasoning(_query)) {
       capabilities.push('logical_reasoning');
     }
     

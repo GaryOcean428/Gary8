@@ -49,6 +49,17 @@ For Supabase Edge Functions, you'll also need to set the environment variables i
 
 ## Development
 
+### Developer Scripts
+
+- `yarn dev`         Start the development server (Vite).
+- `yarn lint`        Run ESLint and auto-fix issues.
+- `yarn typecheck`   Run the TypeScript compiler in no‑emit mode.
+ - `yarn test`        Execute the full test suite (Vitest).
+ - `yarn prefix-unused`  Prefix unused function parameters with `_` (bulk cleanup).
+ - `yarn refine-any`     Replace explicit `any` with `unknown` in type positions.
+
+Continuous Integration runs `lint`, `typecheck`, and `test` on every push and pull request per `.github/workflows/ci.yml`.
+
 ```bash
 # Install dependencies
 yarn

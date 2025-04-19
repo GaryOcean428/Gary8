@@ -24,19 +24,19 @@ export function DocumentList({
 }: DocumentListProps) {
   const [searchQuery, setSearchQuery] = React.useState('');
   const allTags = Array.from(
-    new Set(documents.flatMap(doc => doc.tags))
+    new Set(documents.flatMap(_doc => _doc.tags))
   ).sort();
 
-  const handleTagClick = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      onTagSelect(selectedTags.filter(t => t !== tag));
+  const handleTagClick = (_tag: string) => {
+    if (selectedTags.includes(_tag)) {
+      onTagSelect(selectedTags.filter(_t => _t !== _tag));
     } else {
-      onTagSelect([...selectedTags, tag]);
+      onTagSelect([...selectedTags, _tag]);
     }
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = (_e: React.FormEvent) => {
+    _e.preventDefault();
     onSearch(searchQuery);
   };
 
@@ -69,22 +69,22 @@ export function DocumentList({
           </button>
         </div>
         <div className="flex flex-wrap lg:flex-col gap-2">
-          {allTags.map(tag => (
+          {allTags.map(_tag => (
             <button
-              key={tag}
-              onClick={() => handleTagClick(tag)}
+              key={_tag}
+              onClick={() => handleTagClick(_tag)}
               className={`px-3 py-1.5 rounded text-sm transition-colors ${
-                selectedTags.includes(tag)
+                selectedTags.includes(_tag)
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:bg-muted'
               }`}
             >
               <div className="flex items-center">
                 <Tag className="w-3 h-3 mr-2" />
-                <span>{tag}</span>
-                {selectedTags.includes(tag) && (
+                <span>{_tag}</span>
+                {selectedTags.includes(_tag) && (
                   <span className="ml-auto text-xs bg-primary-foreground/20 px-1.5 rounded-full">
-                    {documents.filter(d => d.tags.includes(tag)).length}
+                    {documents.filter(_d => _d.tags.includes(_tag)).length}
                   </span>
                 )}
               </div>
@@ -101,7 +101,7 @@ export function DocumentList({
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(_e) => setSearchQuery(_e.target.value)}
               placeholder="Search documents..."
               className="w-full bg-input text-foreground rounded-lg pl-10 pr-10 py-2 border border-border focus:outline-none focus:ring-2 focus:ring-primary"
             />
@@ -125,14 +125,14 @@ export function DocumentList({
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {documents.map(doc => (
-              <DocumentCard key={doc.id} document={doc} />
+            {documents.map(_doc => (
+              <DocumentCard key={_doc.id} document={_doc} />
             ))}
           </div>
         ) : (
           <div className="space-y-2">
-            {documents.map(doc => (
-              <DocumentRow key={doc.id} document={doc} />
+            {documents.map(_doc => (
+              <DocumentRow key={_doc.id} document={_doc} />
             ))}
           </div>
         )}
@@ -165,13 +165,13 @@ function DocumentCard({ document }: { document: Document }) {
       </div>
       {document.tags.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
-          {document.tags.map(tag => (
+          {document.tags.map(_tag => (
             <span
-              key={tag}
+              key={_tag}
               className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-muted text-muted-foreground border border-border"
             >
               <Tag size={12} className="mr-1" />
-              {tag}
+              {_tag}
             </span>
           ))}
         </div>
@@ -193,12 +193,12 @@ function DocumentRow({ document }: { document: Document }) {
               <>
                 <span>•</span>
                 <div className="flex items-center space-x-1">
-                  {document.tags.map(tag => (
+                  {document.tags.map(_tag => (
                     <span
-                      key={tag}
+                      key={_tag}
                       className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-muted border border-border"
                     >
-                      {tag}
+                      {_tag}
                     </span>
                   ))}
                 </div>

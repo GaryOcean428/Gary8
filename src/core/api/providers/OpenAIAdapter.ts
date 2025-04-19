@@ -23,8 +23,8 @@ export class OpenAIAdapter implements AIProviderAdapter {
     }
   }
   
-  setApiKey(apiKey: string): void {
-    this.apiKey = apiKey;
+  setApiKey(_apiKey: string): void {
+    this.apiKey = _apiKey;
   }
 
   getAvailableModels(): string[] {
@@ -80,22 +80,22 @@ export class OpenAIAdapter implements AIProviderAdapter {
   }
   
   async chat(
-    messages: Message[],
-    onProgress?: (content: string) => void,
-    options?: ChatOptions
+    _messages: Message[],
+    _onProgress?: (content: string) => void,
+    _options?: ChatOptions
   ): Promise<string> {
     if (!this.apiKey) {
       throw new AppError('OpenAI API key not configured', 'API_ERROR');
     }
     
-    const isResponsesSupported = this.isResponsesCompatibleModel(options?.model || 'gpt-4o');
+    const isResponsesSupported = this.isResponsesCompatibleModel(_options?.model || 'gpt-4o');
     
     try {
       // Use the Responses API for supported models, fall back to Chat Completions for others
       if (isResponsesSupported) {
-        return await this.chatWithResponsesAPI(messages, onProgress, options);
+        return await this.chatWithResponsesAPI(_messages, _onProgress, _options);
       } else {
-        return await this.chatWithCompletionsAPI(messages, onProgress, options);
+        return await this.chatWithCompletionsAPI(_messages, _onProgress, _options);
       }
     } catch (error) {
       // If the Responses API fails with a not-found error, fallback to Completions API
@@ -106,7 +106,7 @@ export class OpenAIAdapter implements AIProviderAdapter {
         isResponsesSupported
       ) {
         thoughtLogger.log('warning', 'Failed to use Responses API, falling back to Chat Completions', { error });
-        return await this.chatWithCompletionsAPI(messages, onProgress, options);
+        return await this.chatWithCompletionsAPI(_messages, _onProgress, _options);
       }
       
       throw error;
@@ -117,25 +117,25 @@ export class OpenAIAdapter implements AIProviderAdapter {
    * Make a request using the new Responses API
    */
   private async chatWithResponsesAPI(
-    messages: Message[],
-    onProgress?: (content: string) => void,
-    options?: ChatOptions
+    _messages: Message[],
+    _onProgress?: (content: string) => void,
+    _options?: ChatOptions
   ): Promise<string> {
-    thoughtLogger.log('execution', 'Using OpenAI Responses API', { model: options?.model });
+    thoughtLogger.log('execution', 'Using OpenAI Responses API', { model: _options?.model });
     
     // Convert from messages to input format for Responses API
-    const input = this.convertMessagesToInput(messages);
+    const input = this.convertMessagesToInput(_messages);
     
     // Build request body
     const requestBody: any = {
-      model: options?.model || 'gpt-4o',
+      model: _options?.model || 'gpt-4o',
       input,
-      stream: Boolean(onProgress)
+      stream: Boolean(_onProgress)
     };
     
     // Add optional parameters
-    if (options?.temperature !== undefined) requestBody.temperature = options.temperature;
-    if (options?.maxTokens !== undefined) requestBody.max_tokens = options.maxTokens;
+    if (_options?.temperature !== undefined) requestBody.temperature = _options.temperature;
+    if (_options?.maxTokens !== undefined) requestBody.max_tokens = _options.maxTokens;
     
     return await this.retryHandler.execute(async () => {
       const response = await fetch(`${this.baseUrl}/responses`, {
@@ -160,8 +160,8 @@ export class OpenAIAdapter implements AIProviderAdapter {
       }
       
       // Handle streaming
-      if (onProgress && response.body) {
-        return await this.handleResponsesStreaming(response.body, onProgress);
+      if (_onProgress && response.body) {
+        return await this.handleResponsesStreaming(response.body, _onProgress);
       }
       
       // Parse response
@@ -174,25 +174,25 @@ export class OpenAIAdapter implements AIProviderAdapter {
    * Fallback method: Make a request using the older Chat Completions API
    */
   private async chatWithCompletionsAPI(
-    messages: Message[],
-    onProgress?: (content: string) => void,
-    options?: ChatOptions
+    _messages: Message[],
+    _onProgress?: (content: string) => void,
+    _options?: ChatOptions
   ): Promise<string> {
-    thoughtLogger.log('execution', 'Using OpenAI Chat Completions API', { model: options?.model });
+    thoughtLogger.log('execution', 'Using OpenAI Chat Completions API', { model: _options?.model });
     
     // Build request body for Chat Completions API
     const requestBody: any = {
-      model: options?.model || 'gpt-4o',
-      messages: messages.map(({ role, content }) => ({ role, content })),
-      stream: Boolean(onProgress)
+      model: _options?.model || 'gpt-4o',
+      messages: _messages.map(({ role, content }) => ({ role, content })),
+      stream: Boolean(_onProgress)
     };
     
     // Add optional parameters
-    if (options?.temperature !== undefined) requestBody.temperature = options.temperature;
-    if (options?.maxTokens !== undefined) requestBody.max_tokens = options.maxTokens;
-    if (options?.topP !== undefined) requestBody.top_p = options.topP;
-    if (options?.frequencyPenalty !== undefined) requestBody.frequency_penalty = options.frequencyPenalty;
-    if (options?.presencePenalty !== undefined) requestBody.presence_penalty = options.presencePenalty;
+    if (_options?.temperature !== undefined) requestBody.temperature = _options.temperature;
+    if (_options?.maxTokens !== undefined) requestBody.max_tokens = _options.maxTokens;
+    if (_options?.topP !== undefined) requestBody.top_p = _options.topP;
+    if (_options?.frequencyPenalty !== undefined) requestBody.frequency_penalty = _options.frequencyPenalty;
+    if (_options?.presencePenalty !== undefined) requestBody.presence_penalty = _options.presencePenalty;
     
     return await this.retryHandler.execute(async () => {
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
@@ -216,8 +216,8 @@ export class OpenAIAdapter implements AIProviderAdapter {
       }
       
       // Handle streaming
-      if (onProgress && response.body) {
-        return await this.handleCompletionsStreaming(response.body, onProgress);
+      if (_onProgress && response.body) {
+        return await this.handleCompletionsStreaming(response.body, _onProgress);
       }
       
       // Parse normal response
@@ -230,10 +230,10 @@ export class OpenAIAdapter implements AIProviderAdapter {
    * Handle streaming responses from the Responses API
    */
   private async handleResponsesStreaming(
-    body: ReadableStream<Uint8Array>,
-    onProgress: (content: string) => void
+    _body: ReadableStream<Uint8Array>,
+    _onProgress: (content: string) => void
   ): Promise<string> {
-    const reader = body.getReader();
+    const reader = _body.getReader();
     const decoder = new TextDecoder();
     let fullContent = '';
     
@@ -256,12 +256,12 @@ export class OpenAIAdapter implements AIProviderAdapter {
               // Check for text_delta chunks in streaming
               if (parsed.type === 'text_delta') {
                 fullContent += parsed.delta;
-                onProgress(parsed.delta);
+                _onProgress(parsed.delta);
               }
               // Also handle text chunks
               else if (parsed.type === 'text') {
                 fullContent += parsed.text;
-                onProgress(parsed.text);
+                _onProgress(parsed.text);
               }
             } catch (e) {
               thoughtLogger.log('error', 'Failed to parse streaming response', { error: e });
@@ -280,10 +280,10 @@ export class OpenAIAdapter implements AIProviderAdapter {
    * Handle streaming responses from the Chat Completions API
    */
   private async handleCompletionsStreaming(
-    body: ReadableStream<Uint8Array>,
-    onProgress: (content: string) => void
+    _body: ReadableStream<Uint8Array>,
+    _onProgress: (content: string) => void
   ): Promise<string> {
-    const reader = body.getReader();
+    const reader = _body.getReader();
     const decoder = new TextDecoder();
     let fullContent = '';
     
@@ -306,7 +306,7 @@ export class OpenAIAdapter implements AIProviderAdapter {
               
               if (content) {
                 fullContent += content;
-                onProgress(content);
+                _onProgress(content);
               }
             } catch (e) {
               thoughtLogger.log('error', 'Failed to parse streaming response', { error: e });
@@ -324,16 +324,16 @@ export class OpenAIAdapter implements AIProviderAdapter {
   /**
    * Extract content from the Responses API response
    */
-  private extractResponsesContent(data: any): string {
+  private extractResponsesContent(_data: unknown): string {
     // Use the convenience method if available
-    if (data.output_text !== undefined) {
-      return data.output_text;
+    if (_data.output_text !== undefined) {
+      return _data.output_text;
     }
     
     // Otherwise manually extract from the structured output
-    if (data.output) {
+    if (_data.output) {
       // Find the first message content that's a text
-      for (const item of data.output) {
+      for (const item of _data.output) {
         if (item.type === 'message' && item.role === 'assistant') {
           for (const content of (item.content || [])) {
             if (content.type === 'output_text') {
@@ -353,20 +353,20 @@ export class OpenAIAdapter implements AIProviderAdapter {
   /**
    * Convert messages array to input format for Responses API
    */
-  private convertMessagesToInput(messages: Message[]): any {
+  private convertMessagesToInput(_messages: Message[]): any {
     // If just one message, return it directly with role and content
-    if (messages.length === 1) {
-      return { role: messages[0].role, content: messages[0].content };
+    if (_messages.length === 1) {
+      return { role: _messages[0].role, content: _messages[0].content };
     }
     
     // Otherwise return an array
-    return messages.map(({ role, content }) => ({ role, content }));
+    return _messages.map(({ role, content }) => ({ role, content }));
   }
   
   /**
    * Check if a model is compatible with the Responses API
    */
-  private isResponsesCompatibleModel(model: string): boolean {
+  private isResponsesCompatibleModel(_model: string): boolean {
     // Only certain OpenAI models work with the Responses API
     const compatibleModels = [
       'gpt-4o',
@@ -378,12 +378,12 @@ export class OpenAIAdapter implements AIProviderAdapter {
     ];
     
     // Check if model name contains any of the compatible models
-    return compatibleModels.some(compatibleModel => 
-      model.includes(compatibleModel)
+    return compatibleModels.some(_compatibleModel => 
+      _model.includes(_compatibleModel)
     );
   }
 }
 
-export function createOpenAIAdapter(apiKey?: string): AIProviderAdapter {
-  return new OpenAIAdapter(apiKey);
+export function createOpenAIAdapter(_apiKey?: string): AIProviderAdapter {
+  return new OpenAIAdapter(_apiKey);
 }

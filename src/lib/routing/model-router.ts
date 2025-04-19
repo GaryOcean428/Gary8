@@ -29,12 +29,12 @@ export class ModelRouter {
     search: 'sonar-reasoning-pro'
   };
 
-  async route(query: string, history: Message[]): Promise<RouterConfig> {
+  async route(_query: string, _history: Message[]): Promise<RouterConfig> {
     thoughtLogger.log('reasoning', 'Analyzing query for model selection');
 
-    const q = query.toLowerCase();
+    const q = _query.toLowerCase();
     const complexity = this.assessComplexity(q);
-    const contextLength = this.calculateContextLength(history);
+    const contextLength = this.calculateContextLength(_history);
     const requiresSearch = this.requiresSearch(q);
     const requiresCode = this.requiresCodeExecution(q);
     const questionType = this.classifyQuestion(q);
@@ -148,7 +148,7 @@ export class ModelRouter {
       };
     }
     // Branch: extended context - prefer high-capacity model if conversation is long
-    if (history.length > 10) {
+    if (_history.length > 10) {
       consideredModels.push(this.models.high);
       return {
         model: this.models.high,
@@ -218,26 +218,26 @@ export class ModelRouter {
     };
   }
 
-  private assessComplexity(query: string): number {
+  private assessComplexity(_query: string): number {
     const factors = {
-      length: Math.min(query.length / 500, 1),
-      questionWords: (query.match(/\b(how|why|what|when|where|who|explain)\b/gi) || []).length * 0.1,
-      technicalTerms: (query.match(/\b(algorithm|function|process|system|analyze|architecture|performance|reliability|security)\b/gi) || []).length * 0.15,
-      codeRelated: /\b(code|program|debug|function|api|schema|implement|optimize)\b/i.test(query) ? 0.3 : 0,
+      length: Math.min(_query.length / 500, 1),
+      questionWords: (_query.match(/\b(how|why|what|when|where|who|explain)\b/gi) || []).length * 0.1,
+      technicalTerms: (_query.match(/\b(algorithm|function|process|system|analyze|architecture|performance|reliability|security)\b/gi) || []).length * 0.15,
+      codeRelated: /\b(code|program|debug|function|api|schema|implement|optimize)\b/i.test(_query) ? 0.3 : 0,
       multipleSteps: 0 // multi-step handled separately
     };
 
     return Math.min(
-      Object.values(factors).reduce((sum, value) => sum + value, 0),
+      Object.values(factors).reduce((_sum, _value) => _sum + _value, 0),
       1
     );
   }
 
-  private calculateContextLength(history: Message[]): number {
-    return history.reduce((sum, msg) => sum + msg.content.length, 0);
+  private calculateContextLength(_history: Message[]): number {
+    return _history.reduce((_sum, _msg) => _sum + _msg.content.length, 0);
   }
 
-  private requiresCodeExecution(query: string): boolean {
+  private requiresCodeExecution(_query: string): boolean {
     const codeKeywords = [
       'code',
       'function',
@@ -250,14 +250,14 @@ export class ModelRouter {
       'execute',
       'schema'
     ];
-    const text = query.toLowerCase();
-    return codeKeywords.some(keyword => {
-      const pattern = new RegExp(`\\b${keyword}\\b`);
+    const text = _query.toLowerCase();
+    return codeKeywords.some(_keyword => {
+      const pattern = new RegExp(`\\b${_keyword}\\b`);
       return pattern.test(text);
     });
   }
 
-  private requiresSearch(query: string): boolean {
+  private requiresSearch(_query: string): boolean {
     const searchTerms = [
       'research',
       'search',
@@ -271,13 +271,13 @@ export class ModelRouter {
       'tell me about'
     ];
 
-    return searchTerms.some(term => 
-      query.toLowerCase().includes(term)
+    return searchTerms.some(_term => 
+      _query.toLowerCase().includes(_term)
     );
   }
 
-  private classifyQuestion(query: string): string {
-    const lowerQuery = query.toLowerCase();
+  private classifyQuestion(_query: string): string {
+    const lowerQuery = _query.toLowerCase();
     
     if (/\b(how|why|explain)\b/.test(lowerQuery)) {
       return 'problem_solving';

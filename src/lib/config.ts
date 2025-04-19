@@ -5,7 +5,7 @@ interface ConfigStore {
   updateApiKeys: (keys: Record<string, string>) => void;
 }
 
-export const useConfigStore = create<ConfigStore>((set) => ({
+export const useConfigStore = create<ConfigStore>((_set) => ({
   apiKeys: {
     groq: import.meta.env.VITE_GROQ_API_KEY || '',
     perplexity: import.meta.env.VITE_PERPLEXITY_API_KEY || '',
@@ -15,7 +15,7 @@ export const useConfigStore = create<ConfigStore>((set) => ({
     openai: import.meta.env.VITE_OPENAI_API_KEY || '',
     github: import.meta.env.VITE_GITHUB_TOKEN || ''
   },
-  updateApiKeys: (keys) => set({ apiKeys: keys })
+  updateApiKeys: (_keys) => _set({ apiKeys: _keys })
 }));
 
 export const getApiKeys = () => {

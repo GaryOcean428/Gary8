@@ -11,10 +11,10 @@ export class SpecialistAgent extends BaseAgent {
     this.webDataTools = WebDataTools.getInstance();
   }
 
-  async processMessage(message: AgentMessage): Promise<Message> {
+  async processMessage(_message: AgentMessage): Promise<Message> {
     const startTime = Date.now();
     thoughtLogger.log('plan', `Specialist agent ${this.config.id} processing message`, {
-      messageType: message.type,
+      messageType: _message.type,
       capabilities: this.config.capabilities
     });
 
@@ -22,14 +22,14 @@ export class SpecialistAgent extends BaseAgent {
       this.setStatus('active');
       let result: any;
 
-      if (message.type === 'search' && this.hasCapability('web-search')) {
-        result = await this.performWebSearch(message.content);
-      } else if (message.type === 'process' && this.hasCapability('data-synthesis')) {
-        result = await this.processData(message.content);
-      } else if (message.type === 'analyze' && this.hasCapability('data-analysis')) {
-        result = await this.analyzeData(message.content);
+      if (_message.type === 'search' && this.hasCapability('web-search')) {
+        result = await this.performWebSearch(_message.content);
+      } else if (_message.type === 'process' && this.hasCapability('data-synthesis')) {
+        result = await this.processData(_message.content);
+      } else if (_message.type === 'analyze' && this.hasCapability('data-analysis')) {
+        result = await this.analyzeData(_message.content);
       } else {
-        throw new Error(`Unsupported message type or missing capability: ${message.type}`);
+        throw new Error(`Unsupported message type or missing capability: ${_message.type}`);
       }
 
       thoughtLogger.log('success', `Specialist agent ${this.config.id} completed task`, {
@@ -50,8 +50,8 @@ export class SpecialistAgent extends BaseAgent {
     }
   }
 
-  private async performWebSearch(query: string): Promise<any> {
-    thoughtLogger.log('execution', 'Performing web search', { query });
+  private async performWebSearch(_query: string): Promise<unknown> {
+    thoughtLogger.log('execution', 'Performing web search', { _query });
 
     // Define target URLs for GTO information
     const urls = [
@@ -61,26 +61,26 @@ export class SpecialistAgent extends BaseAgent {
     ];
 
     const results = await Promise.all(
-      urls.map(url => this.webDataTools.fetchWebData(url))
+      urls.map(_url => this.webDataTools.fetchWebData(_url))
     );
 
     return results.join('\n\n');
   }
 
-  private async processData(content: string): Promise<any> {
+  private async processData(_content: string): Promise<unknown> {
     thoughtLogger.log('execution', 'Processing data');
 
     try {
       // Parse HTML content if present
-      if (content.includes('<!DOCTYPE html>') || content.includes('<html')) {
-        return await this.webDataTools.parseWebContent(content);
+      if (_content.includes('<!DOCTYPE html>') || _content.includes('<html')) {
+        return await this.webDataTools.parseWebContent(_content);
       }
 
       // Structure the data
       const structured = {
-        raw: content,
-        sections: this.extractSections(content),
-        entities: this.extractEntities(content)
+        raw: _content,
+        sections: this.extractSections(_content),
+        entities: this.extractEntities(_content)
       };
 
       return structured;
@@ -90,11 +90,11 @@ export class SpecialistAgent extends BaseAgent {
     }
   }
 
-  private async analyzeData(content: string): Promise<any> {
+  private async analyzeData(_content: string): Promise<unknown> {
     thoughtLogger.log('execution', 'Analyzing data');
 
     try {
-      const data = typeof content === 'string' ? JSON.parse(content) : content;
+      const data = typeof _content === 'string' ? JSON.parse(_content) : _content;
 
       // Analyze the structured data
       const analysis = {
@@ -110,14 +110,14 @@ export class SpecialistAgent extends BaseAgent {
     }
   }
 
-  private extractSections(content: string): any {
+  private extractSections(_content: string): any {
     // Extract meaningful sections from the content
     const sections = {};
     // Implementation here
     return sections;
   }
 
-  private extractEntities(content: string): any {
+  private extractEntities(_content: string): any {
     // Extract named entities (organizations, locations, etc.)
     const entities = {
       organizations: [],
@@ -128,17 +128,17 @@ export class SpecialistAgent extends BaseAgent {
     return entities;
   }
 
-  private generateSummary(data: any): string {
+  private generateSummary(_data: unknown): string {
     // Generate a concise summary of the data
     return '';
   }
 
-  private extractInsights(data: any): string[] {
+  private extractInsights(_data: unknown): string[] {
     // Extract key insights from the data
     return [];
   }
 
-  private generateRecommendations(data: any): string[] {
+  private generateRecommendations(_data: unknown): string[] {
     // Generate recommendations based on the analysis
     return [];
   }

@@ -3,7 +3,7 @@ import { Download } from 'lucide-react';
 import { toolRegistry } from '../lib/tools/tool-registry';
 
 interface DataTableProps {
-  readonly data: any[]; // Corrected duplicate identifier
+  readonly data: unknown[]; // Corrected duplicate identifier
 }
 
 export function DataTable({ data }: Readonly<DataTableProps>) { 
@@ -37,23 +37,23 @@ export function DataTable({ data }: Readonly<DataTableProps>) {
         <table className="min-w-full divide-y divide-gray-700">
           <thead>
             <tr>
-              {headers.map(header => (
+              {headers.map(_header => (
                 <th
-                  key={header}
+                  key={_header}
                   className="px-4 py-3 text-left text-sm font-medium text-gray-300 uppercase tracking-wider bg-gray-700"
                 >
-                  {header}
+                  {_header}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700">
-            {data.map((row, i) => (
+            {data.map((_row, _i) => (
               // Use row.id if available, otherwise fallback to index with prefix
-              <tr key={row.id ?? `row-${i}`} className="hover:bg-gray-700"> 
-                {headers.map(header => (
-                  <td key={`${row.id ?? `row-${i}`}-${header}`} className="px-4 py-3 text-sm"> {/* Also make cell key more unique */}
-                    {row[header]}
+              <tr key={_row.id ?? `row-${_i}`} className="hover:bg-gray-700"> 
+                {headers.map(_header => (
+                  <td key={`${_row.id ?? `row-${_i}`}-${_header}`} className="px-4 py-3 text-sm"> {/* Also make cell key more unique */}
+                    {_row[_header]}
                   </td>
                 ))}
               </tr>

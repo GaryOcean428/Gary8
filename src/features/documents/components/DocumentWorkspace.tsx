@@ -38,7 +38,7 @@ export function DocumentWorkspace() {
       };
 
       const results = await documentManager.searchDocuments(searchOptions);
-      setDocuments(results.map(r => r.document));
+      setDocuments(results.map(_r => _r.document));
     } catch (error) {
       console.error('Failed to load documents:', error);
       setError(error instanceof Error ? error.message : 'Document search failed');
@@ -66,10 +66,10 @@ export function DocumentWorkspace() {
     await loadDocuments();
   };
 
-  const handleUploadError = (error: Error) => {
+  const handleUploadError = (_error: Error) => {
     setUploadStatus({
       success: false,
-      message: `Upload failed: ${error.message}`
+      message: `Upload failed: ${_error.message}`
     });
 
     setTimeout(() => {

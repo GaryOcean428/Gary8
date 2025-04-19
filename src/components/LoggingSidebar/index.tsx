@@ -27,11 +27,11 @@ export function LoggingSidebar() {
     initializeThoughts();
     
     // Set up subscription to thought logger
-    const unsubscribe = thoughtLogger.subscribe(newThoughts => {
+    const unsubscribe = thoughtLogger.subscribe(_newThoughts => {
       if (!isPaused) {
         // We're using functional updater here because we're in a subscription
         // This avoids the React warning about setState during render
-        setThoughts(newThoughts);
+        setThoughts(_newThoughts);
       }
     });
 
@@ -45,20 +45,20 @@ export function LoggingSidebar() {
     }
   }, [thoughts, isPaused]);
 
-  const filteredThoughts = thoughts.filter(thought => {
+  const filteredThoughts = thoughts.filter(_thought => {
     const matchesSearch = searchTerm === '' || 
-      thought.message.toLowerCase().includes(searchTerm.toLowerCase());
+      _thought.message.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = activeFilters.size === 0 || 
-      activeFilters.has(thought.level);
+      activeFilters.has(_thought.level);
     return matchesSearch && matchesFilter;
   });
 
-  const toggleFilter = (type: ThoughtType) => {
+  const toggleFilter = (_type: ThoughtType) => {
     const newFilters = new Set(activeFilters);
-    if (newFilters.has(type)) {
-      newFilters.delete(type);
+    if (newFilters.has(_type)) {
+      newFilters.delete(_type);
     } else {
-      newFilters.add(type);
+      newFilters.add(_type);
     }
     setActiveFilters(newFilters);
   };
@@ -120,7 +120,7 @@ export function LoggingSidebar() {
           <input
             type="text"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(_e) => setSearchTerm(_e.target.value)}
             placeholder="Search thoughts..."
             className="w-full bg-gray-800 text-gray-100 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -143,17 +143,17 @@ export function LoggingSidebar() {
               )}
             </div>
             <div className="flex flex-wrap gap-2">
-              {Object.values(thoughtLogger.getThoughtTypes()).map(type => (
+              {Object.values(thoughtLogger.getThoughtTypes()).map(_type => (
                 <button
-                  key={type}
-                  onClick={() => toggleFilter(type)}
+                  key={_type}
+                  onClick={() => toggleFilter(_type)}
                   className={`px-3 py-1 text-xs rounded-full transition-colors ${
-                    activeFilters.has(type)
+                    activeFilters.has(_type)
                       ? 'bg-blue-500 text-white'
                       : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                   }`}
                 >
-                  {type}
+                  {_type}
                 </button>
               ))}
             </div>
@@ -163,8 +163,8 @@ export function LoggingSidebar() {
 
       {/* Thoughts */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {filteredThoughts.map((thought) => (
-          <ThoughtLog key={thought.id} thought={thought} />
+        {filteredThoughts.map((_thought) => (
+          <ThoughtLog key={_thought.id} thought={_thought} />
         ))}
         <div ref={logsEndRef} />
       </div>

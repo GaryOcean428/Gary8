@@ -23,7 +23,7 @@ interface Particle {
 export function ParticleSystem({ count, type, width, height, isPlaying }: Readonly<ParticleSystemProps>) { // Mark props as read-only
   // Generate particles with random positions and properties
   const particles: Particle[] = useMemo(() => { // Add Particle type
-    return Array.from({ length: count }).map((_, i) => {
+    return Array.from({ length: count }).map((_, _i) => {
       const size = getParticleSize(type);
       const delay = randomBetween(0, 5);
       const duration = randomBetween(5, 20);
@@ -31,7 +31,7 @@ export function ParticleSystem({ count, type, width, height, isPlaying }: Readon
       const y = randomBetween(0, height);
       
       return {
-        id: `particle-${i}`,
+        id: `particle-${_i}`,
         x,
         y,
         size,
@@ -43,8 +43,8 @@ export function ParticleSystem({ count, type, width, height, isPlaying }: Readon
   }, [count, type, width, height]);
 
   // Define particle styling based on type
-  const getParticleStyle = (type: string) => {
-    switch (type) {
+  const getParticleStyle = (_type: string) => {
+    switch (_type) {
       case 'stars':
         return 'rounded-full bg-white';
       case 'dust':
@@ -57,24 +57,24 @@ export function ParticleSystem({ count, type, width, height, isPlaying }: Readon
   };
 
   // Define particle animations based on type
-  const getParticleAnimation = (type: string, particle: Particle) => { // Use Particle type
-    switch (type) {
+  const getParticleAnimation = (_type: string, _particle: Particle) => { // Use Particle type
+    switch (_type) {
       case 'stars':
         return isPlaying ? {
-          opacity: [particle.opacity, particle.opacity * 2, particle.opacity],
+          opacity: [_particle.opacity, _particle.opacity * 2, _particle.opacity],
           scale: [1, 1.2, 1],
         } : {};
       case 'dust':
         return isPlaying ? {
-          x: [particle.x, particle.x + randomBetween(-30, 30)],
-          y: [particle.y, particle.y + randomBetween(-30, 30)],
-          opacity: [particle.opacity, particle.opacity * 0.7, particle.opacity],
+          x: [_particle.x, _particle.x + randomBetween(-30, 30)],
+          y: [_particle.y, _particle.y + randomBetween(-30, 30)],
+          opacity: [_particle.opacity, _particle.opacity * 0.7, _particle.opacity],
         } : {};
       case 'bubbles':
         return isPlaying ? {
-          y: [particle.y, particle.y - randomBetween(50, 200)],
-          x: [particle.x, particle.x + randomBetween(-20, 20)],
-          opacity: [particle.opacity, 0],
+          y: [_particle.y, _particle.y - randomBetween(50, 200)],
+          x: [_particle.x, _particle.x + randomBetween(-20, 20)],
+          opacity: [_particle.opacity, 0],
         } : {};
       default:
         return {};
@@ -82,29 +82,29 @@ export function ParticleSystem({ count, type, width, height, isPlaying }: Readon
   };
 
   // Define particle transition timing based on type
-  const getParticleTransition = (type: string, particle: Particle) => { // Use Particle type
-    switch (type) {
+  const getParticleTransition = (_type: string, _particle: Particle) => { // Use Particle type
+    switch (_type) {
       case 'stars':
         return {
-          duration: particle.duration,
+          duration: _particle.duration,
           repeat: Infinity,
           ease: "easeInOut",
-          delay: particle.delay,
+          delay: _particle.delay,
         };
       case 'dust':
         return {
-          duration: particle.duration,
+          duration: _particle.duration,
           repeat: Infinity,
           repeatType: "reverse" as const,
           ease: "easeInOut",
-          delay: particle.delay,
+          delay: _particle.delay,
         };
       case 'bubbles':
         return {
-          duration: particle.duration,
+          duration: _particle.duration,
           repeat: Infinity,
           ease: "linear",
-          delay: particle.delay,
+          delay: _particle.delay,
         };
       default:
         return {};
@@ -113,27 +113,27 @@ export function ParticleSystem({ count, type, width, height, isPlaying }: Readon
 
   return (
     <div className="absolute inset-0 overflow-hidden z-20">
-      {particles.map((particle) => (
+      {particles.map((_particle) => (
         <motion.div
-          key={particle.id}
+          key={_particle.id}
           className={`absolute ${getParticleStyle(type)}`}
           style={{
-            x: particle.x,
-            y: particle.y,
-            width: particle.size,
-            height: particle.size,
-            opacity: particle.opacity,
+            x: _particle.x,
+            y: _particle.y,
+            width: _particle.size,
+            height: _particle.size,
+            opacity: _particle.opacity,
           }}
-          animate={getParticleAnimation(type, particle)}
-          transition={getParticleTransition(type, particle)}
+          animate={getParticleAnimation(type, _particle)}
+          transition={getParticleTransition(type, _particle)}
         />
       ))}
     </div>
   );
 }
 
-function getParticleSize(type: string) {
-  switch (type) {
+function getParticleSize(_type: string) {
+  switch (_type) {
     case 'stars':
       return randomBetween(1, 3);
     case 'dust':

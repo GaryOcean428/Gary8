@@ -25,12 +25,12 @@ export abstract class BaseAgent extends EventEmitter {
     };
   }
 
-  abstract processMessage(message: AgentMessage): Promise<void>;
-  abstract executeTask(task: string): Promise<unknown>;
+  abstract processMessage(_message: AgentMessage): Promise<void>;
+  abstract executeTask(_task: string): Promise<unknown>;
 
-  async sendMessage(message: Omit<AgentMessage, 'id' | 'timestamp'>): Promise<void> {
+  async sendMessage(_message: Omit<AgentMessage, 'id' | 'timestamp'>): Promise<void> {
     const fullMessage: AgentMessage = {
-      ...message,
+      ..._message,
       id: crypto.randomUUID(),
       timestamp: Date.now()
     };
@@ -39,25 +39,25 @@ export abstract class BaseAgent extends EventEmitter {
     this.emit('message-sent', fullMessage);
   }
 
-  async addSubordinate(agent: BaseAgent): Promise<void> {
-    this.subordinates.set(agent.getId(), agent);
-    this.state.subordinates.push(agent.getId());
-    this.emit('subordinate-added', agent.getId());
+  async addSubordinate(_agent: BaseAgent): Promise<void> {
+    this.subordinates.set(_agent.getId(), _agent);
+    this.state.subordinates.push(_agent.getId());
+    this.emit('subordinate-added', _agent.getId());
   }
 
-  async removeSubordinate(agentId: string): Promise<void> {
-    const agent = this.subordinates.get(agentId);
+  async removeSubordinate(_agentId: string): Promise<void> {
+    const agent = this.subordinates.get(_agentId);
     if (agent) {
-      this.subordinates.delete(agentId);
-      this.state.subordinates = this.state.subordinates.filter(id => id !== agentId);
-      this.emit('subordinate-removed', agentId);
+      this.subordinates.delete(_agentId);
+      this.state.subordinates = this.state.subordinates.filter(_id => _id !== _agentId);
+      this.emit('subordinate-removed', _agentId);
     }
   }
 
-  setStatus(status: AgentStatus): void {
-    this.state.status = status;
+  setStatus(_status: AgentStatus): void {
+    this.state.status = _status;
     this.state.lastActive = Date.now();
-    this.emit('status-changed', status);
+    this.emit('status-changed', _status);
   }
 
   getId(): string {
@@ -76,24 +76,24 @@ export abstract class BaseAgent extends EventEmitter {
     return Array.from(this.subordinates.values());
   }
 
-  protected async delegateTask(task: string, targetAgentId: string): Promise<void> {
-    const agent = this.subordinates.get(targetAgentId);
+  protected async delegateTask(_task: string, _targetAgentId: string): Promise<void> {
+    const agent = this.subordinates.get(_targetAgentId);
     if (!agent) {
-      throw new Error(`Agent ${targetAgentId} not found`);
+      throw new Error(`Agent ${_targetAgentId} not found`);
     }
 
     await this.sendMessage({
       from: this.config.id,
-      to: targetAgentId,
-      content: task,
+      to: _targetAgentId,
+      content: _task,
       type: 'command'
     });
   }
 
-  protected updateMetrics(success: boolean, responseTime: number): void {
+  protected updateMetrics(_success: boolean, _responseTime: number): void {
     const { metrics } = this.state;
     metrics.tasksCompleted++;
-    metrics.successRate = (metrics.successRate * (metrics.tasksCompleted - 1) + (success ? 1 : 0)) / metrics.tasksCompleted;
-    metrics.averageResponseTime = (metrics.averageResponseTime * (metrics.tasksCompleted - 1) + responseTime) / metrics.tasksCompleted;
+    metrics.successRate = (metrics.successRate * (metrics.tasksCompleted - 1) + (_success ? 1 : 0)) / metrics.tasksCompleted;
+    metrics.averageResponseTime = (metrics.averageResponseTime * (metrics.tasksCompleted - 1) + _responseTime) / metrics.tasksCompleted;
   }
 }

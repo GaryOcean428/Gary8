@@ -24,35 +24,35 @@ export function DocumentUpload({
   const documentManager = DocumentManager.getInstance();
   const { user } = useAuth();
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
+  const handleDragOver = (_e: React.DragEvent) => {
+    _e.preventDefault();
     setIsDragging(true);
   };
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
+  const handleDragLeave = (_e: React.DragEvent) => {
+    _e.preventDefault();
     setIsDragging(false);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
+  const handleDrop = (_e: React.DragEvent) => {
+    _e.preventDefault();
     setIsDragging(false);
     setError(null);
     
-    const droppedFiles = Array.from(e.dataTransfer.files);
-    setFiles(prev => [...prev, ...droppedFiles]);
+    const droppedFiles = Array.from(_e.dataTransfer.files);
+    setFiles(_prev => [..._prev, ...droppedFiles]);
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
+  const handleFileSelect = (_e: React.ChangeEvent<HTMLInputElement>) => {
+    if (_e.target.files) {
       setError(null);
-      const selectedFiles = Array.from(e.target.files);
-      setFiles(prev => [...prev, ...selectedFiles]);
+      const selectedFiles = Array.from(_e.target.files);
+      setFiles(_prev => [..._prev, ...selectedFiles]);
     }
   };
 
-  const removeFile = (index: number) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
+  const removeFile = (_index: number) => {
+    setFiles(_prev => _prev.filter((_, _i) => _i !== _index));
     setError(null);
   };
 
@@ -76,30 +76,30 @@ export function DocumentUpload({
       const targetWorkspaceId = workspaceId || user.id;
 
       await Promise.all(
-        files.map(async (file, _index) => {
+        files.map(async (_file, _index) => {
           try {
-            setUploadProgress(prev => ({ ...prev, [file.name]: 0 }));
+            setUploadProgress(_prev => ({ ..._prev, [_file.name]: 0 }));
             
             // Simulate progress updates
             const progressInterval = setInterval(() => {
-              setUploadProgress(prev => ({
-                ...prev,
-                [file.name]: Math.min((prev[file.name] || 0) + 10, 90)
+              setUploadProgress(_prev => ({
+                ..._prev,
+                [_file.name]: Math.min((_prev[_file.name] || 0) + 10, 90)
               }));
             }, 200);
 
             // Upload document with workspace ID
-            await documentManager.addDocument(targetWorkspaceId, file);
+            await documentManager.addDocument(targetWorkspaceId, _file);
             
             clearInterval(progressInterval);
-            setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
+            setUploadProgress(_prev => ({ ..._prev, [_file.name]: 100 }));
             
             thoughtLogger.log('success', 'Document uploaded successfully', {
-              fileName: file.name
+              fileName: _file.name
             });
           } catch (error) {
-            thoughtLogger.log('error', `Failed to upload ${file.name}`, { error });
-            setError(`Failed to upload ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            thoughtLogger.log('error', `Failed to upload ${_file.name}`, { error });
+            setError(`Failed to upload ${_file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
             throw error;
           }
         })
@@ -160,27 +160,27 @@ export function DocumentUpload({
       {/* File List */}
       {files.length > 0 && (
         <div className="space-y-2">
-          {files.map((file, index) => (
+          {files.map((_file, _index) => (
             <div
-              key={index}
+              key={_index}
               className="flex items-center justify-between bg-card/50 backdrop-blur-sm rounded-lg p-3 border border-border"
             >
               <div className="flex items-center space-x-3 flex-1 min-w-0">
                 <FileText className="w-5 h-5 text-primary flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm truncate">{file.name}</p>
-                  {uploadProgress[file.name] !== undefined && (
+                  <p className="text-sm truncate">{_file.name}</p>
+                  {uploadProgress[_file.name] !== undefined && (
                     <div className="mt-1 h-1 w-full bg-muted rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-primary transition-all duration-200"
-                        style={{ width: `${uploadProgress[file.name]}%` }}
+                        style={{ width: `${uploadProgress[_file.name]}%` }}
                       />
                     </div>
                   )}
                 </div>
               </div>
               <button
-                onClick={() => removeFile(index)}
+                onClick={() => removeFile(_index)}
                 className="ml-2 p-1.5 text-muted-foreground hover:text-destructive rounded-md hover:bg-destructive/10 transition-colors"
                 disabled={isUploading}
                 type="button"

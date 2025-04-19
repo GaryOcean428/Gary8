@@ -53,18 +53,18 @@ export function ThemeSettings() {
     await updateSettings('theme', localSettings);
   };
 
-  const handleThemeChange = (mode: 'light' | 'dark' | 'system') => {
-    setLocalSettings(prev => ({
-      ...prev,
-      mode,
-      colors: mode === 'light' ? presetThemes.default.light : presetThemes.default.dark
+  const handleThemeChange = (_mode: 'light' | 'dark' | 'system') => {
+    setLocalSettings(_prev => ({
+      ..._prev,
+      _mode,
+      colors: _mode === 'light' ? presetThemes.default.light : presetThemes.default.dark
     }));
   };
 
-  const handlePresetChange = (preset: keyof typeof presetThemes) => {
-    setLocalSettings(prev => ({
-      ...prev,
-      colors: presetThemes[preset][prev.mode]
+  const handlePresetChange = (_preset: keyof typeof presetThemes) => {
+    setLocalSettings(_prev => ({
+      ..._prev,
+      colors: presetThemes[_preset][_prev.mode]
     }));
   };
 
@@ -82,17 +82,17 @@ export function ThemeSettings() {
         <div>
           <label className="block font-medium mb-2">Theme Mode</label>
           <div className="flex space-x-4">
-            {(['light', 'dark', 'system'] as const).map(mode => (
+            {(['light', 'dark', 'system'] as const).map(_mode => (
               <button
-                key={mode}
-                onClick={() => handleThemeChange(mode)}
+                key={_mode}
+                onClick={() => handleThemeChange(_mode)}
                 className={`px-4 py-2 rounded-lg ${
-                  localSettings.mode === mode
+                  localSettings.mode === _mode
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 }`}
               >
-                {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                {_mode.charAt(0).toUpperCase() + _mode.slice(1)}
               </button>
             ))}
           </div>
@@ -101,22 +101,22 @@ export function ThemeSettings() {
         <div>
           <label className="block font-medium mb-2">Color Preset</label>
           <div className="grid grid-cols-3 gap-4">
-            {Object.keys(presetThemes).map(preset => (
+            {Object.keys(presetThemes).map(_preset => (
               <button
-                key={preset}
-                onClick={() => handlePresetChange(preset as keyof typeof presetThemes)}
+                key={_preset}
+                onClick={() => handlePresetChange(_preset as keyof typeof presetThemes)}
                 className="p-4 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
               >
                 <div className="flex space-x-2 mb-2">
-                  {Object.values(presetThemes[preset as keyof typeof presetThemes].dark).map((color, i) => (
+                  {Object.values(presetThemes[_preset as keyof typeof presetThemes].dark).map((_color, _i) => (
                     <div
-                      key={i}
+                      key={_i}
                       className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: color }}
+                      style={{ backgroundColor: _color }}
                     />
                   ))}
                 </div>
-                <span className="text-sm">{preset.charAt(0).toUpperCase() + preset.slice(1)}</span>
+                <span className="text-sm">{_preset.charAt(0).toUpperCase() + _preset.slice(1)}</span>
               </button>
             ))}
           </div>
@@ -133,11 +133,11 @@ export function ThemeSettings() {
                 <input
                   type="color"
                   value={value}
-                  onChange={(e) => setLocalSettings(prev => ({
-                    ...prev,
+                  onChange={(_e) => setLocalSettings(_prev => ({
+                    ..._prev,
                     colors: {
-                      ...prev.colors,
-                      [key]: e.target.value
+                      ..._prev.colors,
+                      [key]: _e.target.value
                     }
                   }))}
                   className="w-full h-8 rounded cursor-pointer"

@@ -36,21 +36,21 @@ interface AnalysisDashboardProps {
 export function AnalysisDashboard({ competitors, metrics }: AnalysisDashboardProps) {
   const radarData = {
     labels: ['Branding', 'Features', 'UX', 'Technical', 'Marketing', 'Mobile', 'Market', 'Innovation'],
-    datasets: competitors.map((competitor, index) => ({
-      label: competitor.name,
-      data: Object.values(competitor.scores),
-      backgroundColor: `rgba(59, 130, 246, ${0.2 + (index * 0.1)})`,
-      borderColor: `rgba(59, 130, 246, ${0.8 + (index * 0.1)})`,
+    datasets: competitors.map((_competitor, _index) => ({
+      label: _competitor.name,
+      data: Object.values(_competitor.scores),
+      backgroundColor: `rgba(59, 130, 246, ${0.2 + (_index * 0.1)})`,
+      borderColor: `rgba(59, 130, 246, ${0.8 + (_index * 0.1)})`,
       borderWidth: 2,
       fill: true
     }))
   };
 
   const barData = {
-    labels: competitors.map(c => c.name),
+    labels: competitors.map(_c => _c.name),
     datasets: [{
       label: 'Market Share',
-      data: competitors.map(c => c.metrics.marketShare),
+      data: competitors.map(_c => _c.metrics.marketShare),
       backgroundColor: 'rgba(59, 130, 246, 0.8)'
     }]
   };
@@ -109,7 +109,7 @@ export function AnalysisDashboard({ competitors, metrics }: AnalysisDashboardPro
                   beginAtZero: true,
                   max: 100,
                   ticks: {
-                    callback: value => `${value}%`
+                    callback: _value => `${_value}%`
                   }
                 }
               }

@@ -18,12 +18,12 @@ export class MoASearchAggregator {
     this.maxTokens = config.maxTokens || 1024;
   }
 
-  async aggregate(searchResults: SearchResult[]): Promise<string> {
+  async aggregate(_searchResults: SearchResult[]): Promise<string> {
     try {
       // Filter out failed searches
-      const validResults = searchResults.filter(
-        (result): result is { success: true; content: string } => 
-        'success' in result && result.success
+      const validResults = _searchResults.filter(
+        (_result): _result is { success: true; content: string } => 
+        'success' in _result && _result.success
       );
 
       if (validResults.length === 0) {
@@ -31,7 +31,7 @@ export class MoASearchAggregator {
       }
 
       // Extract content from results
-      const contents = validResults.map(result => result.content);
+      const contents = validResults.map(_result => _result.content);
 
       // Apply attention mechanism to each head
       const headResults = await Promise.all(
@@ -48,15 +48,15 @@ export class MoASearchAggregator {
     }
   }
 
-  private async processAttentionHead(contents: string[]): Promise<string> {
+  private async processAttentionHead(_contents: string[]): Promise<string> {
     // Calculate attention scores for each content piece
-    const attentionScores = contents.map(content => ({
-      content,
-      score: this.calculateAttentionScore(content)
+    const attentionScores = _contents.map(_content => ({
+      _content,
+      score: this.calculateAttentionScore(_content)
     }));
 
     // Sort by attention score
-    attentionScores.sort((a, b) => b.score - a.score);
+    attentionScores.sort((_a, _b) => _b.score - _a.score);
 
     // Take top results based on attention scores
     const topResults = attentionScores.slice(0, 3);
@@ -65,81 +65,81 @@ export class MoASearchAggregator {
     return this.combineWithAttention(topResults);
   }
 
-  private calculateAttentionScore(content: string): number {
+  private calculateAttentionScore(_content: string): number {
     // Implement attention scoring based on:
     // - Content length (normalized)
     // - Information density (keywords, entities)
     // - Relevance signals (dates, numbers, proper nouns)
     
-    const lengthScore = Math.min(content.length / 1000, 1);
-    const densityScore = this.calculateDensityScore(content);
-    const relevanceScore = this.calculateRelevanceScore(content);
+    const lengthScore = Math.min(_content.length / 1000, 1);
+    const densityScore = this.calculateDensityScore(_content);
+    const relevanceScore = this.calculateRelevanceScore(_content);
 
     return (lengthScore + densityScore + relevanceScore) / 3;
   }
 
-  private calculateDensityScore(content: string): number {
-    const words = content.toLowerCase().split(/\s+/);
+  private calculateDensityScore(_content: string): number {
+    const words = _content.toLowerCase().split(/\s+/);
     const uniqueWords = new Set(words);
     
     // Calculate information density based on unique words ratio
     return uniqueWords.size / words.length;
   }
 
-  private calculateRelevanceScore(content: string): number {
+  private calculateRelevanceScore(_content: string): number {
     // Count relevance signals:
     // - Dates (YYYY-MM-DD, Month DD, YYYY, etc.)
     // - Numbers and statistics
     // - Proper nouns (capitalized words not at start of sentence)
     
-    const dateMatches = content.match(/\b\d{4}[-/]\d{2}[-/]\d{2}\b/g)?.length || 0;
-    const numberMatches = content.match(/\b\d+([.,]\d+)?\b/g)?.length || 0;
-    const properNouns = content.match(/(?<!^|\.\s+)\b[A-Z][a-z]+\b/g)?.length || 0;
+    const dateMatches = _content.match(/\b\d{4}[-/]\d{2}[-/]\d{2}\b/g)?.length || 0;
+    const numberMatches = _content.match(/\b\d+([.,]\d+)?\b/g)?.length || 0;
+    const properNouns = _content.match(/(?<!^|\.\s+)\b[A-Z][a-z]+\b/g)?.length || 0;
 
     const totalSignals = dateMatches + numberMatches + properNouns;
     return Math.min(totalSignals / 10, 1);
   }
 
   private combineWithAttention(
-    results: Array<{ content: string; score: number }>
+    _results: Array<{ content: string; score: number }>
   ): string {
     // Normalize scores
-    const total = results.reduce((sum, r) => sum + r.score, 0);
-    const normalized = results.map(r => ({
-      ...r,
-      score: r.score / total
+    const total = _results.reduce((_sum, _r) => _sum + _r.score, 0);
+    const normalized = _results.map(_r => ({
+      ..._r,
+      score: _r.score / total
     }));
 
     // Combine content with weighted attention
     return normalized
-      .map(r => this.truncateContent(r.content, Math.floor(this.maxTokens * r.score)))
+      .map(_r => this.truncateContent(_r.content, Math.floor(this.maxTokens * _r.score)))
       .join('\n\n');
   }
 
-  private truncateContent(content: string, maxLength: number): string {
-    if (content.length <= maxLength) return content;
-    return content.slice(0, maxLength - 3) + '...';
+  private truncateContent(_content: string, _maxLength: number): string {
+    if (_content.length <= _maxLength) return _content;
+    return _content.slice(0, _maxLength - 3) + '...';
   }
 
-  private combineHeadResults(headResults: string[]): string {
+  private combineHeadResults(_headResults: string[]): string {
     // Remove duplicates and near-duplicates
-    const uniqueResults = this.deduplicateResults(headResults);
+    const uniqueResults = this.deduplicateResults(_headResults);
 
     // Combine unique results
     return uniqueResults.join('\n\n');
   }
 
-  private deduplicateResults(results: string[]): string[] {
+  private deduplicateResults(_results: string[]): string[] {
     const unique = new Set<string>();
     const output: string[] = [];
 
-    for (const result of results) {
+    for (const result of _results) {
       // Create a simplified version for comparison
       const simplified = result.toLowerCase().replace(/\s+/g, ' ').trim();
       
       // Check if we already have a similar result
-      const isDuplicate = Array.from(unique).some(existing => 
-        this.calculateSimilarity(simplified, existing) > 0.8
+      const isDuplicate = Array.from(unique).some(_existing => 
+        this.calculateSimilarity(simplified, _existing) > 0.8
       );
 
       if (!isDuplicate) {
@@ -151,13 +151,13 @@ export class MoASearchAggregator {
     return output;
   }
 
-  private calculateSimilarity(a: string, b: string): number {
+  private calculateSimilarity(_a: string, _b: string): number {
     // Implement Jaccard similarity for quick string comparison
-    const setA = new Set(a.split(' '));
-    const setB = new Set(b.split(' '));
+    const setA = new Set(_a.split(' '));
+    const setB = new Set(_b.split(' '));
     
     const intersection = new Set(
-      Array.from(setA).filter(x => setB.has(x))
+      Array.from(setA).filter(_x => setB.has(_x))
     );
     
     const union = new Set([...setA, ...setB]);

@@ -17,17 +17,17 @@ const memory = new Memory();
 export interface APIRequestOptions {
   method?: string;
   headers?: Record<string, string>;
-  body?: any;
+  body?: unknown;
 }
 
 export async function makeAPIRequest(
-  endpoint: string,
-  options: APIRequestOptions = {}
+  _endpoint: string,
+  _options: APIRequestOptions = {}
 ) {
-  const { method = 'GET', headers = {}, body } = options;
+  const { method = 'GET', headers = {}, body } = _options;
 
   try {
-    const response = await fetch(`${XAI_CONFIG.baseUrl}${endpoint}`, {
+    const response = await fetch(`${XAI_CONFIG.baseUrl}${_endpoint}`, {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -54,11 +54,11 @@ export async function makeAPIRequest(
 }
 
 export async function chatCompletion(
-  messages: Array<{ role: string; content: string }>,
-  onProgress?: (content: string) => void
+  _messages: Array<{ role: string; content: string }>,
+  _onProgress?: (content: string) => void
 ) {
   try {
-    const context = await memory.getRelevantMemories(messages[0].content);
+    const context = await memory.getRelevantMemories(_messages[0].content);
     
     const systemMessage = {
       role: 'system',
@@ -72,9 +72,9 @@ export async function chatCompletion(
         'Authorization': `Bearer ${XAI_CONFIG.apiKey}`,
       },
       body: JSON.stringify({
-        messages: [systemMessage, ...messages],
+        messages: [systemMessage, ..._messages],
         model: XAI_CONFIG.defaultModel,
-        stream: Boolean(onProgress),
+        stream: Boolean(_onProgress),
         temperature: XAI_CONFIG.temperature,
         max_tokens: XAI_CONFIG.maxTokens,
       }),
@@ -88,7 +88,7 @@ export async function chatCompletion(
       );
     }
 
-    if (onProgress && response.body) {
+    if (_onProgress && response.body) {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
@@ -111,7 +111,7 @@ export async function chatCompletion(
               const content = parsed.choices?.[0]?.delta?.content;
               if (content) {
                 responseContent += content;
-                onProgress(content);
+                _onProgress(content);
               }
             } catch (e) {
               console.error('Failed to parse streaming response:', e);
@@ -120,7 +120,7 @@ export async function chatCompletion(
         }
       }
 
-      await memory.store(messages[0], {
+      await memory.store(_messages[0], {
         id: crypto.randomUUID(),
         role: 'assistant',
         content: responseContent,
@@ -133,7 +133,7 @@ export async function chatCompletion(
     const data = await response.json();
     const responseContent = data.choices[0]?.message?.content || '';
 
-    await memory.store(messages[0], {
+    await memory.store(_messages[0], {
       id: crypto.randomUUID(),
       role: 'assistant',
       content: responseContent,
@@ -149,14 +149,14 @@ export async function chatCompletion(
   }
 }
 
-export async function createEmbeddings(text: string) {
+export async function createEmbeddings(_text: string) {
   return makeAPIRequest('/embeddings', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${XAI_CONFIG.apiKey}`,
     },
     body: {
-      input: text,
+      input: _text,
       model: XAI_CONFIG.embeddingModel,
     },
   });

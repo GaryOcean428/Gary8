@@ -33,8 +33,8 @@ export function MCPConfig() {
   useEffect(() => {
     if (!getNetworkStatus()) {
       // Update all servers to disconnected if offline
-      setServers(servers.map(server => ({
-        ...server,
+      setServers(servers.map(_server => ({
+        ..._server,
         status: 'disconnected'
       })));
       setIsLoading(false);
@@ -49,7 +49,7 @@ export function MCPConfig() {
         if (updatedServers[i].enabled) {
           try {
             // Simulate server connection check (in real app this would actually connect)
-            await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 500));
+            await new Promise(_resolve => setTimeout(_resolve, 500 + Math.random() * 500));
             const success = Math.random() > 0.3; // Simulate 70% success rate for demo
             
             updatedServers[i].status = success ? 'connected' : 'disconnected';
@@ -68,24 +68,24 @@ export function MCPConfig() {
     checkServers();
   }, []);
 
-  const toggleServerEnabled = (serverId: string) => {
+  const toggleServerEnabled = (_serverId: string) => {
     setServers(
-      servers.map(server => 
-        server.id === serverId 
-          ? { ...server, enabled: !server.enabled, status: !server.enabled ? 'initializing' : 'disconnected' } 
-          : server
+      servers.map(_server => 
+        _server.id === _serverId 
+          ? { ..._server, enabled: !_server.enabled, status: !_server.enabled ? 'initializing' : 'disconnected' } 
+          : _server
       )
     );
 
     // If enabling, simulate connection process
-    const server = servers.find(s => s.id === serverId);
+    const server = servers.find(_s => _s.id === _serverId);
     if (server && !server.enabled) {
       setTimeout(() => {
-        setServers(prevServers => 
-          prevServers.map(s => 
-            s.id === serverId 
-              ? { ...s, status: Math.random() > 0.3 ? 'connected' : 'disconnected' } // 70% success rate
-              : s
+        setServers(_prevServers => 
+          _prevServers.map(_s => 
+            _s.id === _serverId 
+              ? { ..._s, status: Math.random() > 0.3 ? 'connected' : 'disconnected' } // 70% success rate
+              : _s
           )
         );
 
@@ -101,18 +101,18 @@ export function MCPConfig() {
     }
   };
 
-  const handleServerClick = (server: MCPServerConfig) => {
-    setActiveServer(server);
+  const handleServerClick = (_server: MCPServerConfig) => {
+    setActiveServer(_server);
     setIsEditing(false);
   };
 
   // Displays capabilities in a readable format
-  const getCapabilities = (server: MCPServerConfig) => {
+  const getCapabilities = (_server: MCPServerConfig) => {
     const caps = [];
-    if (server.capabilities.resources) caps.push('Resources');
-    if (server.capabilities.prompts) caps.push('Prompts');
-    if (server.capabilities.tools) caps.push('Tools');
-    if (server.capabilities.sampling) caps.push('Sampling');
+    if (_server.capabilities.resources) caps.push('Resources');
+    if (_server.capabilities.prompts) caps.push('Prompts');
+    if (_server.capabilities.tools) caps.push('Tools');
+    if (_server.capabilities.sampling) caps.push('Sampling');
     return caps.join(', ');
   };
 
@@ -146,49 +146,49 @@ export function MCPConfig() {
             </div>
           ) : (
             <div className="space-y-3">
-              {servers.map(server => (
+              {servers.map(_server => (
                 <div 
-                  key={server.id} 
-                  className={`p-4 rounded-lg border border-border cursor-pointer hover:bg-muted transition-colors ${activeServer?.id === server.id ? 'bg-muted border-primary' : 'bg-card'}`}
-                  onClick={() => handleServerClick(server)}
+                  key={_server.id} 
+                  className={`p-4 rounded-lg border border-border cursor-pointer hover:bg-muted transition-colors ${activeServer?.id === _server.id ? 'bg-muted border-primary' : 'bg-card'}`}
+                  onClick={() => handleServerClick(_server)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <Server className="h-5 w-5 mr-2 text-primary" />
-                      <span className="font-medium">{server.name}</span>
+                      <span className="font-medium">{_server.name}</span>
                     </div>
                     <Badge 
-                      variant={server.status === 'connected' ? 'success' : server.status === 'initializing' ? 'secondary' : 'destructive'}
-                      animation={server.status === 'initializing' ? 'pulse' : 'none'}
+                      variant={_server.status === 'connected' ? 'success' : _server.status === 'initializing' ? 'secondary' : 'destructive'}
+                      animation={_server.status === 'initializing' ? 'pulse' : 'none'}
                     >
-                      {server.status === 'connected' ? (
+                      {_server.status === 'connected' ? (
                         <Check size={12} className="mr-1" />
-                      ) : server.status === 'initializing' ? (
+                      ) : _server.status === 'initializing' ? (
                         <Loader size={12} className="animate-spin mr-1" />
                       ) : (
                         <X size={12} className="mr-1" />
                       )}
-                      {server.status === 'connected' ? 'Connected' : server.status === 'initializing' ? 'Connecting...' : 'Disconnected'}
+                      {_server.status === 'connected' ? 'Connected' : _server.status === 'initializing' ? 'Connecting...' : 'Disconnected'}
                     </Badge>
                   </div>
                   
                   <div className="mt-2 text-xs text-muted-foreground">
                     <div className="flex items-center mt-1">
                       <Cpu className="h-3 w-3 mr-1" />
-                      <span>{getCapabilities(server)}</span>
+                      <span>{getCapabilities(_server)}</span>
                     </div>
                     {isConfiguring && (
                       <div className="mt-2 flex justify-between items-center">
-                        <span className="text-xs opacity-70 truncate max-w-40">{server.url}</span>
+                        <span className="text-xs opacity-70 truncate max-w-40">{_server.url}</span>
                         <Button 
-                          variant={server.enabled ? "success" : "outline"} 
+                          variant={_server.enabled ? "success" : "outline"} 
                           size="xs"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleServerEnabled(server.id);
+                          onClick={(_e) => {
+                            _e.stopPropagation();
+                            toggleServerEnabled(_server.id);
                           }}
                         >
-                          {server.enabled ? 'Enabled' : 'Disabled'}
+                          {_server.enabled ? 'Enabled' : 'Disabled'}
                         </Button>
                       </div>
                     )}
@@ -233,9 +233,9 @@ export function MCPConfig() {
             isEditing ? (
               <ServerEditor 
                 server={activeServer} 
-                onSave={(updatedServer) => {
-                  setServers(servers.map(s => s.id === updatedServer.id ? updatedServer : s));
-                  setActiveServer(updatedServer);
+                onSave={(_updatedServer) => {
+                  setServers(servers.map(_s => _s.id === _updatedServer.id ? _updatedServer : _s));
+                  setActiveServer(_updatedServer);
                   setIsEditing(false);
                 }}
                 onCancel={() => setIsEditing(false)}
@@ -429,12 +429,12 @@ interface ServerEditorProps {
 function ServerEditor({ server, onSave, onCancel }: ServerEditorProps) {
   const [editedServer, setEditedServer] = useState<MCPServerConfig>({...server});
   
-  const handleCapabilityToggle = (capability: keyof MCPServerConfig['capabilities']) => {
+  const handleCapabilityToggle = (_capability: keyof MCPServerConfig['capabilities']) => {
     setEditedServer({
       ...editedServer,
       capabilities: {
         ...editedServer.capabilities,
-        [capability]: !editedServer.capabilities[capability]
+        [_capability]: !editedServer.capabilities[_capability]
       }
     });
   };
@@ -452,7 +452,7 @@ function ServerEditor({ server, onSave, onCancel }: ServerEditorProps) {
               id="name"
               type="text"
               value={editedServer.name}
-              onChange={e => setEditedServer({...editedServer, name: e.target.value})}
+              onChange={_e => setEditedServer({...editedServer, name: _e.target.value})}
               className="w-full rounded-md border border-input bg-background px-3 py-2"
             />
           </div>
@@ -463,7 +463,7 @@ function ServerEditor({ server, onSave, onCancel }: ServerEditorProps) {
               id="url"
               type="text"
               value={editedServer.url}
-              onChange={e => setEditedServer({...editedServer, url: e.target.value})}
+              onChange={_e => setEditedServer({...editedServer, url: _e.target.value})}
               className="w-full rounded-md border border-input bg-background px-3 py-2"
             />
           </div>
@@ -586,7 +586,7 @@ function MCPResourceCard({ name, description, icon }: MCPResourceCardProps) {
 }
 
 // For the component to work
-function Search(props: React.SVGProps<SVGSVGElement>) {
+function Search(_props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -598,7 +598,7 @@ function Search(props: React.SVGProps<SVGSVGElement>) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      {...props}
+      {..._props}
     >
       <circle cx="11" cy="11" r="8" />
       <path d="m21 21-4.3-4.3" />
@@ -606,7 +606,7 @@ function Search(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-function FileText(props: React.SVGProps<SVGSVGElement>) {
+function FileText(_props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -618,7 +618,7 @@ function FileText(props: React.SVGProps<SVGSVGElement>) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      {...props}
+      {..._props}
     >
       <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
       <polyline points="14 2 14 8 20 8" />
@@ -629,7 +629,7 @@ function FileText(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-function Database(props: React.SVGProps<SVGSVGElement>) {
+function Database(_props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -641,7 +641,7 @@ function Database(props: React.SVGProps<SVGSVGElement>) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      {...props}
+      {..._props}
     >
       <ellipse cx="12" cy="5" rx="9" ry="3" />
       <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
@@ -650,7 +650,7 @@ function Database(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-function BarChart(props: React.SVGProps<SVGSVGElement>) {
+function BarChart(_props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -662,7 +662,7 @@ function BarChart(props: React.SVGProps<SVGSVGElement>) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      {...props}
+      {..._props}
     >
       <line x1="12" x2="12" y1="20" y2="10" />
       <line x1="18" x2="18" y1="20" y2="4" />

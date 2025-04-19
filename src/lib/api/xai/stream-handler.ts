@@ -4,10 +4,10 @@ export class StreamHandler {
   private decoder = new TextDecoder();
 
   async handleStream(
-    body: ReadableStream<Uint8Array>,
-    onProgress: (content: string) => void
+    _body: ReadableStream<Uint8Array>,
+    _onProgress: (content: string) => void
   ): Promise<string> {
-    const reader = body.getReader();
+    const reader = _body.getReader();
     let fullContent = '';
 
     try {
@@ -28,7 +28,7 @@ export class StreamHandler {
               const content = parsed.choices[0]?.delta?.content;
               if (content) {
                 fullContent += content;
-                onProgress(content);
+                _onProgress(content);
               }
             } catch (e) {
               thoughtLogger.log('error', 'Failed to parse streaming response', { error: e });

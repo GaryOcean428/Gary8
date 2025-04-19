@@ -113,12 +113,12 @@ const defaultSettings: SettingsState = {
 
 export const useSettingsStore = create<SettingsStore>()(
   persist(
-    (set) => ({
+    (_set) => ({
       ...defaultSettings,
-      updateSettings: async (newSettings) => {
-        set((state) => ({
-          ...state,
-          ...newSettings
+      updateSettings: async (_newSettings) => {
+        _set((_state) => ({
+          ..._state,
+          ..._newSettings
         }));
         return Promise.resolve();
       }
@@ -133,9 +133,9 @@ export function useSettings() {
   const settings = useSettingsStore();
   const { addToast } = useToast();
 
-  const updateSettings = async (newSettings: Partial<SettingsState>) => {
+  const updateSettings = async (_newSettings: Partial<SettingsState>) => {
     try {
-      await settings.updateSettings(newSettings);
+      await settings.updateSettings(_newSettings);
       addToast({
         type: 'success',
         message: 'Settings updated successfully',

@@ -17,7 +17,7 @@ export class RateLimiter {
     
     // Clean up old timestamps
     this.timestamps = this.timestamps.filter(
-      time => now - time < this.options.interval
+      _time => now - _time < this.options.interval
     );
 
     // If under the limit, proceed immediately
@@ -31,8 +31,8 @@ export class RateLimiter {
     const waitTime = this.options.interval - (now - oldestTimestamp) + 50; // Add 50ms buffer
 
     // Create a promise that will resolve after waitTime
-    return new Promise<void>(resolve => {
-      const waitPromise = { resolve, timestamp: now + waitTime };
+    return new Promise<void>(_resolve => {
+      const waitPromise = { _resolve, timestamp: now + waitTime };
       this.waitingPromises.push(waitPromise);
       
       // Set timeout to resolve this promise after waitTime
@@ -41,7 +41,7 @@ export class RateLimiter {
         if (index !== -1) {
           this.waitingPromises.splice(index, 1);
           this.timestamps.push(Date.now());
-          resolve();
+          _resolve();
         }
       }, waitTime);
     });
@@ -49,7 +49,7 @@ export class RateLimiter {
 
   getStatus(): { current: number; max: number; nextSlotIn: number } {
     const now = Date.now();
-    this.timestamps = this.timestamps.filter(time => now - time < this.options.interval);
+    this.timestamps = this.timestamps.filter(_time => now - _time < this.options.interval);
     
     let nextSlotIn = 0;
     if (this.timestamps.length >= this.options.maxRequests) {

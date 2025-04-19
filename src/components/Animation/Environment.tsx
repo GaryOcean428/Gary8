@@ -38,9 +38,9 @@ export function Environment({ type, theme }: Readonly<EnvironmentProps>) { // Ma
         return (
           <>
             {/* Stars */}
-            {Array.from({ length: 100 }).map((_, i) => (
+            {Array.from({ length: 100 }).map((_, _i) => (
               <motion.div
-                key={`star-${i}`}
+                key={`star-${_i}`}
                 className="absolute rounded-full bg-white"
                 style={{
                   left: `${Math.random() * 100}%`,
@@ -61,12 +61,12 @@ export function Environment({ type, theme }: Readonly<EnvironmentProps>) { // Ma
             ))}
             
             {/* Distant galaxies */}
-            {Array.from({ length: 3 }).map((_, i) => (
+            {Array.from({ length: 3 }).map((_, _i) => (
               <motion.div
-                key={`galaxy-${i}`}
+                key={`galaxy-${_i}`}
                 className="absolute rounded-full bg-opacity-20"
                 style={{
-                  background: `radial-gradient(circle, ${['rgba(138,43,226,0.2)', 'rgba(65,105,225,0.2)', 'rgba(255,105,180,0.2)'][i]} 0%, rgba(0,0,0,0) 70%)`,
+                  background: `radial-gradient(circle, ${['rgba(138,43,226,0.2)', 'rgba(65,105,225,0.2)', 'rgba(255,105,180,0.2)'][_i]} 0%, rgba(0,0,0,0) 70%)`,
                   left: `${Math.random() * 80 + 10}%`,
                   top: `${Math.random() * 80 + 10}%`,
                   width: `${Math.random() * 200 + 100}px`,
@@ -108,15 +108,15 @@ export function Environment({ type, theme }: Readonly<EnvironmentProps>) { // Ma
             />
             
             {/* Clouds */}
-            {Array.from({ length: 3 }).map((_, i) => (
+            {Array.from({ length: 3 }).map((_, _i) => (
               <motion.div
-                key={`cloud-${i}`}
+                key={`cloud-${_i}`}
                 className="absolute rounded-full"
                 style={{
                   background: theme === 'dark' ? '#1F2937' : 'white',
                   boxShadow: 'inset 0 0 20px rgba(255,255,255,0.3)',
-                  left: `${i * 30 + 10}%`,
-                  top: `${i * 15 + 10}%`,
+                  left: `${_i * 30 + 10}%`,
+                  top: `${_i * 15 + 10}%`,
                   width: `${Math.random() * 80 + 100}px`,
                   height: `${Math.random() * 30 + 40}px`,
                   opacity: 0.8,
@@ -141,13 +141,13 @@ export function Environment({ type, theme }: Readonly<EnvironmentProps>) { // Ma
         return (
           <>
             {/* Water surface light rays */}
-            {Array.from({ length: 5 }).map((_, i) => (
+            {Array.from({ length: 5 }).map((_, _i) => (
               <motion.div
-                key={`ray-${i}`}
+                key={`ray-${_i}`}
                 className={`absolute ${theme === 'dark' ? 'bg-blue-400/10' : 'bg-blue-300/30'}`}
                 style={{
                   top: 0,
-                  left: `${i * 20 + Math.random() * 10}%`,
+                  left: `${_i * 20 + Math.random() * 10}%`,
                   width: `${Math.random() * 20 + 10}px`,
                   height: '100%',
                   transformOrigin: 'top',
@@ -160,19 +160,19 @@ export function Environment({ type, theme }: Readonly<EnvironmentProps>) { // Ma
                   duration: Math.random() * 10 + 10,
                   repeat: Infinity,
                   ease: "easeInOut",
-                  delay: i * 0.5
+                  delay: _i * 0.5
                 }}
               />
             ))}
             
             {/* Seaweed */}
-            {Array.from({ length: 5 }).map((_, i) => (
+            {Array.from({ length: 5 }).map((_, _i) => (
               <motion.div
-                key={`seaweed-${i}`}
+                key={`seaweed-${_i}`}
                 className={`absolute rounded-t-full ${theme === 'dark' ? 'bg-green-900' : 'bg-green-600'}`}
                 style={{
                   bottom: 0,
-                  left: `${i * 20 + Math.random() * 5}%`,
+                  left: `${_i * 20 + Math.random() * 5}%`,
                   width: `${Math.random() * 10 + 5}px`,
                   height: `${Math.random() * 100 + 100}px`,
                   opacity: 0.6,
@@ -193,7 +193,7 @@ export function Environment({ type, theme }: Readonly<EnvironmentProps>) { // Ma
         return (
           <>
             {/* Abstract shapes */}
-            {Array.from({ length: 10 }).map((_, i) => {
+            {Array.from({ length: 10 }).map((_, _i) => {
               const shape = ['circle', 'square', 'triangle'][Math.floor(Math.random() * 3)];
               let colors: string[];
               if (theme === 'dark') {
@@ -210,7 +210,7 @@ export function Environment({ type, theme }: Readonly<EnvironmentProps>) { // Ma
               
               return (
                 <motion.div
-                  key={`shape-${i}`}
+                  key={`shape-${_i}`}
                   className="absolute"
                   style={{
                     left: `${Math.random() * 100}%`,

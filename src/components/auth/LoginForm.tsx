@@ -41,8 +41,8 @@ export function LoginForm() {
     };
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (_e: React.FormEvent) => {
+    _e.preventDefault();
     if (!email.trim() || !password.trim() || isLoading || isOffline) return;
 
     setIsLoading(true);
@@ -147,7 +147,7 @@ export function LoginForm() {
                   autoComplete="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(_e) => setEmail(_e.target.value)}
                   className="input pl-10"
                   placeholder="Email address"
                 />
@@ -167,7 +167,7 @@ export function LoginForm() {
                   autoComplete={isLogin ? "current-password" : "new-password"}
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(_e) => setPassword(_e.target.value)}
                   className="input pl-10"
                   placeholder="Password"
                 />

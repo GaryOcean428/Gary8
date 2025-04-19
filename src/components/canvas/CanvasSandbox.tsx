@@ -166,7 +166,7 @@ export function CanvasSandbox({
             <textarea
               ref={editorRef}
               value={code}
-              onChange={(e) => setCode(e.target.value)}
+              onChange={(_e) => setCode(_e.target.value)}
               className="w-full h-full resize-none p-4 font-mono text-sm bg-transparent focus:outline-none"
               spellCheck="false"
               readOnly={readOnly || isExecuting}
@@ -247,8 +247,8 @@ export function CanvasSandbox({
   );
 }
 
-function getDefaultCode(language: string): string {
-  switch (language.toLowerCase()) {
+function getDefaultCode(_language: string): string {
+  switch (_language.toLowerCase()) {
     case 'javascript':
       return `// Write your JavaScript code here
 function greet(name) {
@@ -285,13 +285,13 @@ print(greet("world"))
 </html>
 `;
     default:
-      return `// Write your ${language} code here
+      return `// Write your ${_language} code here
 `;
   }
 }
 
-function getFileExtension(language: string): string {
-  switch (language.toLowerCase()) {
+function getFileExtension(_language: string): string {
+  switch (_language.toLowerCase()) {
     case 'javascript':
       return 'js';
     case 'typescript':
@@ -319,11 +319,11 @@ function getFileExtension(language: string): string {
   }
 }
 
-function simulateExecution(code: string, language: string): string {
+function simulateExecution(_code: string, _language: string): string {
   // In a real implementation, this would execute code in a secure sandbox
   // For demonstration purposes, we'll just return some simulated output
   
-  if (!code.trim()) {
+  if (!_code.trim()) {
     return 'No code to execute';
   }
   
@@ -332,7 +332,7 @@ function simulateExecution(code: string, language: string): string {
     throw new Error('Simulated execution error');
   }
   
-  switch (language.toLowerCase()) {
+  switch (_language.toLowerCase()) {
     case 'javascript':
       return `> Running JavaScript code...
 > Output:
@@ -352,7 +352,7 @@ Hello, world!
 Preview available in HTML view.`;
     
     default:
-      return `Running ${language} code...
+      return `Running ${_language} code...
 Output:
 Hello, world!
 

@@ -26,8 +26,8 @@ export default function SearchInterface() {
     cancelSearch
   } = useSearch();
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = async (_e: React.FormEvent) => {
+    _e.preventDefault();
     if (!query.trim() || isStreaming) return;
 
     try {
@@ -37,17 +37,17 @@ export default function SearchInterface() {
     }
   };
 
-  const handleSortChange = (value: string) => {
-    setSortOption(value);
+  const handleSortChange = (_value: string) => {
+    setSortOption(_value);
     if (results.length > 0 && query) {
-      search(query, filterState, value);
+      search(query, filterState, _value);
     }
   };
 
-  const handleFilterChange = (key: keyof typeof filterState, value: string) => {
-    setFilterState(prev => ({ ...prev, [key]: value }));
+  const handleFilterChange = (_key: keyof typeof filterState, _value: string) => {
+    setFilterState(_prev => ({ ..._prev, [_key]: _value }));
     if (results.length > 0 && query) {
-      search(query, { ...filterState, [key]: value }, sortOption);
+      search(query, { ...filterState, [_key]: _value }, sortOption);
     }
   };
 
@@ -57,15 +57,15 @@ export default function SearchInterface() {
     }
   }, [results]);
   
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (_e: React.KeyboardEvent<HTMLInputElement>) => {
     // If the user presses Enter, start search
-    if (e.key === 'Enter') {
+    if (_e.key === 'Enter') {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      handleSearch(e as any);
+      handleSearch(_e as any);
     }
     
     // If the user presses Escape, clear the search input
-    if (e.key === 'Escape') {
+    if (_e.key === 'Escape') {
       setQuery('');
     }
   };
@@ -83,7 +83,7 @@ export default function SearchInterface() {
             <input
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(_e) => setQuery(_e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask me anything..."
               className="w-full bg-input rounded-lg pl-12 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus-glow text-foreground"
@@ -142,18 +142,18 @@ export default function SearchInterface() {
                         { id: 'week', label: 'Past week' },
                         { id: 'month', label: 'Past month' },
                         { id: 'year', label: 'Past year' }
-                      ].map(option => (
+                      ].map(_option => (
                         <button
-                          key={option.id}
+                          key={_option.id}
                           type="button"
-                          onClick={() => handleFilterChange('time', option.id)}
+                          onClick={() => handleFilterChange('time', _option.id)}
                           className={`px-3 py-1 text-xs rounded-full transition-colors ${
-                            filterState.time === option.id 
+                            filterState.time === _option.id 
                               ? 'bg-primary text-primary-foreground' 
                               : 'bg-muted text-foreground hover:bg-muted/80'
                           }`}
                         >
-                          {option.label}
+                          {_option.label}
                         </button>
                       ))}
                     </div>
@@ -181,19 +181,19 @@ export default function SearchInterface() {
                         { id: 'news', label: 'News', icon: Newspaper },
                         { id: 'academic', label: 'Academic', icon: Book },
                         { id: 'image', label: 'Images', icon: Image }
-                      ].map(option => (
+                      ].map(_option => (
                         <button
-                          key={option.id}
+                          key={_option.id}
                           type="button"
-                          onClick={() => handleFilterChange('source', option.id)}
+                          onClick={() => handleFilterChange('source', _option.id)}
                           className={`px-3 py-1 text-xs rounded-full flex items-center gap-1 transition-colors ${
-                            filterState.source === option.id 
+                            filterState.source === _option.id 
                               ? 'bg-primary text-primary-foreground' 
                               : 'bg-muted text-foreground hover:bg-muted/80'
                           }`}
                         >
-                          <option.icon className="w-3 h-3" />
-                          <span>{option.label}</span>
+                          <_option.icon className="w-3 h-3" />
+                          <span>{_option.label}</span>
                         </button>
                       ))}
                     </div>

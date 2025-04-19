@@ -31,37 +31,37 @@ export class ModelConnector {
   }
 
   async routeToModel(
-    messages: Array<{ role: string; content: string }>,
-    routerConfig: RouterConfig,
-    onProgress?: (content: string) => void
+    _messages: Array<{ role: string; content: string }>,
+    _routerConfig: RouterConfig,
+    _onProgress?: (content: string) => void
   ): Promise<ModelResponse> {
-    const endpoint = this.modelEndpoints.get(routerConfig.model);
+    const endpoint = this.modelEndpoints.get(_routerConfig.model);
     if (!endpoint) {
-      throw new Error(`No endpoint found for model ${routerConfig.model}`);
+      throw new Error(`No endpoint found for model ${_routerConfig.model}`);
     }
 
-    thoughtLogger.log('plan', `Routing request to ${routerConfig.model}`, {
-      modelUsed: routerConfig.model,
-      confidence: routerConfig.confidence
+    thoughtLogger.log('plan', `Routing request to ${_routerConfig.model}`, {
+      modelUsed: _routerConfig.model,
+      confidence: _routerConfig.confidence
     });
 
     try {
-      if (routerConfig.model.includes('granite')) {
-        return this.callHuggingFace(messages, routerConfig);
+      if (_routerConfig.model.includes('granite')) {
+        return this.callHuggingFace(_messages, _routerConfig);
       }
 
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.getApiKey(routerConfig.model)}`
+          'Authorization': `Bearer ${this.getApiKey(_routerConfig.model)}`
         },
         body: JSON.stringify({
-          messages,
-          model: routerConfig.model,
-          temperature: routerConfig.temperature,
-          max_tokens: routerConfig.maxTokens,
-          stream: Boolean(onProgress)
+          _messages,
+          model: _routerConfig.model,
+          temperature: _routerConfig.temperature,
+          max_tokens: _routerConfig.maxTokens,
+          stream: Boolean(_onProgress)
         })
       });
 
@@ -69,15 +69,15 @@ export class ModelConnector {
         throw new Error(`Model API request failed: ${response.statusText}`);
       }
 
-      if (onProgress && response.body) {
-        return this.handleStreamingResponse(response.body, routerConfig, onProgress);
+      if (_onProgress && response.body) {
+        return this.handleStreamingResponse(response.body, _routerConfig, _onProgress);
       }
 
       const data = await response.json();
       return {
         content: data.choices[0].message.content,
-        model: routerConfig.model,
-        confidence: routerConfig.confidence
+        model: _routerConfig.model,
+        confidence: _routerConfig.confidence
       };
     } catch (error) {
       thoughtLogger.log('critique', `Model request failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -86,12 +86,12 @@ export class ModelConnector {
   }
 
   private async callHuggingFace(
-    messages: Array<{ role: string; content: string }>,
-    routerConfig: RouterConfig
+    _messages: Array<{ role: string; content: string }>,
+    _routerConfig: RouterConfig
   ): Promise<ModelResponse> {
-    const combinedMessage = messages.map(m => `${m.role}: ${m.content}`).join('\n');
+    const combinedMessage = _messages.map(_m => `${_m.role}: ${_m.content}`).join('\n');
 
-    const response = await fetch(this.modelEndpoints.get(routerConfig.model)!, {
+    const response = await fetch(this.modelEndpoints.get(_routerConfig.model)!, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -100,8 +100,8 @@ export class ModelConnector {
       body: JSON.stringify({
         inputs: combinedMessage,
         parameters: {
-          max_new_tokens: routerConfig.maxTokens,
-          temperature: routerConfig.temperature,
+          max_new_tokens: _routerConfig.maxTokens,
+          temperature: _routerConfig.temperature,
           return_full_text: false
         }
       })
@@ -110,17 +110,17 @@ export class ModelConnector {
     const data = await response.json();
     return {
       content: data[0].generated_text,
-      model: routerConfig.model,
-      confidence: routerConfig.confidence
+      model: _routerConfig.model,
+      confidence: _routerConfig.confidence
     };
   }
 
   private async handleStreamingResponse(
-    body: ReadableStream<Uint8Array>,
-    routerConfig: RouterConfig,
-    onProgress: (content: string) => void
+    _body: ReadableStream<Uint8Array>,
+    _routerConfig: RouterConfig,
+    _onProgress: (content: string) => void
   ): Promise<ModelResponse> {
-    const reader = body.getReader();
+    const reader = _body.getReader();
     const decoder = new TextDecoder();
     let fullContent = '';
 
@@ -142,7 +142,7 @@ export class ModelConnector {
               const content = parsed.choices[0]?.delta?.content;
               if (content) {
                 fullContent += content;
-                onProgress(content);
+                _onProgress(content);
               }
             } catch (e) {
               console.error('Failed to parse streaming response:', e);
@@ -153,36 +153,36 @@ export class ModelConnector {
 
       return {
         content: fullContent,
-        model: routerConfig.model,
-        confidence: routerConfig.confidence
+        model: _routerConfig.model,
+        confidence: _routerConfig.confidence
       };
     } finally {
       reader.releaseLock();
     }
   }
 
-  private getApiKey(model: string): string {
-    if (model.startsWith('grok')) {
+  private getApiKey(_model: string): string {
+    if (_model.startsWith('grok')) {
       return config.apiKeys.xai;
     }
-    if (model.includes('llama')) {
+    if (_model.includes('llama')) {
       return config.apiKeys.groq;
     }
-    if (model.includes('claude')) {
+    if (_model.includes('claude')) {
       return config.apiKeys.anthropic;
     }
-    if (model.includes('granite')) {
+    if (_model.includes('granite')) {
       return config.apiKeys.huggingface;
     }
-    if (model.includes('gpt') || model.includes('o1') || model.includes('o3')) {
+    if (_model.includes('gpt') || _model.includes('o1') || _model.includes('o3')) {
       return config.apiKeys.openai;
     }
-    if (model.includes('sonar')) {
+    if (_model.includes('sonar')) {
       return config.apiKeys.perplexity;
     }
-    if (model.includes('gemini')) {
+    if (_model.includes('gemini')) {
       return config.apiKeys.google;
     }
-    throw new Error(`No API key found for model ${model}`);
+    throw new Error(`No API key found for model ${_model}`);
   }
 }

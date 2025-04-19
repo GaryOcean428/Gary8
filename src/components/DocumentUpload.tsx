@@ -25,61 +25,61 @@ export function DocumentUpload({
   const documentManager = DocumentManager.getInstance();
   const { user } = useAuth();
 
-  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => { // Type added
-    e.preventDefault();
+  const handleDragOver = (_e: React.DragEvent<HTMLLabelElement>) => { // Type added
+    _e.preventDefault();
     setIsDragging(true);
   };
 
-  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => { // Type added
-    e.preventDefault();
+  const handleDragLeave = (_e: React.DragEvent<HTMLLabelElement>) => { // Type added
+    _e.preventDefault();
     setIsDragging(false);
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => { // Type added
-    e.preventDefault();
+  const handleDrop = (_e: React.DragEvent<HTMLLabelElement>) => { // Type added
+    _e.preventDefault();
     setIsDragging(false);
     setError(null);
     
-    const droppedFiles = Array.from(e.dataTransfer.files);
-    setFiles((prev: File[]) => [...prev, ...droppedFiles]); // Type added
+    const droppedFiles = Array.from(_e.dataTransfer.files);
+    setFiles((_prev: File[]) => [..._prev, ...droppedFiles]); // Type added
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => { // Type added
-    if (e.target.files) {
+  const handleFileSelect = (_e: React.ChangeEvent<HTMLInputElement>) => { // Type added
+    if (_e.target.files) {
       setError(null);
-      const selectedFiles = Array.from(e.target.files);
-      setFiles((prev: File[]) => [...prev, ...selectedFiles]); // Type added
+      const selectedFiles = Array.from(_e.target.files);
+      setFiles((_prev: File[]) => [..._prev, ...selectedFiles]); // Type added
     }
   };
 
-  const removeFile = (index: number) => {
-    setFiles((prev: File[]) => prev.filter((_: File, i: number) => i !== index)); // Types added
+  const removeFile = (_index: number) => {
+    setFiles((_prev: File[]) => _prev.filter((_: File, _i: number) => _i !== _index)); // Types added
     setError(null);
   };
 
   // Extracted function to handle single file upload logic (Refactor for nesting)
-  const uploadSingleFile = async (file: File, targetWorkspaceId: string) => {
+  const uploadSingleFile = async (_file: File, _targetWorkspaceId: string) => {
     try {
-      setUploadProgress((prev: Record<string, number>) => ({ ...prev, [file.name]: 0 })); // Type added
+      setUploadProgress((_prev: Record<string, number>) => ({ ..._prev, [_file.name]: 0 })); // Type added
       
       // Simulate progress updates (replace with actual progress if available)
       const progressInterval = setInterval(() => {
-        setUploadProgress((prev: Record<string, number>) => ({ // Type added
-          ...prev,
-          [file.name]: Math.min((prev[file.name] ?? 0) + 10, 90) // Use ??
+        setUploadProgress((_prev: Record<string, number>) => ({ // Type added
+          ..._prev,
+          [_file.name]: Math.min((_prev[_file.name] ?? 0) + 10, 90) // Use ??
         }));
       }, 200);
 
       // Upload document with workspace ID
-      await documentManager.addDocument(targetWorkspaceId, file);
+      await documentManager.addDocument(_targetWorkspaceId, _file);
       
       clearInterval(progressInterval);
-      setUploadProgress((prev: Record<string, number>) => ({ ...prev, [file.name]: 100 })); // Type added
+      setUploadProgress((_prev: Record<string, number>) => ({ ..._prev, [_file.name]: 100 })); // Type added
       
-      thoughtLogger.log('success', 'Document uploaded successfully', { fileName: file.name });
+      thoughtLogger.log('success', 'Document uploaded successfully', { fileName: _file.name });
     } catch (uploadError) { // Renamed error variable
-      thoughtLogger.log('error', `Failed to upload ${file.name}`, { error: uploadError });
-      setError(`Failed to upload ${file.name}: ${uploadError instanceof Error ? uploadError.message : 'Unknown error'}`);
+      thoughtLogger.log('error', `Failed to upload ${_file.name}`, { error: uploadError });
+      setError(`Failed to upload ${_file.name}: ${uploadError instanceof Error ? uploadError.message : 'Unknown error'}`);
       throw uploadError; // Re-throw to be caught by Promise.all
     }
   };
@@ -104,7 +104,7 @@ export function DocumentUpload({
       const targetWorkspaceId = workspaceId ?? user.id; // Use ??
 
       // Use the extracted function within Promise.all
-      await Promise.all(files.map(file => uploadSingleFile(file, targetWorkspaceId)));
+      await Promise.all(files.map(_file => uploadSingleFile(_file, targetWorkspaceId)));
 
       setFiles([]); // Clear files after successful upload
       onUploadComplete?.();
@@ -127,9 +127,9 @@ export function DocumentUpload({
         htmlFor="fileUploadInput" // Associate label with input
         role="button" // Make it behave like a button for accessibility
         tabIndex={0} // Make it focusable
-        onKeyDown={(e: React.KeyboardEvent<HTMLLabelElement>) => { // Handle keyboard interaction
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
+        onKeyDown={(_e: React.KeyboardEvent<HTMLLabelElement>) => { // Handle keyboard interaction
+          if (_e.key === 'Enter' || _e.key === ' ') {
+            _e.preventDefault();
             fileInputRef.current?.click();
           }
         }}
@@ -168,28 +168,28 @@ export function DocumentUpload({
       {/* File List */}
       {files.length > 0 && (
         <div className="space-y-2">
-          {files.map((file: File) => ( // Add type for file
+          {files.map((_file: File) => ( // Add type for file
             <div
-              key={file.name} // Use file.name as key
+              key={_file.name} // Use file.name as key
               className="flex items-center justify-between bg-card/50 backdrop-blur-sm rounded-lg p-3 border border-border"
             >
               <div className="flex items-center space-x-3 flex-1 min-w-0">
                 <FileText className="w-5 h-5 text-primary flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm truncate">{file.name}</p>
-                  {uploadProgress[file.name] !== undefined && (
+                  <p className="text-sm truncate">{_file.name}</p>
+                  {uploadProgress[_file.name] !== undefined && (
                     <div className="mt-1 h-1 w-full bg-muted rounded-full overflow-hidden">
                       {/* Apply CSS class and keep dynamic width */}
                       <div 
                         className="upload-progress-bar" // Apply CSS class
-                        style={{ width: `${uploadProgress[file.name]}%` }} 
+                        style={{ width: `${uploadProgress[_file.name]}%` }} 
                       />
                     </div>
                   )}
                 </div>
               </div>
               <button
-                onClick={() => removeFile(files.indexOf(file))} // Find index for removal
+                onClick={() => removeFile(files.indexOf(_file))} // Find index for removal
                 className="ml-2 p-1.5 text-muted-foreground hover:text-destructive rounded-md hover:bg-destructive/10 transition-colors"
                 disabled={isUploading}
                 type="button"

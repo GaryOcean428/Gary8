@@ -13,11 +13,11 @@ export class TaskScheduler {
 
   constructor(private checkInterval = 1000) {}
 
-  schedule(id: string, task: Task, interval: number): void {
-    this.tasks.set(id, {
-      id,
-      task,
-      interval,
+  schedule(_id: string, _task: Task, _interval: number): void {
+    this.tasks.set(_id, {
+      _id,
+      _task,
+      _interval,
       lastRun: 0,
     });
 
@@ -26,8 +26,8 @@ export class TaskScheduler {
     }
   }
 
-  unschedule(id: string): void {
-    this.tasks.delete(id);
+  unschedule(_id: string): void {
+    this.tasks.delete(_id);
     if (this.tasks.size === 0) {
       this.stop();
     }

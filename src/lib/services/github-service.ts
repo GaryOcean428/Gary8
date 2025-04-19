@@ -17,11 +17,11 @@ export class GitHubService {
     return GitHubService.instance;
   }
 
-  async fetchRepositoryInfo(owner: string, repo: string): Promise<any> {
-    thoughtLogger.log('execution', `Fetching repository info: ${owner}/${repo}`);
+  async fetchRepositoryInfo(_owner: string, _repo: string): Promise<unknown> {
+    thoughtLogger.log('execution', `Fetching repository info: ${_owner}/${_repo}`);
 
     try {
-      const response = await fetch(`${this.baseUrl}/repos/${owner}/${repo}`, {
+      const response = await fetch(`${this.baseUrl}/repos/${_owner}/${_repo}`, {
         headers: this.getHeaders(),
       });
 
@@ -36,12 +36,12 @@ export class GitHubService {
     }
   }
 
-  async searchRepositories(query: string): Promise<any[]> {
-    thoughtLogger.log('execution', `Searching repositories: ${query}`);
+  async searchRepositories(_query: string): Promise<any[]> {
+    thoughtLogger.log('execution', `Searching repositories: ${_query}`);
 
     try {
       const response = await fetch(
-        `${this.baseUrl}/search/repositories?q=${encodeURIComponent(query)}`,
+        `${this.baseUrl}/search/repositories?q=${encodeURIComponent(_query)}`,
         { headers: this.getHeaders() }
       );
 

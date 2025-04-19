@@ -75,8 +75,8 @@ export function Layout({ children, activePanel, onPanelChange }: LayoutProps) {
           >
             <Sidebar 
               activePanel={activePanel} 
-              onPanelChange={(panel) => {
-                onPanelChange(panel);
+              onPanelChange={(_panel) => {
+                onPanelChange(_panel);
                 setIsMobileMenuOpen(false);
               }} 
             />

@@ -14,20 +14,20 @@ export class FirebaseStorage {
     return FirebaseStorage.instance;
   }
 
-  async uploadDocument(file: File, userId: string): Promise<Document> {
+  async uploadDocument(_file: File, _userId: string): Promise<Document> {
     thoughtLogger.log('execution', 'Uploading document to Supabase Storage', {
-      fileName: file.name,
-      fileSize: file.size
+      fileName: _file.name,
+      fileSize: _file.size
     });
 
     try {
       // Create storage path
-      const filePath = `documents/${userId}/${Date.now()}_${file.name}`;
+      const filePath = `documents/${_userId}/${Date.now()}_${_file.name}`;
       
       // Upload file to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('documents')
-        .upload(filePath, file, {
+        .upload(filePath, _file, {
           cacheControl: '3600',
           upsert: false
         });
@@ -43,10 +43,10 @@ export class FirebaseStorage {
       const { data: docData, error: docError } = await supabase
         .from('documents')
         .insert({
-          name: file.name,
-          mime_type: file.type,
-          size: file.size,
-          user_id: userId,
+          name: _file.name,
+          mime_type: _file.type,
+          size: _file.size,
+          user_id: _userId,
           storage_path: filePath,
           url: urlData.publicUrl,
           created_at: new Date().toISOString(),
@@ -63,15 +63,15 @@ export class FirebaseStorage {
 
       return {
         id: docData.id,
-        name: file.name,
+        name: _file.name,
         content: urlData.publicUrl,
-        mimeType: file.type,
+        mimeType: _file.type,
         tags: [],
-        workspaceId: userId,
+        workspaceId: _userId,
         createdAt: Date.now(),
         updatedAt: Date.now(),
         metadata: {
-          fileSize: file.size,
+          fileSize: _file.size,
           storagePath: filePath
         }
       };
@@ -81,29 +81,29 @@ export class FirebaseStorage {
     }
   }
 
-  async listDocuments(userId: string): Promise<Document[]> {
+  async listDocuments(_userId: string): Promise<Document[]> {
     thoughtLogger.log('execution', 'Fetching documents from Supabase');
 
     try {
       const { data, error } = await supabase
         .from('documents')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', _userId);
 
       if (error) throw error;
 
-      return (data || []).map(doc => ({
-        id: doc.id,
-        name: doc.name,
-        content: doc.url,
-        mimeType: doc.mime_type,
-        tags: doc.tags || [],
-        workspaceId: doc.user_id,
-        createdAt: new Date(doc.created_at).getTime(),
-        updatedAt: new Date(doc.updated_at).getTime(),
+      return (data || []).map(_doc => ({
+        id: _doc.id,
+        name: _doc.name,
+        content: _doc.url,
+        mimeType: _doc.mime_type,
+        tags: _doc.tags || [],
+        workspaceId: _doc.user_id,
+        createdAt: new Date(_doc.created_at).getTime(),
+        updatedAt: new Date(_doc.updated_at).getTime(),
         metadata: {
-          fileSize: doc.size,
-          storagePath: doc.storage_path
+          fileSize: _doc.size,
+          storagePath: _doc.storage_path
         }
       }));
     } catch (error) {
@@ -112,15 +112,15 @@ export class FirebaseStorage {
     }
   }
 
-  async deleteDocument(document: Document, userId: string): Promise<void> {
-    thoughtLogger.log('execution', 'Deleting document', { documentId: document.id });
+  async deleteDocument(_document: Document, _userId: string): Promise<void> {
+    thoughtLogger.log('execution', 'Deleting document', { documentId: _document.id });
 
     try {
       // Delete file from Supabase Storage
-      if (document.metadata?.storagePath) {
+      if (_document.metadata?.storagePath) {
         const { error: storageError } = await supabase.storage
           .from('documents')
-          .remove([document.metadata.storagePath]);
+          .remove([_document.metadata.storagePath]);
         
         if (storageError) throw storageError;
       }
@@ -129,7 +129,7 @@ export class FirebaseStorage {
       const { error } = await supabase
         .from('documents')
         .delete()
-        .eq('id', document.id);
+        .eq('id', _document.id);
 
       if (error) throw error;
 

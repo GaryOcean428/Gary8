@@ -3,11 +3,11 @@ import { useToast } from '../../hooks/useToast';
 export class ErrorHandler {
   private static toast = useToast();
 
-  static handle(error: unknown): void {
-    console.error('Error:', error);
+  static handle(_error: unknown): void {
+    console.error('Error:', _error);
 
-    const message = error instanceof Error 
-      ? error.message 
+    const message = _error instanceof Error 
+      ? _error.message 
       : 'An unexpected error occurred';
 
     this.toast.addToast({
@@ -19,11 +19,11 @@ export class ErrorHandler {
   }
 
   static async handleAsync<T>(
-    promise: Promise<T>,
-    errorMessage = 'Operation failed'
+    _promise: Promise<T>,
+    _errorMessage = 'Operation failed'
   ): Promise<T | null> {
     try {
-      return await promise;
+      return await _promise;
     } catch (error) {
       this.handle(error);
       return null;

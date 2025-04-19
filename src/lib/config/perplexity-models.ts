@@ -12,10 +12,10 @@ export const perplexityModels = {
 
 /**
  * Get a Perplexity model by name
- * @param modelName The model name
+ * @param _modelName The model name
  * @returns The model ID or undefined if not found
  */
-export function getPerplexityModel(modelName: string): string | undefined {
+export function getPerplexityModel(_modelName: string): string | undefined {
   const modelMap: Record<string, string> = {
     'sonar-deep-research': perplexityModels.sonarDeepResearch,
     'sonar-reasoning-pro': perplexityModels.sonarReasoningPro,
@@ -24,15 +24,15 @@ export function getPerplexityModel(modelName: string): string | undefined {
     'sonar': perplexityModels.sonar,
   };
   
-  return modelMap[modelName];
+  return modelMap[_modelName];
 }
 
 /**
  * Get context window size for a model
- * @param modelName The model name
+ * @param _modelName The model name
  * @returns The context window size in tokens
  */
-export function getModelContextWindow(modelName: string): number {
+export function getModelContextWindow(_modelName: string): number {
   const contextMap: Record<string, number> = {
     'sonar-deep-research': 128000,
     'sonar-reasoning-pro': 128000,
@@ -41,5 +41,5 @@ export function getModelContextWindow(modelName: string): number {
     'sonar': 128000,
   };
   
-  return contextMap[modelName] || 128000; // Default to 128k
+  return contextMap[_modelName] || 128000; // Default to 128k
 }

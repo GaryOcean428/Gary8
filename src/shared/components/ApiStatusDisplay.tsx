@@ -140,8 +140,8 @@ export function ApiStatusDisplay() {
   }, [settings.useEdgeFunctions]);
 
   // Display status icon based on API connection state
-  const getStatusIcon = (status: 'checking' | 'connected' | 'disconnected') => {
-    switch (status) {
+  const getStatusIcon = (_status: 'checking' | 'connected' | 'disconnected') => {
+    switch (_status) {
       case 'checking':
         return <Loader width={16} height={16} className="text-primary animate-spin" />;
       case 'connected':
@@ -251,15 +251,15 @@ export function ApiStatusDisplay() {
                   Edge Functions
                 </motion.span>
               )}
-              {connectedProviders.map(provider => (
+              {connectedProviders.map(_provider => (
                 <motion.span 
-                  key={provider}
+                  key={_provider}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-success/10 text-success border border-success/20"
                 >
                   <CheckCircle width={12} height={12} className="mr-1" />
-                  {provider.charAt(0).toUpperCase() + provider.slice(1)}
+                  {_provider.charAt(0).toUpperCase() + _provider.slice(1)}
                 </motion.span>
               ))}
             </div>

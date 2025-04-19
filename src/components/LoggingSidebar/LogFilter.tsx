@@ -16,12 +16,12 @@ export function LogFilter({ activeFilters, onFilterChange }: Readonly<LogFilterP
     'router'
   ];
 
-  const toggleFilter = (source: LogSource) => {
+  const toggleFilter = (_source: LogSource) => {
     const newFilters = new Set(activeFilters);
-    if (newFilters.has(source)) {
-      newFilters.delete(source);
+    if (newFilters.has(_source)) {
+      newFilters.delete(_source);
     } else {
-      newFilters.add(source);
+      newFilters.add(_source);
     }
     onFilterChange(newFilters);
   };
@@ -29,17 +29,17 @@ export function LogFilter({ activeFilters, onFilterChange }: Readonly<LogFilterP
   return (
     <div className="p-4 border-b border-gray-700">
       <div className="flex flex-wrap gap-2">
-        {sources.map(source => (
+        {sources.map(_source => (
           <button
-            key={source}
-            onClick={() => toggleFilter(source)}
+            key={_source}
+            onClick={() => toggleFilter(_source)}
             className={`px-3 py-1 text-sm rounded-full transition-colors ${
-              activeFilters.has(source)
+              activeFilters.has(_source)
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
             }`}
           >
-            {source.replace('-', ' ')}
+            {_source.replace('-', ' ')}
           </button>
         ))}
       </div>

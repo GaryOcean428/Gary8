@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-// Removed duplicate/unused: ChevronDown, Search. Combined imports. Corrected Send import.
-import { Pause, Play, Sparkles, RotateCcw, Share2, Filter, Hash, Send, User, Terminal, X, Robot as Bot } from 'lucide-react';
+// Removed duplicate/unused: ChevronDown, Search. Combined imports.
+import { Pause, Play, Sparkles, RotateCcw, Share2, Filter, Hash, Send, User, Terminal, X, Bot } from 'lucide-react';
 import { AgentSystem } from '../lib/agent-system';
 import { LoadingIndicator } from './LoadingIndicator';
 import { useChat } from '../hooks/useChat';
@@ -38,7 +38,9 @@ interface Agent {
   capabilities: string[];
 }
 
-type ProcessingPhase = 'thinking' | 'searching' | 'processing' | 'generating';
+// Use the same type as defined in LoadingIndicator
+import { ProcessingState } from './LoadingIndicator';
+type ProcessingPhase = ProcessingState;
 
 export function Chat() {
   const [input, setInput] = useState('');
@@ -116,30 +118,30 @@ export function Chat() {
     setAutoScroll(isScrolledToBottom);
   };
 
-  const handleModelChange = (model: string) => {
-    setFilters(prev => ({ ...prev, model }));
+  const handleModelChange = (_model: string) => {
+    setFilters(_prev => ({ ..._prev, _model }));
     setShowFilterMenu(false);
   };
 
-  const toggleFilter = (key: 'searchEnabled' | 'streamingEnabled') => {
-    setFilters(prev => ({ ...prev, [key]: !prev[key] }));
+  const toggleFilter = (_key: 'searchEnabled' | 'streamingEnabled') => {
+    setFilters(_prev => ({ ..._prev, [_key]: !_prev[_key] }));
   };
 
-  const updateProcessingPhase = (state?: string) => {
-    if (!state) return;
+  const updateProcessingPhase = (_state?: string) => {
+    if (!_state) return;
     
-    switch (state) {
+    switch (_state) {
       case 'searching': setProcessingPhase('searching'); break;
-      case 'retrieving':
-      case 'processing': setProcessingPhase('processing'); break;
-      case 'thinking':
-      case 'reasoning': setProcessingPhase('thinking'); break;
+      case 'retrieving': setProcessingPhase('retrieving'); break;
+      case 'processing': setProcessingPhase('analyzing'); break; // Map 'processing' to 'analyzing'
+      case 'thinking': setProcessingPhase('thinking'); break;
+      case 'reasoning': setProcessingPhase('reasoning'); break;
       default: setProcessingPhase('generating');
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (_e: React.FormEvent) => {
+    _e.preventDefault();
     const trimmedInput = input.trim();
     if (!trimmedInput || isProcessing) return;
 
@@ -189,17 +191,17 @@ export function Chat() {
       const system = AgentSystem.getInstance();
       await system.processMessage(
         userMessage.content,
-        (contentChunk) => { // Renamed for clarity
+        (_contentChunk) => { // Renamed for clarity
           if (!isPaused) {
-            currentContent += contentChunk;
+            currentContent += _contentChunk;
             chunkCount++;
             
             // Update the existing assistant message content
-            addMessage((currentMessages: Message[]) => { 
-              return currentMessages.map((msg: Message) => 
-                msg.id === assistantMessage.id
-                  ? { ...msg, content: currentContent }
-                  : msg
+            addMessage((_currentMessages: Message[]) => { 
+              return _currentMessages.map((_msg: Message) => 
+                _msg.id === assistantMessage.id
+                  ? { ..._msg, content: currentContent }
+                  : _msg
               );
             });
           }
@@ -244,8 +246,8 @@ export function Chat() {
 
   // --- Command Handling Logic ---
 
-  const handleAgentCommand = (args: string[]) => {
-    if (args.length === 0) {
+  const handleAgentCommand = (_args: string[]) => {
+    if (_args.length === 0) {
       const nextIsAgentMode = !isAgentMode;
       setIsAgentMode(nextIsAgentMode);
       setInput('');
@@ -255,13 +257,13 @@ export function Chat() {
       return;
     }
 
-    const agentAction = args[0]?.toLowerCase();
+    const agentAction = _args[0]?.toLowerCase();
     if (agentAction === 'list') {
       setShowAgentList(true);
       setInput('');
-    } else if (agentAction === 'activate' && args[1]) {
-      const agentName = args.slice(1).join(' ');
-      const agent = availableAgents.find((a: Agent) => a.name.toLowerCase() === agentName.toLowerCase());
+    } else if (agentAction === 'activate' && _args[1]) {
+      const agentName = _args.slice(1).join(' ');
+      const agent = availableAgents.find((_a: Agent) => _a.name.toLowerCase() === agentName.toLowerCase());
       if (agent) {
         setActiveAgent(agent.id);
         setIsAgentMode(true);
@@ -271,19 +273,19 @@ export function Chat() {
         addToast({ type: 'error', message: `Agent not found: ${agentName}`, duration: 3000 });
       }
     } else {
-       addToast({ type: 'warning', message: 'Invalid agent command. Use /agent list or /agent activate [name].' });
+       addToast({ type: 'info', message: 'Invalid agent command. Use /agent list or /agent activate [name].' });
     }
   };
 
-  const handleSandboxCommand = (args: string[]) => {
-    if (args.length === 0) {
+  const handleSandboxCommand = (_args: string[]) => {
+    if (_args.length === 0) {
       setShowSandbox(!showSandbox);
       setInput('');
       return;
     }
     
-    if (args[0]?.toLowerCase() === 'language' && args[1]) {
-      const language = args[1].toLowerCase();
+    if (_args[0]?.toLowerCase() === 'language' && _args[1]) {
+      const language = _args[1].toLowerCase();
       const supportedLanguages = ['javascript', 'python', 'html'];
       if (supportedLanguages.includes(language)) {
         setSandboxLanguage(language);
@@ -294,7 +296,7 @@ export function Chat() {
         addToast({ type: 'error', message: `Unsupported language: ${language}. Supported: ${supportedLanguages.join(', ')}`, duration: 3000 });
       }
     } else {
-       addToast({ type: 'warning', message: 'Invalid sandbox command. Use /sandbox language [lang].' });
+       addToast({ type: 'info', message: 'Invalid sandbox command. Use /sandbox language [lang].' });
     }
   };
 
@@ -314,18 +316,18 @@ export function Chat() {
       addToast({ type: 'info', message: 'Chat cleared', duration: 2000 });
   };
 
-  const handleUnknownCommand = async (command: string) => {
+  const handleUnknownCommand = async (_command: string) => {
      await addMessage({
         id: crypto.randomUUID(),
         role: 'system',
-        content: `Unknown command: ${command}\nType \`/help\` to see available commands.`,
+        content: `Unknown command: ${_command}\nType \`/help\` to see available commands.`,
         timestamp: Date.now()
       });
       setInput('');
   };
 
-  const handleCommand = async (commandText: string) => {
-    const commandParts = commandText.trim().split(' ');
+  const handleCommand = async (_commandText: string) => {
+    const commandParts = _commandText.trim().split(' ');
     const command = commandParts[0].toLowerCase();
     const args = commandParts.slice(1);
 
@@ -344,32 +346,32 @@ export function Chat() {
     }
   };
 
-  const activateAgent = (agentId: string) => {
-    setActiveAgent(agentId);
+  const activateAgent = (_agentId: string) => {
+    setActiveAgent(_agentId);
     setShowAgentList(false);
-    const agent = availableAgents.find((a: Agent) => a.id === agentId);
+    const agent = availableAgents.find((_a: Agent) => _a.id === _agentId);
     if (agent) {
       addToast({ type: 'success', message: `Activated agent: ${agent.name}`, duration: 3000 });
     }
   };
 
   // Helper to render message bubble classes
-  const getBubbleClasses = (role: Message['role']) => {
-    if (role === 'user') return 'bg-secondary/90 text-secondary-foreground rounded-l-lg rounded-tr-lg card-elevated';
-    if (role === 'system') return 'bg-destructive/90 text-destructive-foreground rounded-lg card-elevated glow-destructive';
+  const getBubbleClasses = (_role: Message['role']) => {
+    if (_role === 'user') return 'bg-secondary/90 text-secondary-foreground rounded-l-lg rounded-tr-lg card-elevated';
+    if (_role === 'system') return 'bg-destructive/90 text-destructive-foreground rounded-lg card-elevated glow-destructive';
     return 'bg-card/90 text-card-foreground rounded-r-lg rounded-tl-lg card-elevated';
   };
 
   // Helper to render message role icon and name
-  const renderRoleInfo = (role: Message['role']) => {
-    if (role === 'user') {
+  const renderRoleInfo = (_role: Message['role']) => {
+    if (_role === 'user') {
       return <div className="flex items-center text-xs text-secondary-foreground/70"><User className="w-3 h-3 mr-1" /> User</div>;
     }
-    if (role === 'system') {
+    if (_role === 'system') {
       return <div className="flex items-center text-xs text-destructive-foreground/70"><Terminal className="w-3 h-3 mr-1" /> System</div>;
     }
     if (activeAgent) {
-      const agentName = availableAgents.find((a: Agent) => a.id === activeAgent)?.name ?? 'Assistant';
+      const agentName = availableAgents.find((_a: Agent) => _a.id === activeAgent)?.name ?? 'Assistant';
       return <div className="flex items-center text-xs text-primary/70"><Bot className="w-3 h-3 mr-1" /> {agentName}</div>;
     }
     return <div className="flex items-center text-xs text-card-foreground/70"><Bot className="w-3 h-3 mr-1" /> Assistant</div>;
@@ -385,7 +387,7 @@ export function Chat() {
             <span className="text-sm font-medium">Agent Mode</span>
             {activeAgent && (
               <Badge variant="outline" className="text-xs">
-                {availableAgents.find((a: Agent) => a.id === activeAgent)?.name ?? 'Unknown Agent'} {/* Use ?? */}
+                {availableAgents.find((_a: Agent) => _a.id === activeAgent)?.name ?? 'Unknown Agent'} {/* Use ?? */}
               </Badge>
             )}
           </div>
@@ -413,13 +415,13 @@ export function Chat() {
                   "Analyze the trends in renewable energy adoption",
                   "Generate a React component for a dynamic form",
                   "How can I optimize my SQLite database queries?"
-                ].map((suggestion, i) => (
+                ].map((_suggestion, _i) => (
                   <button
-                    key={i}
+                    key={_i}
                     className="p-3 text-left rounded-lg bg-muted hover:bg-accent/20 transition-colors"
-                    onClick={() => { setInput(suggestion); textareaRef.current?.focus(); }}
+                    onClick={() => { setInput(_suggestion); textareaRef.current?.focus(); }}
                   >
-                    {suggestion}
+                    {_suggestion}
                   </button>
                 ))}
               </div>
@@ -451,14 +453,14 @@ export function Chat() {
                 <div className="text-center py-4 text-muted-foreground"> <p>No agents available</p> </div>
               ) : (
                 <div className="space-y-2">
-                  {availableAgents.map((agent: Agent) => (
+                  {availableAgents.map((_agent: Agent) => (
                     <button
-                      key={agent.id}
-                      className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors ${ activeAgent === agent.id ? 'bg-primary text-primary-foreground' : 'bg-card hover:bg-muted' }`}
-                      onClick={() => activateAgent(agent.id)}
+                      key={_agent.id}
+                      className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors ${ activeAgent === _agent.id ? 'bg-primary text-primary-foreground' : 'bg-card hover:bg-muted' }`}
+                      onClick={() => activateAgent(_agent.id)}
                     >
-                      <div> <div className="font-medium">{agent.name}</div> <div className="text-xs opacity-80">Role: {agent.role}</div> </div>
-                      <div> {agent.capabilities.includes('mcp') ? <Badge variant="secondary" className="text-xs">MCP</Badge> : <Badge variant="outline" className="text-xs">Standard</Badge>} </div>
+                      <div> <div className="font-medium">{_agent.name}</div> <div className="text-xs opacity-80">Role: {_agent.role}</div> </div>
+                      <div> {_agent.capabilities.includes('mcp') ? <Badge variant="secondary" className="text-xs">MCP</Badge> : <Badge variant="outline" className="text-xs">Standard</Badge>} </div>
                     </button>
                   ))}
                 </div>
@@ -478,39 +480,39 @@ export function Chat() {
             <CanvasSandbox
               language={sandboxLanguage}
               height="300px"
-              onExecute={result => { addMessage({ id: crypto.randomUUID(), role: 'system', content: `**Sandbox Result:**\n\`\`\`\n${result}\n\`\`\``, timestamp: Date.now() }); }}
+              onExecute={_result => { addMessage({ id: crypto.randomUUID(), role: 'system', content: `**Sandbox Result:**\n\`\`\`\n${_result}\n\`\`\``, timestamp: Date.now() }); }}
             />
           </div>
         )}
 
-        {messages.map((message: Message) => (
+        {messages.map((_message: Message) => (
           <motion.div
-            key={message.id}
+            key={_message.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex ${_message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {(() => {
-              const bubbleClass = getBubbleClasses(message.role);
-              const streamingClass = (message.role === 'assistant' && message.content === '' && isProcessing) ? `streaming-cursor streaming-cursor-${processingPhase}` : '';
+              const bubbleClass = getBubbleClasses(_message.role);
+              const streamingClass = (_message.role === 'assistant' && _message.content === '' && isProcessing) ? `streaming-cursor streaming-cursor-${processingPhase}` : '';
               return (
                 <div className={`max-w-[95%] sm:max-w-[80%] rounded-lg p-4 shadow-lg backdrop-blur-sm ${bubbleClass} ${streamingClass}`}>
-                  {renderRoleInfo(message.role)}
-                  {message.role === 'assistant' && message.content.length > 0 ? (
-                    <ProgressiveMessage content={message.content} isLoading={isProcessing && message.content === ''} streamingPhase={processingPhase} className="prose prose-invert max-w-none break-words" />
+                  {renderRoleInfo(_message.role)}
+                  {_message.role === 'assistant' && _message.content.length > 0 ? (
+                    <ProgressiveMessage content={_message.content} isLoading={isProcessing && _message.content === ''} streamingPhase={processingPhase} className="prose prose-invert max-w-none break-words" />
                   ) : (
-                    <div className="prose prose-invert max-w-none break-words"> <ReactMarkdown>{String(message.content ?? '')}</ReactMarkdown> </div>
+                    <div className="prose prose-invert max-w-none break-words"> <ReactMarkdown>{String(_message.content ?? '')}</ReactMarkdown> </div>
                   )}
-                  {message.model && (
-                    <div className="mt-2 text-xs text-muted-foreground flex gap-1 items-center"> <span className="badge badge-primary">{message.model}</span> <span className="text-muted-foreground">{new Date(message.timestamp).toLocaleTimeString()}</span> </div>
+                  {_message.model && (
+                    <div className="mt-2 text-xs text-muted-foreground flex gap-1 items-center"> <span className="badge badge-primary">{_message.model}</span> <span className="text-muted-foreground">{new Date(_message.timestamp).toLocaleTimeString()}</span> </div>
                   )}
                 </div>
               );
             })()} 
           </motion.div>
         ))}
-        {isProcessing && !messages.some((m: Message) => m.role === 'assistant' && m.content === '') && (
+        {isProcessing && !messages.some((_m: Message) => _m.role === 'assistant' && _m.content === '') && (
           <div className="flex justify-start"> <div className="bg-card backdrop-blur-sm rounded-lg p-3 shadow-lg"> <LoadingIndicator state={processingPhase} /> </div> </div>
         )}
         <div ref={messagesEndRef} />
@@ -530,8 +532,8 @@ export function Chat() {
                       <div>
                         <label className="text-sm text-muted-foreground">Model Selection</label>
                         <div className="grid grid-cols-2 gap-1 mt-1">
-                          {['auto', 'grok', 'claude', 'openai', 'groq'].map(model => (
-                            <button key={model} type="button" onClick={() => handleModelChange(model)} className={`px-2 py-1 text-xs rounded-full ${ filters.model === model ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80' }`}> {model.charAt(0).toUpperCase() + model.slice(1)} </button>
+                          {['auto', 'grok', 'claude', 'openai', 'groq'].map(_model => (
+                            <button key={_model} type="button" onClick={() => handleModelChange(_model)} className={`px-2 py-1 text-xs rounded-full ${ filters.model === _model ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80' }`}> {_model.charAt(0).toUpperCase() + _model.slice(1)} </button>
                           ))}
                         </div>
                       </div>
@@ -556,13 +558,13 @@ export function Chat() {
             <textarea
               ref={textareaRef}
               value={input}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
-              onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e); }
-                if (e.key === 'Tab' && input.startsWith('/') && !input.includes(' ')) {
-                  e.preventDefault();
+              onChange={(_e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(_e.target.value)}
+              onKeyDown={(_e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+                if (_e.key === 'Enter' && !_e.shiftKey) { _e.preventDefault(); handleSubmit(_e); }
+                if (_e.key === 'Tab' && input.startsWith('/') && !input.includes(' ')) {
+                  _e.preventDefault();
                   const commands = ['/agent', '/sandbox', '/clear', '/help'];
-                  const matchingCommands = commands.filter(cmd => cmd.startsWith(input));
+                  const matchingCommands = commands.filter(_cmd => _cmd.startsWith(input));
                   if (matchingCommands.length === 1) setInput(matchingCommands[0] + ' ');
                 }
               }}
@@ -589,9 +591,9 @@ export function Chat() {
                   { command: '/sandbox', description: 'Toggle code sandbox or set sandbox language' },
                   { command: '/clear', description: 'Clear all messages in the current chat' },
                   { command: '/help', description: 'Show available commands and help' }
-                ].map(item => (
-                  <button key={item.command} className={`w-full text-left p-2 hover:bg-muted ${ input.split(' ')[0] === item.command ? 'bg-muted' : '' }`} onClick={() => setInput(item.command + ' ')}>
-                    <div className="flex items-center"> <code className="bg-muted/50 px-1 py-0.5 rounded text-primary">{item.command}</code> <span className="ml-2 text-sm text-muted-foreground">{item.description}</span> </div>
+                ].map(_item => (
+                  <button key={_item.command} className={`w-full text-left p-2 hover:bg-muted ${ input.split(' ')[0] === _item.command ? 'bg-muted' : '' }`} onClick={() => setInput(_item.command + ' ')}>
+                    <div className="flex items-center"> <code className="bg-muted/50 px-1 py-0.5 rounded text-primary">{_item.command}</code> <span className="ml-2 text-sm text-muted-foreground">{_item.description}</span> </div>
                   </button>
                 ))}
               </div>
@@ -614,4 +616,3 @@ export function Chat() {
     </div>
   );
 }
-

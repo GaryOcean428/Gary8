@@ -22,6 +22,11 @@ declare module 'lucide-react' {
   export const Bot: typeof Icon;
   export const Terminal: typeof Icon;
   export const Hash: typeof Icon;
+  export const Send: typeof Icon;
+  export const Brush: typeof Icon;
+  export const Wrench: typeof Icon;
+  export const Code: typeof Icon;
+  export const Cpu: typeof Icon;
   export const History: typeof Icon;
   export const Download: typeof Icon;
   export const Tag: typeof Icon;
@@ -40,7 +45,6 @@ declare module 'lucide-react' {
   export const RefreshCw: typeof Icon;
   export const Save: typeof Icon;
   export const Settings: typeof Icon;
-  export const Wrench: typeof Icon;
   export const Palette: typeof Icon;
   export const Menu: typeof Icon;
   export const Sun: typeof Icon;
@@ -52,7 +56,6 @@ declare module 'lucide-react' {
   export const Server: typeof Icon;
   export const ToggleLeft: typeof Icon;
   export const ToggleRight: typeof Icon;
-  export const Code: typeof Icon;
   export const Info: typeof Icon;
   export const MessageSquare: typeof Icon;
   export const BarChart4: typeof Icon;

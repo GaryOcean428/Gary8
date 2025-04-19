@@ -30,18 +30,18 @@ export class IndexedDBStorage {
   }
 
   private openDatabase(): Promise<IDBDatabase> {
-    return new Promise((resolve, reject) => {
+    return new Promise((_resolve, _reject) => {
       const request = indexedDB.open(this.dbName, this.version);
 
       request.onerror = () => {
-        reject(new AppError('Failed to open database', 'STORAGE_ERROR', request.error));
+        _reject(new AppError('Failed to open database', 'STORAGE_ERROR', request.error));
       };
 
       request.onsuccess = () => {
-        resolve(request.result);
+        _resolve(request.result);
       };
 
-      request.onupgradeneeded = (event) => {
+      request.onupgradeneeded = (_event) => {
         const db = request.result;
 
         // Create all required object stores if they don't exist
@@ -73,122 +73,122 @@ export class IndexedDBStorage {
     });
   }
 
-  async put(storeName: string, value: any): Promise<void> {
+  async put(_storeName: string, _value: unknown): Promise<void> {
     if (!this.db) {
       throw new AppError('Database not initialized', 'STORAGE_ERROR');
     }
 
-    if (!this.stores[storeName as keyof typeof this.stores]) {
-      throw new AppError(`Invalid store name: ${storeName}`, 'STORAGE_ERROR');
+    if (!this.stores[_storeName as keyof typeof this.stores]) {
+      throw new AppError(`Invalid store name: ${_storeName}`, 'STORAGE_ERROR');
     }
 
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(storeName, 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const request = store.put(value);
+    return new Promise((_resolve, _reject) => {
+      const transaction = this.db!.transaction(_storeName, 'readwrite');
+      const store = transaction.objectStore(_storeName);
+      const request = store.put(_value);
 
       request.onerror = () => {
-        reject(new AppError('Failed to store data', 'STORAGE_ERROR', request.error));
+        _reject(new AppError('Failed to store data', 'STORAGE_ERROR', request.error));
       };
 
       request.onsuccess = () => {
-        resolve();
+        _resolve();
       };
     });
   }
 
-  async get(storeName: string, key: IDBValidKey): Promise<any> {
+  async get(_storeName: string, _key: IDBValidKey): Promise<unknown> {
     if (!this.db) {
       throw new AppError('Database not initialized', 'STORAGE_ERROR');
     }
 
-    if (!this.stores[storeName as keyof typeof this.stores]) {
-      throw new AppError(`Invalid store name: ${storeName}`, 'STORAGE_ERROR');
+    if (!this.stores[_storeName as keyof typeof this.stores]) {
+      throw new AppError(`Invalid store name: ${_storeName}`, 'STORAGE_ERROR');
     }
 
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(storeName, 'readonly');
-      const store = transaction.objectStore(storeName);
-      const request = store.get(key);
+    return new Promise((_resolve, _reject) => {
+      const transaction = this.db!.transaction(_storeName, 'readonly');
+      const store = transaction.objectStore(_storeName);
+      const request = store.get(_key);
 
       request.onerror = () => {
-        reject(new AppError('Failed to retrieve data', 'STORAGE_ERROR', request.error));
+        _reject(new AppError('Failed to retrieve data', 'STORAGE_ERROR', request.error));
       };
 
       request.onsuccess = () => {
-        resolve(request.result);
+        _resolve(request.result);
       };
     });
   }
 
-  async getAll(storeName: string): Promise<any[]> {
+  async getAll(_storeName: string): Promise<any[]> {
     if (!this.db) {
       throw new AppError('Database not initialized', 'STORAGE_ERROR');
     }
 
-    if (!this.stores[storeName as keyof typeof this.stores]) {
-      throw new AppError(`Invalid store name: ${storeName}`, 'STORAGE_ERROR');
+    if (!this.stores[_storeName as keyof typeof this.stores]) {
+      throw new AppError(`Invalid store name: ${_storeName}`, 'STORAGE_ERROR');
     }
 
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(storeName, 'readonly');
-      const store = transaction.objectStore(storeName);
+    return new Promise((_resolve, _reject) => {
+      const transaction = this.db!.transaction(_storeName, 'readonly');
+      const store = transaction.objectStore(_storeName);
       const request = store.getAll();
 
       request.onerror = () => {
-        reject(new AppError('Failed to retrieve data', 'STORAGE_ERROR', request.error));
+        _reject(new AppError('Failed to retrieve data', 'STORAGE_ERROR', request.error));
       };
 
       request.onsuccess = () => {
-        resolve(request.result);
+        _resolve(request.result);
       };
     });
   }
 
-  async delete(storeName: string, key: IDBValidKey): Promise<void> {
+  async delete(_storeName: string, _key: IDBValidKey): Promise<void> {
     if (!this.db) {
       throw new AppError('Database not initialized', 'STORAGE_ERROR');
     }
 
-    if (!this.stores[storeName as keyof typeof this.stores]) {
-      throw new AppError(`Invalid store name: ${storeName}`, 'STORAGE_ERROR');
+    if (!this.stores[_storeName as keyof typeof this.stores]) {
+      throw new AppError(`Invalid store name: ${_storeName}`, 'STORAGE_ERROR');
     }
 
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(storeName, 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const request = store.delete(key);
+    return new Promise((_resolve, _reject) => {
+      const transaction = this.db!.transaction(_storeName, 'readwrite');
+      const store = transaction.objectStore(_storeName);
+      const request = store.delete(_key);
 
       request.onerror = () => {
-        reject(new AppError('Failed to delete data', 'STORAGE_ERROR', request.error));
+        _reject(new AppError('Failed to delete data', 'STORAGE_ERROR', request.error));
       };
 
       request.onsuccess = () => {
-        resolve();
+        _resolve();
       };
     });
   }
 
-  async clear(storeName: string): Promise<void> {
+  async clear(_storeName: string): Promise<void> {
     if (!this.db) {
       throw new AppError('Database not initialized', 'STORAGE_ERROR');
     }
 
-    if (!this.stores[storeName as keyof typeof this.stores]) {
-      throw new AppError(`Invalid store name: ${storeName}`, 'STORAGE_ERROR');
+    if (!this.stores[_storeName as keyof typeof this.stores]) {
+      throw new AppError(`Invalid store name: ${_storeName}`, 'STORAGE_ERROR');
     }
 
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(storeName, 'readwrite');
-      const store = transaction.objectStore(storeName);
+    return new Promise((_resolve, _reject) => {
+      const transaction = this.db!.transaction(_storeName, 'readwrite');
+      const store = transaction.objectStore(_storeName);
       const request = store.clear();
 
       request.onerror = () => {
-        reject(new AppError('Failed to clear store', 'STORAGE_ERROR', request.error));
+        _reject(new AppError('Failed to clear store', 'STORAGE_ERROR', request.error));
       };
 
       request.onsuccess = () => {
-        resolve();
+        _resolve();
       };
     });
   }

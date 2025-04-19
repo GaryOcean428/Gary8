@@ -3,34 +3,34 @@ type EventCallback = (...args: any[]) => void;
 export class EventEmitter {
   private events: { [key: string]: EventCallback[] } = {};
 
-  on(event: string, callback: EventCallback): void {
-    if (!this.events[event]) {
-      this.events[event] = [];
+  on(_event: string, _callback: EventCallback): void {
+    if (!this.events[_event]) {
+      this.events[_event] = [];
     }
-    this.events[event].push(callback);
+    this.events[_event].push(_callback);
   }
 
-  off(event: string, callback: EventCallback): void {
-    if (!this.events[event]) return;
-    this.events[event] = this.events[event].filter(cb => cb !== callback);
+  off(_event: string, _callback: EventCallback): void {
+    if (!this.events[_event]) return;
+    this.events[_event] = this.events[_event].filter(_cb => _cb !== _callback);
   }
 
-  emit(event: string, ...args: any[]): void {
-    if (!this.events[event]) return;
-    this.events[event].forEach(callback => callback(...args));
+  emit(_event: string, ..._args: any[]): void {
+    if (!this.events[_event]) return;
+    this.events[_event].forEach(_callback => _callback(..._args));
   }
 
-  once(event: string, callback: EventCallback): void {
-    const wrapper = (...args: any[]) => {
-      callback(...args);
-      this.off(event, wrapper);
+  once(_event: string, _callback: EventCallback): void {
+    const wrapper = (..._args: any[]) => {
+      _callback(..._args);
+      this.off(_event, wrapper);
     };
-    this.on(event, wrapper);
+    this.on(_event, wrapper);
   }
 
-  removeAllListeners(event?: string): void {
-    if (event) {
-      delete this.events[event];
+  removeAllListeners(_event?: string): void {
+    if (_event) {
+      delete this.events[_event];
     } else {
       this.events = {};
     }

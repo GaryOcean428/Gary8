@@ -17,11 +17,11 @@ interface SavedWorkflow {
   title: string;
   trigger?: {
     type: 'schedule' | 'event';
-    config: Record<string, any>;
+    config: Record<string, unknown>;
   };
   steps: Array<{
     type: string;
-    config: Record<string, any>;
+    config: Record<string, unknown>;
   }>;
   createdAt: number;
   updatedAt: number;
@@ -58,7 +58,7 @@ export class PersistenceManager {
   }
 
   // Chat Management
-  async saveChat(title: string, messages: Message[], tags?: string[]): Promise<string> {
+  async saveChat(_title: string, _messages: Message[], _tags?: string[]): Promise<string> {
     try {
       const { user } = useAuth();
       if (!user) throw new Error('User not authenticated');
@@ -70,8 +70,8 @@ export class PersistenceManager {
       const { error: chatError } = await supabase.from('chats').insert({
         id,
         user_id: user.id,
-        title,
-        tags,
+        _title,
+        _tags,
         created_at: new Date(timestamp).toISOString(),
         updated_at: new Date(timestamp).toISOString()
       });
@@ -80,13 +80,13 @@ export class PersistenceManager {
       
       // Insert all messages
       const { error: messagesError } = await supabase.from('chat_messages').insert(
-        messages.map(msg => ({
-          id: msg.id,
+        _messages.map(_msg => ({
+          id: _msg.id,
           chat_id: id,
-          role: msg.role,
-          content: msg.content,
-          model: msg.model,
-          created_at: new Date(msg.timestamp).toISOString()
+          role: _msg.role,
+          content: _msg.content,
+          model: _msg.model,
+          created_at: new Date(_msg.timestamp).toISOString()
         }))
       );
       
@@ -127,12 +127,12 @@ export class PersistenceManager {
         savedChats.push({
           id: chat.id,
           title: chat.title,
-          messages: messages.map(msg => ({
-            id: msg.id,
-            role: msg.role,
-            content: msg.content,
-            timestamp: new Date(msg.created_at).getTime(),
-            model: msg.model
+          messages: messages.map(_msg => ({
+            id: _msg.id,
+            role: _msg.role,
+            content: _msg.content,
+            timestamp: new Date(_msg.created_at).getTime(),
+            model: _msg.model
           })),
           createdAt: new Date(chat.created_at).getTime(),
           updatedAt: new Date(chat.updated_at).getTime(),
@@ -147,7 +147,7 @@ export class PersistenceManager {
     }
   }
 
-  async deleteChat(id: string): Promise<void> {
+  async deleteChat(_id: string): Promise<void> {
     try {
       const { user } = useAuth();
       if (!user) throw new Error('User not authenticated');
@@ -156,12 +156,12 @@ export class PersistenceManager {
       const { error } = await supabase
         .from('chats')
         .delete()
-        .eq('id', id)
+        .eq('id', _id)
         .eq('user_id', user.id);
         
       if (error) throw error;
       
-      thoughtLogger.log('success', 'Chat deleted', { chatId: id });
+      thoughtLogger.log('success', 'Chat deleted', { chatId: _id });
     } catch (error) {
       thoughtLogger.log('error', 'Failed to delete chat', { error });
       throw error;
@@ -169,7 +169,7 @@ export class PersistenceManager {
   }
 
   // Settings Management
-  async saveSettings(category: string, values: Record<string, any>): Promise<void> {
+  async saveSettings(_category: string, _values: Record<string, unknown>): Promise<void> {
     try {
       const { user } = useAuth();
       if (!user) throw new Error('User not authenticated');
@@ -178,7 +178,7 @@ export class PersistenceManager {
         .from('settings')
         .select('id')
         .eq('user_id', user.id)
-        .eq('category', category)
+        .eq('category', _category)
         .maybeSingle();
       
       if (selectError) throw selectError;
@@ -188,7 +188,7 @@ export class PersistenceManager {
         const { error: updateError } = await supabase
           .from('settings')
           .update({
-            settings: values,
+            settings: _values,
             updated_at: new Date().toISOString()
           })
           .eq('id', data.id);
@@ -200,21 +200,21 @@ export class PersistenceManager {
           .from('settings')
           .insert({
             user_id: user.id,
-            category,
-            settings: values
+            _category,
+            settings: _values
           });
           
         if (insertError) throw insertError;
       }
       
-      thoughtLogger.log('success', 'Settings saved', { category });
+      thoughtLogger.log('success', 'Settings saved', { _category });
     } catch (error) {
       thoughtLogger.log('error', 'Failed to save settings', { error });
       throw error;
     }
   }
 
-  async getSettings(category: string): Promise<Record<string, any> | null> {
+  async getSettings(_category: string): Promise<Record<string, unknown> | null> {
     try {
       const { user } = useAuth();
       if (!user) return null;
@@ -223,7 +223,7 @@ export class PersistenceManager {
         .from('settings')
         .select('settings')
         .eq('user_id', user.id)
-        .eq('category', category)
+        .eq('category', _category)
         .maybeSingle();
         
       if (error) throw error;
@@ -234,7 +234,7 @@ export class PersistenceManager {
     }
   }
 
-  async getAllSettings(): Promise<Record<string, Record<string, any>>> {
+  async getAllSettings(): Promise<Record<string, Record<string, unknown>>> {
     try {
       const { user } = useAuth();
       if (!user) return {};
@@ -246,10 +246,10 @@ export class PersistenceManager {
         
       if (error) throw error;
       
-      return data.reduce((acc, setting) => {
-        acc[setting.category] = setting.settings;
-        return acc;
-      }, {} as Record<string, Record<string, any>>);
+      return data.reduce((_acc, _setting) => {
+        _acc[_setting.category] = _setting.settings;
+        return _acc;
+      }, {} as Record<string, Record<string, unknown>>);
     } catch (error) {
       thoughtLogger.log('error', 'Failed to get all settings', { error });
       return {};

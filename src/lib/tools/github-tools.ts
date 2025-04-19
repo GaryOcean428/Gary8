@@ -22,10 +22,10 @@ export class GitHubTools {
       {
         name: 'search-repositories',
         description: 'Search GitHub repositories',
-        execute: async (query: string) => {
-          thoughtLogger.log('execution', `Searching repositories: ${query}`);
+        execute: async (_query: string) => {
+          thoughtLogger.log('execution', `Searching repositories: ${_query}`);
           try {
-            const repositories = await this.githubService.searchRepositories(query);
+            const repositories = await this.githubService.searchRepositories(_query);
             return {
               success: true,
               result: repositories
@@ -41,10 +41,10 @@ export class GitHubTools {
       {
         name: 'get-repository-info',
         description: 'Get information about a specific repository',
-        execute: async (owner: string, repo: string) => {
-          thoughtLogger.log('execution', `Fetching repository info: ${owner}/${repo}`);
+        execute: async (_owner: string, _repo: string) => {
+          thoughtLogger.log('execution', `Fetching repository info: ${_owner}/${_repo}`);
           try {
-            const info = await this.githubService.fetchRepositoryInfo(owner, repo);
+            const info = await this.githubService.fetchRepositoryInfo(_owner, _repo);
             return {
               success: true,
               result: info

@@ -9,8 +9,8 @@ interface LogGroupProps {
 export function LogGroup({ logs }: LogGroupProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const getLogLevelColor = (level: LogEntry['level']) => {
-    switch (level) {
+  const getLogLevelColor = (_level: LogEntry['level']) => {
+    switch (_level) {
       case 'error': return 'text-red-400';
       case 'warning': return 'text-yellow-400';
       case 'debug': return 'text-purple-400';
@@ -18,8 +18,8 @@ export function LogGroup({ logs }: LogGroupProps) {
     }
   };
 
-  const formatTimestamp = (timestamp: number) => {
-    const date = new Date(timestamp);
+  const formatTimestamp = (_timestamp: number) => {
+    const date = new Date(_timestamp);
     return date.toLocaleTimeString();
   };
 
@@ -41,20 +41,20 @@ export function LogGroup({ logs }: LogGroupProps) {
 
       {isExpanded && (
         <div className="px-3 pb-3 space-y-2">
-          {logs.map((log) => (
-            <div key={log.id} className="pl-6 border-l-2 border-gray-700">
+          {logs.map((_log) => (
+            <div key={_log.id} className="pl-6 border-l-2 border-gray-700">
               <div className="flex items-start space-x-2">
-                <span className={`text-sm ${getLogLevelColor(log.level)}`}>
-                  [{log.level}]
+                <span className={`text-sm ${getLogLevelColor(_log.level)}`}>
+                  [{_log.level}]
                 </span>
-                <span className="text-sm">{log.message}</span>
+                <span className="text-sm">{_log.message}</span>
                 <span className="text-xs text-gray-500">
-                  {formatTimestamp(log.timestamp)}
+                  {formatTimestamp(_log.timestamp)}
                 </span>
               </div>
-              {log.metadata && (
+              {_log.metadata && (
                 <pre className="mt-1 text-xs text-gray-400 overflow-x-auto">
-                  {JSON.stringify(log.metadata, null, 2)}
+                  {JSON.stringify(_log.metadata, null, 2)}
                 </pre>
               )}
             </div>

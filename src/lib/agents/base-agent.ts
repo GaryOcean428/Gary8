@@ -18,13 +18,13 @@ export class BaseAgent extends EventEmitter {
     this.messageProcessor = new MessageProcessor();
   }
 
-  async processMessage(message: Message): Promise<ProcessingResult> {
+  async processMessage(_message: Message): Promise<ProcessingResult> {
     try {
-      const result = await this.messageProcessor.processMessage(message);
+      const result = await this.messageProcessor.processMessage(_message);
       
       if (result.success) {
-        this.messages.push(message);
-        this.emit('message', message);
+        this.messages.push(_message);
+        this.emit('message', _message);
       }
 
       return result;
@@ -55,18 +55,18 @@ export class BaseAgent extends EventEmitter {
     return this.role;
   }
 
-  addCapability(capability: string): void {
-    this.capabilities.add(capability);
-    this.emit('capability-added', capability);
+  addCapability(_capability: string): void {
+    this.capabilities.add(_capability);
+    this.emit('capability-added', _capability);
   }
 
-  removeCapability(capability: string): void {
-    this.capabilities.delete(capability);
-    this.emit('capability-removed', capability);
+  removeCapability(_capability: string): void {
+    this.capabilities.delete(_capability);
+    this.emit('capability-removed', _capability);
   }
 
-  hasCapability(capability: string): boolean {
-    return this.capabilities.has(capability);
+  hasCapability(_capability: string): boolean {
+    return this.capabilities.has(_capability);
   }
 
   getCapabilities(): string[] {

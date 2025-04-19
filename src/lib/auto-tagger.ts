@@ -12,9 +12,9 @@ export class AutoTagger {
     return AutoTagger.instance;
   }
 
-  generateTags(messages: Message[]): string[] {
+  generateTags(_messages: Message[]): string[] {
     const tags = new Set<string>();
-    const content = messages.map(m => m.content).join(' ').toLowerCase();
+    const content = _messages.map(_m => _m.content).join(' ').toLowerCase();
 
     // Topic-based tags
     this.addTopicTags(content, tags);
@@ -23,15 +23,15 @@ export class AutoTagger {
     this.addTechnicalTags(content, tags);
     
     // Length-based tags
-    this.addLengthTags(messages, tags);
+    this.addLengthTags(_messages, tags);
     
     // Interaction-based tags
-    this.addInteractionTags(messages, tags);
+    this.addInteractionTags(_messages, tags);
 
     return Array.from(tags);
   }
 
-  private addTopicTags(content: string, tags: Set<string>): void {
+  private addTopicTags(_content: string, _tags: Set<string>): void {
     const topics = {
       coding: ['code', 'programming', 'function', 'api', 'debug'],
       design: ['design', 'ui', 'ux', 'layout', 'style'],
@@ -40,13 +40,13 @@ export class AutoTagger {
     };
 
     Object.entries(topics).forEach(([topic, keywords]) => {
-      if (keywords.some(keyword => content.includes(keyword))) {
-        tags.add(topic);
+      if (keywords.some(_keyword => _content.includes(_keyword))) {
+        _tags.add(topic);
       }
     });
   }
 
-  private addTechnicalTags(content: string, tags: Set<string>): void {
+  private addTechnicalTags(_content: string, _tags: Set<string>): void {
     const technologies = {
       javascript: ['javascript', 'js', 'node', 'react'],
       python: ['python', 'django', 'flask'],
@@ -55,26 +55,26 @@ export class AutoTagger {
     };
 
     Object.entries(technologies).forEach(([tech, keywords]) => {
-      if (keywords.some(keyword => content.includes(keyword))) {
-        tags.add(tech);
+      if (keywords.some(_keyword => _content.includes(_keyword))) {
+        _tags.add(tech);
       }
     });
   }
 
-  private addLengthTags(messages: Message[], tags: Set<string>): void {
-    const totalLength = messages.reduce((sum, msg) => sum + msg.content.length, 0);
+  private addLengthTags(_messages: Message[], _tags: Set<string>): void {
+    const totalLength = _messages.reduce((_sum, _msg) => _sum + _msg.content.length, 0);
     
-    if (totalLength < 500) tags.add('short');
-    else if (totalLength > 2000) tags.add('long');
+    if (totalLength < 500) _tags.add('short');
+    else if (totalLength > 2000) _tags.add('long');
     
-    if (messages.length > 10) tags.add('detailed-conversation');
+    if (_messages.length > 10) _tags.add('detailed-conversation');
   }
 
-  private addInteractionTags(messages: Message[], tags: Set<string>): void {
-    const hasCode = messages.some(m => m.content.includes('```'));
-    if (hasCode) tags.add('contains-code');
+  private addInteractionTags(_messages: Message[], _tags: Set<string>): void {
+    const hasCode = _messages.some(_m => _m.content.includes('```'));
+    if (hasCode) _tags.add('contains-code');
 
-    const hasLinks = messages.some(m => m.content.includes('http'));
-    if (hasLinks) tags.add('contains-links');
+    const hasLinks = _messages.some(_m => _m.content.includes('http'));
+    if (hasLinks) _tags.add('contains-links');
   }
 }

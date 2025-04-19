@@ -45,10 +45,10 @@ export interface ChatCompletionOptions {
 // Options for the Responses API
 export interface ResponsesAPIOptions {
   model: string;
-  input: any; // Can be string or structured input
+  input: unknown; // Can be string or structured input
   temperature?: number;
   max_tokens?: number;
-  tools?: Record<string, any>;
+  tools?: Record<string, unknown>;
   reasoning?: { effort?: number };
   response_format?: 'json' | 'text';
   stream?: boolean;

@@ -13,11 +13,11 @@ export class WebDataTools {
     return WebDataTools.instance;
   }
 
-  async scrapeGitHubLinks(url: string): Promise<any[]> {
-    thoughtLogger.log('execution', `Scraping GitHub links from ${url}`);
+  async scrapeGitHubLinks(_url: string): Promise<any[]> {
+    thoughtLogger.log('execution', `Scraping GitHub links from ${_url}`);
 
     try {
-      const response = await fetch(url);
+      const response = await fetch(_url);
       const html = await response.text();
       
       // Parse HTML and extract repository links
@@ -25,12 +25,12 @@ export class WebDataTools {
       const doc = parser.parseFromString(html, 'text/html');
       
       const links = Array.from(doc.querySelectorAll('a[href*="github.com"]'))
-        .map(link => ({
-          title: link.textContent?.trim() || '',
-          url: link.getAttribute('href') || '',
-          category: this.findCategory(link)
+        .map(_link => ({
+          title: _link.textContent?.trim() || '',
+          url: _link.getAttribute('href') || '',
+          category: this.findCategory(_link)
         }))
-        .filter(link => link.url.includes('github.com') && !link.url.includes('github.com/search'));
+        .filter(_link => _link.url.includes('github.com') && !_link.url.includes('github.com/search'));
 
       thoughtLogger.log('success', `Found ${links.length} repository links`);
       return links;
@@ -40,9 +40,9 @@ export class WebDataTools {
     }
   }
 
-  private findCategory(link: Element): string {
+  private findCategory(_link: Element): string {
     // Find the nearest heading element
-    let element = link.parentElement;
+    let element = _link.parentElement;
     while (element) {
       const prevSibling = element.previousElementSibling;
       if (prevSibling?.tagName.match(/^H[1-6]$/)) {
@@ -53,27 +53,27 @@ export class WebDataTools {
     return 'Uncategorized';
   }
 
-  async exportToCSV(data: any[]): Promise<string> {
+  async exportToCSV(_data: any[]): Promise<string> {
     thoughtLogger.log('execution', 'Exporting data to CSV');
 
     try {
-      if (!Array.isArray(data)) {
+      if (!Array.isArray(_data)) {
         throw new AppError('Data must be an array', 'VALIDATION_ERROR');
       }
 
-      if (data.length === 0) {
+      if (_data.length === 0) {
         throw new AppError('Data array is empty', 'VALIDATION_ERROR');
       }
 
       // Get headers from first object
-      const headers = Object.keys(data[0]);
+      const headers = Object.keys(_data[0]);
       
       // Create CSV content
       const csvContent = [
         headers.join(','),
-        ...data.map(row => 
-          headers.map(header => 
-            this.formatCSVValue(row[header])
+        ..._data.map(_row => 
+          headers.map(_header => 
+            this.formatCSVValue(_row[_header])
           ).join(',')
         )
       ].join('\n');
@@ -86,12 +86,12 @@ export class WebDataTools {
     }
   }
 
-  private formatCSVValue(value: any): string {
-    if (value === null || value === undefined) {
+  private formatCSVValue(_value: unknown): string {
+    if (_value === null || _value === undefined) {
       return '';
     }
     
-    const stringValue = String(value);
+    const stringValue = String(_value);
     
     // Escape quotes and wrap in quotes if necessary
     if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {

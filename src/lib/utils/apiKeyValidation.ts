@@ -4,12 +4,12 @@ import { thoughtLogger } from '../logging/thought-logger';
  * Validates API key formats for various providers
  * Returns true if the key appears valid, false otherwise
  */
-export function validateApiKey(provider: string, key: string): boolean {
-  if (!key || typeof key !== 'string' || key.trim().length === 0) {
+export function validateApiKey(_provider: string, _key: string): boolean {
+  if (!_key || typeof _key !== 'string' || _key.trim().length === 0) {
     return false;
   }
   
-  const trimmedKey = key.trim();
+  const trimmedKey = _key.trim();
   
   // General minimum length check
   if (trimmedKey.length < 8) {
@@ -18,7 +18,7 @@ export function validateApiKey(provider: string, key: string): boolean {
   
   // Provider-specific validation
   try {
-    switch (provider) {
+    switch (_provider) {
       case 'openai':
         // OpenAI keys typically start with 'sk-' and are longer than 30 chars
         return /^sk-[A-Za-z0-9]{30,}$/.test(trimmedKey);
@@ -60,7 +60,7 @@ export function validateApiKey(provider: string, key: string): boolean {
         return trimmedKey.length >= 16;
     }
   } catch (error) {
-    thoughtLogger.log('error', `API key validation failed for ${provider}`, { error });
+    thoughtLogger.log('error', `API key validation failed for ${_provider}`, { error });
     return false;
   }
 }
@@ -69,12 +69,12 @@ export function validateApiKey(provider: string, key: string): boolean {
  * Loosely validates API keys for various providers with more lenient requirements
  * Used as a fallback when strict validation fails
  */
-export function looseValidateApiKey(provider: string, key: string): boolean {
-  if (!key || typeof key !== 'string' || key.trim().length === 0) {
+export function looseValidateApiKey(_provider: string, _key: string): boolean {
+  if (!_key || typeof _key !== 'string' || _key.trim().length === 0) {
     return false;
   }
   
-  const trimmedKey = key.trim();
+  const trimmedKey = _key.trim();
   
   // Minimum reasonable length for any API key
   return trimmedKey.length >= 10;
@@ -84,12 +84,12 @@ export function looseValidateApiKey(provider: string, key: string): boolean {
  * Provides a quality score for an API key (0-1)
  * Even if a key passes validation, it might have quality issues
  */
-export function getApiKeyQualityScore(provider: string, key: string): number {
-  if (!key || typeof key !== 'string') {
+export function getApiKeyQualityScore(_provider: string, _key: string): number {
+  if (!_key || typeof _key !== 'string') {
     return 0;
   }
   
-  const trimmedKey = key.trim();
+  const trimmedKey = _key.trim();
   
   // Start with a base score
   let score = 0.5;
@@ -102,7 +102,7 @@ export function getApiKeyQualityScore(provider: string, key: string): number {
   }
   
   // Add points for proper prefix
-  switch (provider) {
+  switch (_provider) {
     case 'openai':
       if (trimmedKey.startsWith('sk-')) score += 0.3;
       break;

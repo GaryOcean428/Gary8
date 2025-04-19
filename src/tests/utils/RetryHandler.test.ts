@@ -89,7 +89,7 @@ describe('RetryHandler', () => {
     expect(nextFn).not.toHaveBeenCalled();
     
     // Wait for circuit breaker to reset
-    await new Promise(resolve => setTimeout(resolve, 600));
+    await new Promise(_resolve => setTimeout(_resolve, 600));
     
     // Should work again
     const workingFn = vi.fn().mockResolvedValue('success after reset');

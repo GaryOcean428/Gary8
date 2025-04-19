@@ -21,18 +21,18 @@ export class ErrorBoundary extends Component<Props, State> {
     isRetrying: false
   };
 
-  public static getDerivedStateFromError(error: Error): State {
+  public static getDerivedStateFromError(_error: Error): State {
     return {
       hasError: true,
-      error,
+      _error,
       isRetrying: false
     };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    thoughtLogger.log('error', `Uncaught error: ${error.message}`, {
-      error,
-      componentStack: errorInfo.componentStack
+  public componentDidCatch(_error: Error, _errorInfo: ErrorInfo) {
+    thoughtLogger.log('error', `Uncaught error: ${_error.message}`, {
+      _error,
+      componentStack: _errorInfo.componentStack
     });
   }
 
@@ -43,7 +43,7 @@ export class ErrorBoundary extends Component<Props, State> {
       // Check if error is API key related
       if (this.state.error?.message.includes('API key')) {
         // Wait for potential env var updates
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(_resolve => setTimeout(_resolve, 1000));
       }
       
       this.setState({ hasError: false, error: null, isRetrying: false });

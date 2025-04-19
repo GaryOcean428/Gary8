@@ -14,21 +14,21 @@ export function ModelSettings() {
     presencePenalty: settings.models.presencePenalty || 0
   });
 
-  const handleParamChange = (param: string, value: number) => {
-    setModelParams(prev => ({ ...prev, [param]: value }));
+  const handleParamChange = (_param: string, _value: number) => {
+    setModelParams(_prev => ({ ..._prev, [_param]: _value }));
     updateSettings({
       models: {
         ...settings.models,
-        [param]: value
+        [_param]: _value
       }
     });
   };
 
-  const handleModelChange = (model: string) => {
+  const handleModelChange = (_model: string) => {
     updateSettings({
       models: {
         ...settings.models,
-        defaultModel: model
+        defaultModel: _model
       }
     });
   };
@@ -86,10 +86,10 @@ export function ModelSettings() {
     }
   ];
 
-  const handleModelToggle = (modelId: string) => {
-    const enabledModels = settings.models.enabledModels.includes(modelId)
-      ? settings.models.enabledModels.filter(m => m !== modelId)
-      : [...settings.models.enabledModels, modelId];
+  const handleModelToggle = (_modelId: string) => {
+    const enabledModels = settings.models.enabledModels.includes(_modelId)
+      ? settings.models.enabledModels.filter(_m => _m !== _modelId)
+      : [...settings.models.enabledModels, _modelId];
     updateSettings({ models: { ...settings.models, enabledModels } });
   };
 
@@ -107,13 +107,13 @@ export function ModelSettings() {
               <label className="block text-sm font-medium mb-2">Default Model</label>
               <select
                 value={settings.models.defaultModel}
-                onChange={(e) => handleModelChange(e.target.value)}
+                onChange={(_e) => handleModelChange(_e.target.value)}
                 className="w-full bg-input rounded-lg px-3 py-2 text-foreground"
               >
-                {modelConfigs.map(provider => (
-                  <optgroup key={provider.provider} label={provider.provider}>
-                    {provider.models.map(model => (
-                      <option key={model.id} value={model.id}>{model.name}</option>
+                {modelConfigs.map(_provider => (
+                  <optgroup key={_provider.provider} label={_provider.provider}>
+                    {_provider.models.map(_model => (
+                      <option key={_model.id} value={_model.id}>{_model.name}</option>
                     ))}
                   </optgroup>
                 ))}
@@ -132,7 +132,7 @@ export function ModelSettings() {
                       max="1"
                       step="0.1"
                       value={modelParams.temperature}
-                      onChange={(e) => handleParamChange('temperature', parseFloat(e.target.value))}
+                      onChange={(_e) => handleParamChange('temperature', parseFloat(_e.target.value))}
                       className="flex-1"
                     />
                     <input
@@ -141,7 +141,7 @@ export function ModelSettings() {
                       max="1"
                       step="0.1"
                       value={modelParams.temperature}
-                      onChange={(e) => handleParamChange('temperature', parseFloat(e.target.value))}
+                      onChange={(_e) => handleParamChange('temperature', parseFloat(_e.target.value))}
                       className="w-20 bg-input rounded px-2 py-1 text-sm"
                     />
                   </div>
@@ -154,7 +154,7 @@ export function ModelSettings() {
                     min="1"
                     max="200000"
                     value={modelParams.maxTokens}
-                    onChange={(e) => handleParamChange('maxTokens', parseInt(e.target.value))}
+                    onChange={(_e) => handleParamChange('maxTokens', parseInt(_e.target.value))}
                     className="w-full bg-input rounded px-3 py-1"
                   />
                 </div>
@@ -168,7 +168,7 @@ export function ModelSettings() {
                       max="1"
                       step="0.1"
                       value={modelParams.topP}
-                      onChange={(e) => handleParamChange('topP', parseFloat(e.target.value))}
+                      onChange={(_e) => handleParamChange('topP', parseFloat(_e.target.value))}
                       className="flex-1"
                     />
                     <input
@@ -177,7 +177,7 @@ export function ModelSettings() {
                       max="1"
                       step="0.1"
                       value={modelParams.topP}
-                      onChange={(e) => handleParamChange('topP', parseFloat(e.target.value))}
+                      onChange={(_e) => handleParamChange('topP', parseFloat(_e.target.value))}
                       className="w-20 bg-input rounded px-2 py-1 text-sm"
                     />
                   </div>
@@ -192,7 +192,7 @@ export function ModelSettings() {
                       max="2"
                       step="0.1"
                       value={modelParams.frequencyPenalty}
-                      onChange={(e) => handleParamChange('frequencyPenalty', parseFloat(e.target.value))}
+                      onChange={(_e) => handleParamChange('frequencyPenalty', parseFloat(_e.target.value))}
                       className="flex-1"
                     />
                     <input
@@ -201,7 +201,7 @@ export function ModelSettings() {
                       max="2"
                       step="0.1"
                       value={modelParams.frequencyPenalty}
-                      onChange={(e) => handleParamChange('frequencyPenalty', parseFloat(e.target.value))}
+                      onChange={(_e) => handleParamChange('frequencyPenalty', parseFloat(_e.target.value))}
                       className="w-20 bg-input rounded px-2 py-1 text-sm"
                     />
                   </div>
@@ -210,23 +210,23 @@ export function ModelSettings() {
 
               <label className="block text-sm font-medium mb-2">Enabled Models</label>
               <div className="space-y-6">
-                {modelConfigs.map(provider => (
-                  <div key={provider.provider} className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">{provider.provider}</h4>
+                {modelConfigs.map(_provider => (
+                  <div key={_provider.provider} className="space-y-2">
+                    <h4 className="text-sm font-medium text-muted-foreground">{_provider.provider}</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {provider.models.map(model => (
-                        <div key={model.id} className="bg-card rounded-lg p-3">
+                      {_provider.models.map(_model => (
+                        <div key={_model.id} className="bg-card rounded-lg p-3">
                           <div className="flex items-start">
                             <input
                               type="checkbox"
-                              checked={settings.models.enabledModels.includes(model.id)}
-                              onChange={() => handleModelToggle(model.id)}
+                              checked={settings.models.enabledModels.includes(_model.id)}
+                              onChange={() => handleModelToggle(_model.id)}
                               className="mt-1 rounded bg-input border-border text-primary focus:ring-primary"
                             />
                             <div className="ml-3">
-                              <label className="font-medium block">{model.name}</label>
-                              <p className="text-sm text-muted-foreground">{model.description}</p>
-                              <p className="text-xs text-muted-foreground mt-1">Context: {model.context}</p>
+                              <label className="font-medium block">{_model.name}</label>
+                              <p className="text-sm text-muted-foreground">{_model.description}</p>
+                              <p className="text-xs text-muted-foreground mt-1">Context: {_model.context}</p>
                             </div>
                           </div>
                         </div>

@@ -10,30 +10,30 @@ export function usePersistence() {
   useEffect(() => {
     persistenceManager.init()
       .then(() => setIsLoading(false))
-      .catch(err => setError(err));
+      .catch(_err => setError(_err));
   }, [persistenceManager]);
 
-  const saveChat = async (title: string, messages: Message[], tags?: string[]) => {
+  const saveChat = async (_title: string, _messages: Message[], _tags?: string[]) => {
     try {
-      return await persistenceManager.saveChat(title, messages, tags);
+      return await persistenceManager.saveChat(_title, _messages, _tags);
     } catch (err) {
       setError(err as Error);
       throw err;
     }
   };
 
-  const saveWorkflow = async (workflow: any) => {
+  const saveWorkflow = async (_workflow: unknown) => {
     try {
-      return await persistenceManager.saveWorkflow(workflow);
+      return await persistenceManager.saveWorkflow(_workflow);
     } catch (err) {
       setError(err as Error);
       throw err;
     }
   };
 
-  const saveSettings = async (category: string, values: Record<string, any>) => {
+  const saveSettings = async (_category: string, _values: Record<string, unknown>) => {
     try {
-      await persistenceManager.saveSettings(category, values);
+      await persistenceManager.saveSettings(_category, _values);
     } catch (err) {
       setError(err as Error);
       throw err;

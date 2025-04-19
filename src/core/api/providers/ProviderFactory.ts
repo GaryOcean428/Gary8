@@ -3,41 +3,43 @@ import { createOpenAIAdapter } from './OpenAIAdapter';
 import { createGroqAdapter } from './GroqAdapter';
 import { createAnthropicAdapter } from './AnthropicAdapter';
 
+// Supported provider keys
+export type ProviderName = 'openai' | 'groq' | 'anthropic' | 'perplexity' | 'xai' | 'google';
 export class ProviderFactory {
   static createProvider(
-    provider: 'openai' | 'groq' | 'anthropic' | 'perplexity' | 'xai' | 'google',
-    apiKey?: string
+    _provider: ProviderName,
+    _apiKey?: string
   ): AIProviderAdapter {
-    switch (provider) {
+    switch (_provider) {
       case 'openai':
-        return createOpenAIAdapter(apiKey);
+        return createOpenAIAdapter(_apiKey);
       case 'groq':
-        return createGroqAdapter(apiKey);
+        return createGroqAdapter(_apiKey);
       case 'anthropic':
-        return createAnthropicAdapter(apiKey);
+        return createAnthropicAdapter(_apiKey);
       // Add more providers as they are implemented
       default:
-        throw new Error(`Provider ${provider} not implemented yet`);
+        throw new Error(`Provider ${_provider} not implemented yet`);
     }
   }
   
-  static getModelProvider(model: string): string {
-    if (model.includes('gpt') || model.includes('o1') || model.includes('o3')) {
+  static getModelProvider(_model: string): string {
+    if (_model.includes('gpt') || _model.includes('o1') || _model.includes('o3')) {
       return 'openai';
     }
-    if (model.includes('claude')) {
+    if (_model.includes('claude')) {
       return 'anthropic';
     }
-    if (model.includes('llama') || model.startsWith('llama3')) {
+    if (_model.includes('llama') || _model.startsWith('llama3')) {
       return 'groq';
     }
-    if (model.includes('grok')) {
+    if (_model.includes('grok')) {
       return 'xai';
     }
-    if (model.includes('sonar')) {
+    if (_model.includes('sonar')) {
       return 'perplexity';
     }
-    if (model.includes('gemini')) {
+    if (_model.includes('gemini')) {
       return 'google';
     }
     

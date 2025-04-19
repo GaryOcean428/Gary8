@@ -13,3 +13,10 @@ export interface SavedChat {
   timestamp: number;
   tags?: string[];
 }
+
+export interface Agent {
+  id: string;
+  name: string;
+  role: string;
+  capabilities: string[];
+}

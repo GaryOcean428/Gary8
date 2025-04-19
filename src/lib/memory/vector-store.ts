@@ -14,17 +14,17 @@ export class VectorStore {
   private entries: VectorEntry[] = [];
   private readonly dimensions = 384; // Standard for small-medium models
 
-  async addEntry(content: string, type: string, metadata?: Record<string, unknown>): Promise<void> {
+  async addEntry(_content: string, _type: string, _metadata?: Record<string, unknown>): Promise<void> {
     try {
-      const embedding = await this.generateEmbedding(content);
+      const embedding = await this.generateEmbedding(_content);
       
       this.entries.push({
         id: crypto.randomUUID(),
-        content,
-        type,
+        _content,
+        _type,
         timestamp: Date.now(),
         embedding,
-        metadata
+        _metadata
       });
 
       // Keep only recent entries to prevent memory bloat
@@ -36,34 +36,34 @@ export class VectorStore {
     }
   }
 
-  async search(query: string, limit = 5): Promise<Array<{ content: string; score: number }>> {
+  async search(_query: string, _limit = 5): Promise<Array<{ content: string; score: number }>> {
     try {
       if (this.entries.length === 0) return [];
 
-      const queryEmbedding = await this.generateEmbedding(query);
+      const queryEmbedding = await this.generateEmbedding(_query);
       
-      const results = this.entries.map(entry => ({
-        content: entry.content,
-        score: this.cosineSimilarity(queryEmbedding, entry.embedding)
+      const results = this.entries.map(_entry => ({
+        content: _entry.content,
+        score: this.cosineSimilarity(queryEmbedding, _entry.embedding)
       }));
 
-      results.sort((a, b) => b.score - a.score);
+      results.sort((_a, _b) => _b.score - _a.score);
       
       // Filter out low-relevance results
       return results
-        .filter(result => result.score > 0.7)
-        .slice(0, limit);
+        .filter(_result => _result.score > 0.7)
+        .slice(0, _limit);
     } catch (error) {
       throw new AppError('Failed to search vector store', 'VECTOR_STORE_ERROR', error);
     }
   }
 
-  private async generateEmbedding(text: string): Promise<number[]> {
+  private async generateEmbedding(_text: string): Promise<number[]> {
     // Initialize embedding vector
     const embedding = new Array(this.dimensions).fill(0);
     
     // Normalize and tokenize text
-    const tokens = text.toLowerCase()
+    const tokens = _text.toLowerCase()
       .replace(/[^\w\s]/g, '')
       .split(/\s+/)
       .filter(Boolean);
@@ -81,30 +81,30 @@ export class VectorStore {
 
     // Normalize embedding vector
     const magnitude = Math.sqrt(
-      embedding.reduce((sum, val) => sum + val * val, 0)
+      embedding.reduce((_sum, _val) => _sum + _val * _val, 0)
     );
 
-    return embedding.map(val => val / magnitude);
+    return embedding.map(_val => _val / magnitude);
   }
 
-  private hashString(str: string): number {
+  private hashString(_str: string): number {
     let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
+    for (let i = 0; i < _str.length; i++) {
+      const char = _str.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
       hash = hash & hash;
     }
     return hash;
   }
 
-  private cosineSimilarity(a: number[], b: number[]): number {
-    if (a.length !== b.length) {
+  private cosineSimilarity(_a: number[], _b: number[]): number {
+    if (_a.length !== _b.length) {
       throw new Error('Vectors must have same length');
     }
 
-    const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
-    const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
-    const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
+    const dotProduct = _a.reduce((_sum, _val, _i) => _sum + _val * _b[_i], 0);
+    const magnitudeA = Math.sqrt(_a.reduce((_sum, _val) => _sum + _val * _val, 0));
+    const magnitudeB = Math.sqrt(_b.reduce((_sum, _val) => _sum + _val * _val, 0));
     
     return dotProduct / (magnitudeA * magnitudeB);
   }

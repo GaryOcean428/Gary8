@@ -1,26 +1,26 @@
 export class ResponseParser {
-  static parseJSON<T>(text: string): T {
+  static parseJSON<T>(_text: string): T {
     try {
-      return JSON.parse(text);
+      return JSON.parse(_text);
     } catch (error) {
       throw new Error(`Invalid JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
-  static extractLinks(html: string): string[] {
+  static extractLinks(_html: string): string[] {
     const linkRegex = /<a[^>]+href=["']([^"']+)["'][^>]*>/g;
     const links: string[] = [];
     let match;
 
-    while ((match = linkRegex.exec(html)) !== null) {
+    while ((match = linkRegex.exec(_html)) !== null) {
       links.push(match[1]);
     }
 
     return links;
   }
 
-  static sanitizeHTML(html: string): string {
-    return html
+  static sanitizeHTML(_html: string): string {
+    return _html
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
       .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
       .replace(/<[^>]+>/g, ' ')
@@ -28,9 +28,9 @@ export class ResponseParser {
       .trim();
   }
 
-  static validateURL(url: string): boolean {
+  static validateURL(_url: string): boolean {
     try {
-      new URL(url);
+      new URL(_url);
       return true;
     } catch {
       return false;

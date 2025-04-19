@@ -10,12 +10,12 @@ export class TaskAgent extends BaseAgent {
     this.messageQueue.registerHandler('command', this.handleCommand.bind(this));
   }
 
-  async processMessage(message: AgentMessage): Promise<void> {
+  async processMessage(_message: AgentMessage): Promise<void> {
     const startTime = Date.now();
     try {
       this.setStatus('active');
 
-      const result = await this.executeTask(message.content);
+      const result = await this.executeTask(_message.content);
       
       // Report back to superior
       if (this.config.superiorId) {
@@ -36,17 +36,17 @@ export class TaskAgent extends BaseAgent {
     }
   }
 
-  async executeTask(task: string): Promise<unknown> {
+  async executeTask(_task: string): Promise<unknown> {
     try {
       // Task-specific execution logic
-      return { status: 'completed', task };
+      return { status: 'completed', _task };
     } catch (error) {
       const handled = ErrorHandler.handle(error);
       throw new Error(`Task execution failed: ${handled.message}`);
     }
   }
 
-  private async handleCommand(message: AgentMessage): Promise<void> {
-    await this.processMessage(message);
+  private async handleCommand(_message: AgentMessage): Promise<void> {
+    await this.processMessage(_message);
   }
 }

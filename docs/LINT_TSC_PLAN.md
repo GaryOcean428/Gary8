@@ -30,12 +30,12 @@
   - 3.1.b Underwater bubbles map: ✅ Done
   - 3.1.c Abstract shapes map: ✅ Done
 - Step 3.2: Remove parse errors in Chat.tsx and ChatHistory.tsx → ✅ Done
-- Step 3.3: Remove or prefix unused variables with `_`:
+ - Step 3.3: Remove or prefix unused variables with `_`: ✅ Done
   - 3.3.a Identify all `no-unused-vars` warnings via `eslint . --ext .ts,.tsx --rule '@typescript-eslint/no-unused-vars': 2`.
   - 3.3.b Prefix unused variables and function parameters with `_` (e.g. `_value`) or remove if truly unnecessary.
   - 3.3.c Eliminate unused imports and disable directives (`eslint-disable`) where no longer needed.
 
-- Step 3.4: Demote or refactor explicit `any` in core modules:
+ - Step 3.4: Demote or refactor explicit `any` in core modules: ✅ Done
   - 3.4.a Run `tsc --noEmit` to locate all implicit and explicit `any` usages.
   - 3.4.b Replace `any` with accurate interfaces, union types, or `unknown` with runtime type guards.
   - 3.4.c Add `// TODO` comments for complex types to revisit in a separate tagging sprint.
@@ -84,3 +84,8 @@
   - 5.3.a Add `CONTRIBUTING.md` section describing lint and type-check commands.
   - 5.3.b Update project README with developer setup: lint, types, tests.
   - 5.3.c Ensure `docs/LINT_TSC_PLAN.md` references current workflow.
+  - 5.3.d Mark documentation tasks completed in LINT_TSC_PLAN.md.
+
+- Step 5.4: CI Setup (✅ Completed):
+  - 5.4.a Created `.github/workflows/ci.yml` to run lint, type-check, and tests on all pushes/pull requests.
+  - 5.4.b Configured jobs to fail on lint/type errors and test failures.

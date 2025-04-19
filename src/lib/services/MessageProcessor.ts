@@ -10,10 +10,10 @@ export class MessageProcessor {
     this.searchService = new SearchService();
   }
 
-  async processMessage(message: Message): Promise<Message> {
+  async processMessage(_message: Message): Promise<Message> {
     try {
       const [searchResults, searchError] = await ErrorHandler.handleAsync(
-        this.searchService.search(message.content)
+        this.searchService.search(_message.content)
       );
 
       if (searchError) {
@@ -23,7 +23,7 @@ export class MessageProcessor {
       }
 
       return {
-        id: message.id,
+        id: _message.id,
         content: searchResults || 'No results found',
         timestamp: new Date().toISOString(),
         type: 'response'
@@ -31,7 +31,7 @@ export class MessageProcessor {
     } catch (error) {
       const handled = ErrorHandler.handle(error);
       return {
-        id: message.id,
+        id: _message.id,
         content: `Error: ${handled.message}`,
         timestamp: new Date().toISOString(),
         type: 'error'

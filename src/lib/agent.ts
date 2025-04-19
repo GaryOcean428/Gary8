@@ -13,34 +13,34 @@ class AgentManager {
     this.reasoningEngine = new ReasoningEngine();
   }
 
-  async processMessage(message: Message, onStream?: (content: string) => void): Promise<Message> {
+  async processMessage(_message: Message, _onStream?: (content: string) => void): Promise<Message> {
     try {
-      const context = await this.memory.getRelevantMemories(message.content);
+      const context = await this.memory.getRelevantMemories(_message.content);
       
       // Determine if reasoning is needed
-      const complexity = this.assessComplexity(message.content);
-      const strategy = this.reasoningEngine.selectStrategy(message.content, complexity);
+      const complexity = this.assessComplexity(_message.content);
+      const strategy = this.reasoningEngine.selectStrategy(_message.content, complexity);
       
       // Get reasoning steps if needed
       let reasoningSteps: ReasoningStep[] = [];
       if (strategy !== 'none') {
-        reasoningSteps = await this.reasoningEngine.reason(message.content, strategy);
+        reasoningSteps = await this.reasoningEngine.reason(_message.content, strategy);
       }
 
       // Include reasoning in the prompt if available
       const reasoningContext = reasoningSteps.length > 0
-        ? '\n\nReasoning steps:\n' + reasoningSteps.map(step => 
-            `[${step.type.toUpperCase()}] ${step.content}`
+        ? '\n\nReasoning steps:\n' + reasoningSteps.map(_step => 
+            `[${_step.type.toUpperCase()}] ${_step.content}`
           ).join('\n')
         : '';
 
       const response = await this.callAPI(
-        message,
+        _message,
         context + reasoningContext,
-        onStream
+        _onStream
       );
 
-      await this.memory.store(message, response);
+      await this.memory.store(_message, response);
       return response;
     } catch (error) {
       console.error('Agent processing error:', error);
@@ -48,22 +48,22 @@ class AgentManager {
     }
   }
 
-  private assessComplexity(content: string): number {
+  private assessComplexity(_content: string): number {
     const factors = {
-      length: Math.min(content.length / 500, 1),
-      questionWords: (content.match(/\b(how|why|what|when|where|who)\b/gi) || []).length * 0.1,
-      technicalTerms: (content.match(/\b(algorithm|function|process|system|analyze)\b/gi) || []).length * 0.15,
-      codeRelated: /\b(code|program|debug|function|api)\b/i.test(content) ? 0.3 : 0,
-      multipleSteps: (content.match(/\b(and|then|after|before|finally)\b/gi) || []).length * 0.1
+      length: Math.min(_content.length / 500, 1),
+      questionWords: (_content.match(/\b(how|why|what|when|where|who)\b/gi) || []).length * 0.1,
+      technicalTerms: (_content.match(/\b(algorithm|function|process|system|analyze)\b/gi) || []).length * 0.15,
+      codeRelated: /\b(code|program|debug|function|api)\b/i.test(_content) ? 0.3 : 0,
+      multipleSteps: (_content.match(/\b(and|then|after|before|finally)\b/gi) || []).length * 0.1
     };
 
     return Math.min(
-      Object.values(factors).reduce((sum, value) => sum + value, 0),
+      Object.values(factors).reduce((_sum, _value) => _sum + _value, 0),
       1
     );
   }
 
-  private async callAPI(message: Message, context: string, onStream?: (content: string) => void): Promise<Message> {
+  private async callAPI(_message: Message, _context: string, _onStream?: (content: string) => void): Promise<Message> {
     const response = await fetch(`${config.apiBaseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -73,12 +73,12 @@ class AgentManager {
       body: JSON.stringify({
         model: config.model,
         messages: [
-          { role: 'system', content: `${config.systemPrompt}\n\nContext: ${context}` },
-          { role: 'user', content: message.content }
+          { role: 'system', content: `${config.systemPrompt}\n\nContext: ${_context}` },
+          { role: 'user', content: _message.content }
         ],
         max_tokens: config.maxTokens,
         temperature: config.temperature,
-        stream: Boolean(onStream)
+        stream: Boolean(_onStream)
       })
     });
 
@@ -86,9 +86,9 @@ class AgentManager {
       throw new Error(`API request failed: ${response.statusText}`);
     }
 
-    if (onStream && response.body) {
+    if (_onStream && response.body) {
       const reader = response.body.getReader();
-      const processor = new StreamProcessor(onStream);
+      const processor = new StreamProcessor(_onStream);
       await processor.processStream(reader);
       
       return {

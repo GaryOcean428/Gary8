@@ -41,8 +41,8 @@ export function useInView({
     if (once && hasBeenInView) return;
     
     const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
+      (_entries) => {
+        const [entry] = _entries;
         setIsInView(entry.isIntersecting);
         
         if (entry.isIntersecting) {
@@ -74,9 +74,9 @@ export function useInView({
   }, [root, rootMargin, threshold, once, hasBeenInView]);
   
   // Callback ref pattern to get the DOM node
-  const ref = (node: Element | null) => {
-    if (node) {
-      targetRef.current = node;
+  const ref = (_node: Element | null) => {
+    if (_node) {
+      targetRef.current = _node;
       
       // If we already have an observer, disconnect it
       if (observerRef.current) {
@@ -84,7 +84,7 @@ export function useInView({
         
         // If the element hasn't been in view or once is false, observe the new node
         if (!hasBeenInView || !once) {
-          observerRef.current.observe(node);
+          observerRef.current.observe(_node);
         }
       }
     } else {

@@ -23,29 +23,29 @@ export class SwarmCoordinator extends EventEmitter {
     this.memoryAggregator = MemoryAggregator.getInstance();
   }
 
-  async processTask(message: Message): Promise<Message> {
+  async processTask(_message: Message): Promise<Message> {
     const taskId = crypto.randomUUID();
     thoughtLogger.log('plan', 'Starting swarm task processing', { taskId });
 
     try {
       // Analyze task complexity and requirements
-      const routerConfig = await this.router.route(message.content, []);
+      const routerConfig = await this.router.route(_message.content, []);
       
       // Create agent swarm based on task requirements
-      const swarm = this.createSwarm(message.content, routerConfig);
-      this.tasks.set(taskId, swarm.map(agent => agent.id));
+      const swarm = this.createSwarm(_message.content, routerConfig);
+      this.tasks.set(taskId, swarm.map(_agent => _agent.id));
 
       // Execute task in parallel with coordinated agents
       const results = await Promise.all(
-        swarm.map(agent => this.executeAgentTask(agent, message, taskId))
+        swarm.map(_agent => this.executeAgentTask(_agent, _message, taskId))
       );
 
       // Aggregate results using MoA approach
       const aggregatedContent = await this.memoryAggregator.aggregateResults(
-        results.map(r => ({
-          agentId: r.agentId,
-          content: r.content,
-          confidence: r.confidence
+        results.map(_r => ({
+          agentId: _r.agentId,
+          content: _r.content,
+          confidence: _r.confidence
         }))
       );
 
@@ -63,19 +63,19 @@ export class SwarmCoordinator extends EventEmitter {
     }
   }
 
-  private createSwarm(task: string, config: any): SwarmAgent[] {
+  private createSwarm(_task: string, _config: unknown): SwarmAgent[] {
     const swarm: SwarmAgent[] = [];
 
     // Add specialized agents based on task requirements
-    if (task.toLowerCase().includes('search') || task.toLowerCase().includes('find')) {
+    if (_task.toLowerCase().includes('search') || _task.toLowerCase().includes('find')) {
       swarm.push(this.createAgent('search', ['web-search', 'data-gathering']));
     }
 
-    if (task.toLowerCase().includes('analyze') || task.toLowerCase().includes('compare')) {
+    if (_task.toLowerCase().includes('analyze') || _task.toLowerCase().includes('compare')) {
       swarm.push(this.createAgent('analysis', ['data-analysis', 'insight-generation']));
     }
 
-    if (task.toLowerCase().includes('export') || task.toLowerCase().includes('table')) {
+    if (_task.toLowerCase().includes('export') || _task.toLowerCase().includes('table')) {
       swarm.push(this.createAgent('export', ['data-export', 'format-conversion']));
     }
 
@@ -85,11 +85,11 @@ export class SwarmCoordinator extends EventEmitter {
     return swarm;
   }
 
-  private createAgent(role: string, capabilities: string[]): SwarmAgent {
+  private createAgent(_role: string, _capabilities: string[]): SwarmAgent {
     const agent: SwarmAgent = {
       id: crypto.randomUUID(),
-      role,
-      capabilities: new Set(capabilities),
+      _role,
+      capabilities: new Set(_capabilities),
       status: 'idle'
     };
 
@@ -98,50 +98,50 @@ export class SwarmCoordinator extends EventEmitter {
   }
 
   private async executeAgentTask(
-    agent: SwarmAgent,
-    message: Message,
-    taskId: string
+    _agent: SwarmAgent,
+    _message: Message,
+    _taskId: string
   ): Promise<{ agentId: string; content: string; confidence: number }> {
-    thoughtLogger.log('execution', `Agent ${agent.id} starting task`, {
-      role: agent.role,
-      taskId
+    thoughtLogger.log('execution', `Agent ${_agent.id} starting task`, {
+      role: _agent.role,
+      _taskId
     });
 
     try {
-      agent.status = 'active';
+      _agent.status = 'active';
       
       // Simulate agent-specific processing
-      const result = await this.simulateAgentProcessing(agent, message);
+      const result = await this.simulateAgentProcessing(_agent, _message);
 
-      agent.status = 'idle';
+      _agent.status = 'idle';
       return {
-        agentId: agent.id,
+        agentId: _agent.id,
         content: result,
         confidence: 0.9
       };
     } catch (error) {
-      agent.status = 'idle';
+      _agent.status = 'idle';
       throw error;
     }
   }
 
   private async simulateAgentProcessing(
-    agent: SwarmAgent,
-    message: Message
+    _agent: SwarmAgent,
+    _message: Message
   ): Promise<string> {
     // This is a placeholder for actual agent-specific processing
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return `${agent.role} processed: ${message.content}`;
+    await new Promise(_resolve => setTimeout(_resolve, 1000));
+    return `${_agent.role} processed: ${_message.content}`;
   }
 
   getActiveAgents(): SwarmAgent[] {
     return Array.from(this.agents.values()).filter(
-      agent => agent.status === 'active'
+      _agent => _agent.status === 'active'
     );
   }
 
-  getTaskAgents(taskId: string): SwarmAgent[] {
-    const agentIds = this.tasks.get(taskId) || [];
-    return agentIds.map(id => this.agents.get(id)!).filter(Boolean);
+  getTaskAgents(_taskId: string): SwarmAgent[] {
+    const agentIds = this.tasks.get(_taskId) || [];
+    return agentIds.map(_id => this.agents.get(_id)!).filter(Boolean);
   }
 }

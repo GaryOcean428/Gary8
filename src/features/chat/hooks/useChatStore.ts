@@ -26,33 +26,33 @@ const initialState: ChatState = {
 
 export const useChatStore = create(
   persist(
-    combine(initialState, (set, get) => ({
-      addMessage: (messageOrUpdater: Message | ((prev: Message[]) => Message[])) => {
+    combine(initialState, (_set, _get) => ({
+      addMessage: (_messageOrUpdater: Message | ((prev: Message[]) => Message[])) => {
         performanceMonitor.startMeasure('addMessage');
-        set(state => {
-          if (typeof messageOrUpdater === 'function') {
-            return { messages: messageOrUpdater(state.messages) };
+        _set(_state => {
+          if (typeof _messageOrUpdater === 'function') {
+            return { messages: _messageOrUpdater(_state.messages) };
           }
-          return { messages: [...state.messages, messageOrUpdater] };
+          return { messages: [..._state.messages, _messageOrUpdater] };
         });
         performanceMonitor.endMeasure('addMessage');
       },
 
-      saveChat: async (title: string, customMessages?: Message[]) => {
+      saveChat: async (_title: string, _customMessages?: Message[]) => {
         performanceMonitor.startMeasure('saveChat');
-        const messages = customMessages || get().messages;
+        const messages = _customMessages || _get().messages;
         const autoTagger = AutoTagger.getInstance();
 
         const newChat: SavedChat = {
           id: crypto.randomUUID(),
-          title,
+          _title,
           messages,
           timestamp: Date.now(),
           tags: autoTagger.generateTags(messages)
         };
 
-        set(state => ({ 
-          savedChats: [...state.savedChats, newChat],
+        _set(_state => ({ 
+          savedChats: [..._state.savedChats, newChat],
           currentChatId: newChat.id
         }));
         
@@ -60,25 +60,25 @@ export const useChatStore = create(
         return newChat.id;
       },
 
-      loadChat: (chatId: string) => {
+      loadChat: (_chatId: string) => {
         performanceMonitor.startMeasure('loadChat');
-        const chat = get().savedChats.find(c => c.id === chatId);
+        const chat = _get().savedChats.find(_c => _c.id === _chatId);
         if (chat) {
-          set({ 
+          _set({ 
             messages: chat.messages,
-            currentChatId: chatId
+            currentChatId: _chatId
           });
         }
         performanceMonitor.endMeasure('loadChat');
       },
 
-      deleteChat: (chatId: string) => {
-        set(state => {
+      deleteChat: (_chatId: string) => {
+        _set(_state => {
           const newState = { 
-            savedChats: state.savedChats.filter(chat => chat.id !== chatId) 
+            savedChats: _state.savedChats.filter(_chat => _chat.id !== _chatId) 
           };
           
-          if (state.currentChatId === chatId) {
+          if (_state.currentChatId === _chatId) {
             newState.messages = [];
             newState.currentChatId = null;
           }
@@ -88,7 +88,7 @@ export const useChatStore = create(
       },
 
       clearMessages: () => {
-        set({ 
+        _set({ 
           messages: [],
           currentChatId: null
         });
@@ -96,8 +96,8 @@ export const useChatStore = create(
     })),
     {
       name: 'agent-one-chat-store',
-      partialize: (state) => ({
-        savedChats: state.savedChats
+      partialize: (_state) => ({
+        savedChats: _state.savedChats
       })
     }
   )

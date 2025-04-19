@@ -6,7 +6,7 @@ export interface Tool {
 
 export interface ToolResult {
   success: boolean;
-  result?: any;
+  result?: unknown;
   error?: string;
 }
 

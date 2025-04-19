@@ -33,26 +33,26 @@ export class AutoTagger {
     'text/markdown': ['markdown', 'documentation']
   };
 
-  async generateTags(content: string, fileName: string, mimeType: string): Promise<string[]> {
-    thoughtLogger.log('execution', 'Generating tags for document', { fileName });
+  async generateTags(_content: string, _fileName: string, _mimeType: string): Promise<string[]> {
+    thoughtLogger.log('execution', 'Generating tags for document', { _fileName });
 
     try {
       const tags = new Set<string>();
 
       // Add file type tags
-      this.addFileTypeTags(tags, mimeType);
+      this.addFileTypeTags(tags, _mimeType);
 
       // Add content-based tags
-      this.addContentTags(tags, content);
+      this.addContentTags(tags, _content);
 
       // Add filename-based tags
-      this.addFilenameTags(tags, fileName);
+      this.addFilenameTags(tags, _fileName);
 
       // Convert to array and limit number of tags
       const finalTags = Array.from(tags).slice(0, 10);
 
       thoughtLogger.log('success', 'Tags generated successfully', {
-        fileName,
+        _fileName,
         tagCount: finalTags.length,
         tags: finalTags
       });
@@ -64,86 +64,86 @@ export class AutoTagger {
     }
   }
 
-  private addFileTypeTags(tags: Set<string>, mimeType: string): void {
-    const typeTags = this.fileTypeTags[mimeType] || [];
-    typeTags.forEach(tag => tags.add(tag));
+  private addFileTypeTags(_tags: Set<string>, _mimeType: string): void {
+    const typeTags = this.fileTypeTags[_mimeType] || [];
+    typeTags.forEach(_tag => _tags.add(_tag));
   }
 
-  private addContentTags(tags: Set<string>, content: string): void {
-    const normalizedContent = content.toLowerCase();
+  private addContentTags(_tags: Set<string>, _content: string): void {
+    const normalizedContent = _content.toLowerCase();
 
     // Add category-based tags
     for (const [category, terms] of Object.entries(this.tagCategories)) {
-      const hasTerms = terms.some(term => normalizedContent.includes(term));
+      const hasTerms = terms.some(_term => normalizedContent.includes(_term));
       if (hasTerms) {
-        tags.add(category);
+        _tags.add(category);
         // Add specific matching terms as tags
         terms
-          .filter(term => normalizedContent.includes(term))
-          .forEach(term => tags.add(term));
+          .filter(_term => normalizedContent.includes(_term))
+          .forEach(_term => _tags.add(_term));
       }
     }
 
     // Add language-specific tags
-    this.detectLanguages(normalizedContent).forEach(lang => tags.add(lang));
+    this.detectLanguages(normalizedContent).forEach(_lang => _tags.add(_lang));
   }
 
-  private addFilenameTags(tags: Set<string>, fileName: string): void {
-    const normalizedName = fileName.toLowerCase();
+  private addFilenameTags(_tags: Set<string>, _fileName: string): void {
+    const normalizedName = _fileName.toLowerCase();
 
     // Add tags based on common filename patterns
-    if (normalizedName.includes('readme')) tags.add('documentation');
-    if (normalizedName.includes('config')) tags.add('configuration');
-    if (normalizedName.includes('test')) tags.add('testing');
-    if (normalizedName.includes('example')) tags.add('example');
+    if (normalizedName.includes('readme')) _tags.add('documentation');
+    if (normalizedName.includes('config')) _tags.add('configuration');
+    if (normalizedName.includes('test')) _tags.add('testing');
+    if (normalizedName.includes('example')) _tags.add('example');
     
     // Add extension as tag
-    const extension = fileName.split('.').pop()?.toLowerCase();
-    if (extension && extension !== fileName.toLowerCase()) {
-      tags.add(extension);
+    const extension = _fileName.split('.').pop()?.toLowerCase();
+    if (extension && extension !== _fileName.toLowerCase()) {
+      _tags.add(extension);
     }
   }
 
-  private detectLanguages(content: string): string[] {
+  private detectLanguages(_content: string): string[] {
     const languages: string[] = [];
     
     // Simple language detection based on common patterns
-    if (content.includes('function') || content.includes('const') || content.includes('let')) {
+    if (_content.includes('function') || _content.includes('const') || _content.includes('let')) {
       languages.push('javascript');
     }
-    if (content.includes('interface') || content.includes('type ') || content.includes(': string')) {
+    if (_content.includes('interface') || _content.includes('type ') || _content.includes(': string')) {
       languages.push('typescript');
     }
-    if (content.includes('def ') || content.includes('import ') || content.includes('class ')) {
+    if (_content.includes('def ') || _content.includes('import ') || _content.includes('class ')) {
       languages.push('python');
     }
-    if (content.includes('public class') || content.includes('private void')) {
+    if (_content.includes('public class') || _content.includes('private void')) {
       languages.push('java');
     }
 
     return languages;
   }
 
-  generateTagsFromMessages(messages: { content: string }[]): string[] {
+  generateTagsFromMessages(_messages: { content: string }[]): string[] {
     const tags = new Set<string>();
-    const content = messages.map(m => m.content).join(' ').toLowerCase();
+    const content = _messages.map(_m => _m.content).join(' ').toLowerCase();
 
     // Topic-based tags
     this.addContentTags(tags, content);
 
     // Interaction-based tags
-    const hasCode = messages.some(m => m.content.includes('```'));
+    const hasCode = _messages.some(_m => _m.content.includes('```'));
     if (hasCode) tags.add('contains-code');
 
-    const hasLinks = messages.some(m => m.content.includes('http'));
+    const hasLinks = _messages.some(_m => _m.content.includes('http'));
     if (hasLinks) tags.add('contains-links');
     
     // Length-based tags
-    const totalLength = messages.reduce((sum, msg) => sum + msg.content.length, 0);
+    const totalLength = _messages.reduce((_sum, _msg) => _sum + _msg.content.length, 0);
     if (totalLength < 500) tags.add('short');
     else if (totalLength > 2000) tags.add('long');
     
-    if (messages.length > 10) tags.add('detailed-conversation');
+    if (_messages.length > 10) tags.add('detailed-conversation');
 
     return Array.from(tags);
   }

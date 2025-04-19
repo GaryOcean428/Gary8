@@ -6,7 +6,7 @@ export interface CanvasElement {
   width: number;
   height: number;
   rotation: number;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   style: {
     fill?: string;
     stroke?: string;
@@ -46,5 +46,5 @@ export interface DesignSpec {
     variant?: string;
     text?: string;
   }[];
-  styles: Record<string, Record<string, any>>;
+  styles: Record<string, Record<string, unknown>>;
 }

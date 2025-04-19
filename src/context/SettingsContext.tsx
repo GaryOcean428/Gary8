@@ -88,11 +88,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     setSettings(storedSettings);
   }, [storedSettings]);
 
-  const updateSettings = useCallback(async (newSettings: Partial<Settings>) => {
+  const updateSettings = useCallback(async (_newSettings: Partial<Settings>) => {
     try {
       const updated = {
         ...settings,
-        ...newSettings
+        ..._newSettings
       };
       setStoredSettings(updated);
       addToast({

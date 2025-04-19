@@ -62,28 +62,28 @@ export function ToolManager() {
       
       // Apply category filter if any categories selected
       if (selectedCategories.length > 0) {
-        filtered = filtered.filter(tool => selectedCategories.includes(tool.category));
+        filtered = filtered.filter(_tool => selectedCategories.includes(_tool.category));
       }
       
       // Apply search filter
       if (searchQuery) {
         const lowerQuery = searchQuery.toLowerCase();
-        filtered = filtered.filter(tool => 
-          tool.name.toLowerCase().includes(lowerQuery) ||
-          tool.description.toLowerCase().includes(lowerQuery)
+        filtered = filtered.filter(_tool => 
+          _tool.name.toLowerCase().includes(lowerQuery) ||
+          _tool.description.toLowerCase().includes(lowerQuery)
         );
       }
       
       // Apply sort
       switch (sortOption) {
         case 'recent':
-          filtered.sort((a, b) => b.updatedAt - a.updatedAt);
+          filtered.sort((_a, _b) => _b.updatedAt - _a.updatedAt);
           break;
         case 'name':
-          filtered.sort((a, b) => a.name.localeCompare(b.name));
+          filtered.sort((_a, _b) => _a.name.localeCompare(_b.name));
           break;
         case 'usage':
-          filtered.sort((a, b) => b.usageCount - a.usageCount);
+          filtered.sort((_a, _b) => _b.usageCount - _a.usageCount);
           break;
       }
       
@@ -92,29 +92,29 @@ export function ToolManager() {
     }, 300);
   }, [tools, searchQuery, selectedCategories, sortOption]);
 
-  const handleCategoryToggle = (category: ToolCategory) => {
-    if (selectedCategories.includes(category)) {
-      setSelectedCategories(selectedCategories.filter(c => c !== category));
+  const handleCategoryToggle = (_category: ToolCategory) => {
+    if (selectedCategories.includes(_category)) {
+      setSelectedCategories(selectedCategories.filter(_c => _c !== _category));
     } else {
-      setSelectedCategories([...selectedCategories, category]);
+      setSelectedCategories([...selectedCategories, _category]);
     }
   };
 
-  const handleToggleCategory = (category: string) => {
+  const handleToggleCategory = (_category: string) => {
     setOpenCategories({
       ...openCategories,
-      [category]: !openCategories[category]
+      [_category]: !openCategories[_category]
     });
   };
 
   const groupToolsByCategory = () => {
     const grouped: Record<string, Tool[]> = {};
     
-    filteredTools.forEach(tool => {
-      if (!grouped[tool.category]) {
-        grouped[tool.category] = [];
+    filteredTools.forEach(_tool => {
+      if (!grouped[_tool.category]) {
+        grouped[_tool.category] = [];
       }
-      grouped[tool.category].push(tool);
+      grouped[_tool.category].push(_tool);
     });
     
     return grouped;
@@ -140,16 +140,16 @@ export function ToolManager() {
     'ai-integration': <PenTool className="h-4 w-4" />
   };
 
-  const getCategoryIcon = (category: ToolCategory) => {
-    return categoryIcons[category] || <Wrench className="h-4 w-4" />;
+  const getCategoryIcon = (_category: ToolCategory) => {
+    return categoryIcons[_category] || <Wrench className="h-4 w-4" />;
   };
 
-  const deleteTool = (id: string) => {
+  const deleteTool = (_id: string) => {
     if (window.confirm('Are you sure you want to delete this tool?')) {
-      const updatedTools = tools.filter(tool => tool.id !== id);
+      const updatedTools = tools.filter(_tool => _tool.id !== _id);
       setTools(updatedTools);
       
-      if (selectedTool?.id === id) {
+      if (selectedTool?.id === _id) {
         setSelectedTool(null);
       }
       
@@ -185,51 +185,51 @@ export function ToolManager() {
     
     return (
       <div className="space-y-4">
-        {categories.map((category) => (
-          <div key={category} className="border border-border rounded-lg overflow-hidden">
+        {categories.map((_category) => (
+          <div key={_category} className="border border-border rounded-lg overflow-hidden">
             <div 
               className="flex items-center justify-between p-3 bg-muted/30 cursor-pointer"
-              onClick={() => handleToggleCategory(category)}
+              onClick={() => handleToggleCategory(_category)}
             >
               <div className="flex items-center space-x-2">
-                {getCategoryIcon(category as ToolCategory)}
-                <span className="font-medium">{categoryDisplayNames[category as ToolCategory]}</span>
-                <Badge variant="outline">{groupedTools[category].length}</Badge>
+                {getCategoryIcon(_category as ToolCategory)}
+                <span className="font-medium">{categoryDisplayNames[_category as ToolCategory]}</span>
+                <Badge variant="outline">{groupedTools[_category].length}</Badge>
               </div>
-              {openCategories[category] ? (
+              {openCategories[_category] ? (
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
               ) : (
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               )}
             </div>
             
-            {openCategories[category] && (
+            {openCategories[_category] && (
               <div className="divide-y divide-border">
-                {groupedTools[category].map((tool) => (
+                {groupedTools[_category].map((_tool) => (
                   <div 
-                    key={tool.id} 
+                    key={_tool.id} 
                     className={`p-3 hover:bg-muted/30 cursor-pointer transition-colors ${
-                      selectedTool?.id === tool.id ? 'bg-muted' : ''
+                      selectedTool?.id === _tool.id ? 'bg-muted' : ''
                     }`}
-                    onClick={() => setSelectedTool(tool)}
+                    onClick={() => setSelectedTool(_tool)}
                   >
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-medium">
-                          {tool.name}
-                          {tool.isBuiltIn && (
+                          {_tool.name}
+                          {_tool.isBuiltIn && (
                             <Badge variant="secondary" className="ml-2 text-xs">Built-in</Badge>
                           )}
                         </h3>
-                        <p className="text-sm text-muted-foreground">{tool.description}</p>
+                        <p className="text-sm text-muted-foreground">{_tool.description}</p>
                       </div>
                       <div className="flex space-x-2">
-                        <Badge variant="outline" className="text-xs">v{tool.version}</Badge>
-                        {!tool.isBuiltIn && (
+                        <Badge variant="outline" className="text-xs">v{_tool.version}</Badge>
+                        {!_tool.isBuiltIn && (
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteTool(tool.id);
+                            onClick={(_e) => {
+                              _e.stopPropagation();
+                              deleteTool(_tool.id);
                             }}
                             className="text-muted-foreground hover:text-destructive"
                           >
@@ -273,7 +273,7 @@ export function ToolManager() {
                 type="text"
                 placeholder="Search tools..."
                 value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+                onChange={_e => setSearchQuery(_e.target.value)}
                 className="w-full pl-10 py-2 bg-muted/20 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
@@ -293,18 +293,18 @@ export function ToolManager() {
                 
                 <div className="flex flex-wrap gap-1 px-1">
                   {(['data-processing', 'web-scraping', 'code-generation', 'visualization', 'utility', 'database', 'ai-integration'] as ToolCategory[])
-                    .map((category) => (
+                    .map((_category) => (
                       <button
-                        key={category}
+                        key={_category}
                         className={`px-2 py-0.5 rounded-full text-xs ${
-                          selectedCategories.includes(category)
+                          selectedCategories.includes(_category)
                             ? 'bg-primary text-white'
                             : 'bg-muted/50 text-muted-foreground'
                         }`}
-                        onClick={() => handleCategoryToggle(category)}
+                        onClick={() => handleCategoryToggle(_category)}
                       >
-                        {getCategoryIcon(category)}
-                        <span className="ml-1">{categoryDisplayNames[category]}</span>
+                        {getCategoryIcon(_category)}
+                        <span className="ml-1">{categoryDisplayNames[_category]}</span>
                       </button>
                     ))
                   }
@@ -552,15 +552,15 @@ function ToolDetail({ tool }: ToolDetailProps) {
               <Card>
                 <CardContent className="p-4">
                   <div className="space-y-2">
-                    {[0, 1, 2].map((i) => (
-                      <div key={i} className="text-sm p-2 border-b border-border last:border-0">
+                    {[0, 1, 2].map((_i) => (
+                      <div key={_i} className="text-sm p-2 border-b border-border last:border-0">
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">{new Date(Date.now() - 1000 * 60 * 60 * (i + 2)).toLocaleString()}</span>
+                          <span className="text-muted-foreground">{new Date(Date.now() - 1000 * 60 * 60 * (_i + 2)).toLocaleString()}</span>
                           <Badge variant="outline" className="text-xs">Success</Badge>
                         </div>
                         <p className="mt-1">
-                          {i === 0 ? `Processed data with parameters: limit=50, format="json"` : 
-                           i === 1 ? `Analyzed text with options: language="en", sentiment=true` :
+                          {_i === 0 ? `Processed data with parameters: limit=50, format="json"` : 
+                           _i === 1 ? `Analyzed text with options: language="en", sentiment=true` :
                            `Generated report with type="summary", length="short"`}
                         </p>
                       </div>
